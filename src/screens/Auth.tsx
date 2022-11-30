@@ -12,6 +12,7 @@ import React, {useState} from 'react';
 import SVG from './../assets/svg';
 import constants from '../assets/constants';
 import {Dimensions} from 'react-native';
+import SignIn from './SignIn';
 // import Modal from 'react-native-modal';
 const WIDTH = Dimensions.get('window').width;
 export default function Auth() {
@@ -39,28 +40,24 @@ export default function Auth() {
     setpopUpErr(show_popup);
     setOverlayText(overlay_text);
   };
-  const temp = () => {
-    return (
-      <View style={styles.container}>
-        <View style={styles.logo}>
-          <SVG.HereLogo viewBox="-31 0 150 150" width={200} height={200} />
-        </View>
-        <Text>Auth</Text>
-      </View>
-    );
-  };
+  //   const temp = () => {
+  //     return (
+  //       <View style={styles.container}>
+  //         <View style={styles.logo}>
+  //           <SVG.HereLogo viewBox="-31 0 150 150" width={200} height={200} />
+  //         </View>
+  //         <Text>Auth</Text>
+  //       </View>
+  //     );
+  //   };
   const Temp2 = () => {
     return (
       //   <SafeAreaView>
       <View style={styles.container}>
         <View style={styles.topSection}>
-          <View style={styles.logo}>
-            <SVG.HereLogo width="200" height="200" />
-          </View>
+          <SVG.HereLogo width="200" height="200" />
         </View>
-        <View style={styles.bottomSection}>
-          <Text>asdasd</Text>
-        </View>
+        <SignIn />
       </View>
       //   </SafeAreaView>
     );
@@ -76,37 +73,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: constants.colors.BGC,
   },
-  logo: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: WIDTH / 10,
-  },
   topSection: {
     // display: 'flex',
+    marginRight: WIDTH / 10,
     flex: 1,
     width: '100%',
-
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: constants.colors.BGC,
     // height: '30%',
   },
-  bottomSection: {
-    // display: 'flex',
-    flex: 2,
-    width: '100%',
-    backgroundColor: constants.colors.OFF_WHITE,
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-  },
+
   body: {
     flex: 1,
     backgroundColor: constants.colors.BGC,
     flexDirection: 'column',
     justifyContent: 'space-between',
   },
-
+  textlogo: {
+    // fontFamily: 'Montserrat-Regular',
+    fontSize: 40,
+    color: constants.colors.GREEN,
+  },
   inputText: {
     height: 52,
     width: '100%',

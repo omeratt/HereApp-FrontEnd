@@ -11,6 +11,7 @@
 import {NavigationContainer} from '@react-navigation/native';
 import React, {type PropsWithChildren} from 'react';
 import {
+  I18nManager,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -21,7 +22,8 @@ import {
 
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import MainStack from './src/MainStack';
-
+I18nManager.forceRTL(true);
+// I18nManager.swapLeftAndRightInRTL(true);
 const App = () => {
   return (
     <>

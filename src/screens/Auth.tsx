@@ -13,6 +13,8 @@ import SVG from './../assets/svg';
 import constants from '../assets/constants';
 import {Dimensions} from 'react-native';
 import SignIn from './SignIn';
+import SignUp from './SignUp';
+
 // import Modal from 'react-native-modal';
 const WIDTH = Dimensions.get('window').width;
 export default function Auth() {
@@ -40,26 +42,18 @@ export default function Auth() {
     setpopUpErr(show_popup);
     setOverlayText(overlay_text);
   };
-  //   const temp = () => {
-  //     return (
-  //       <View style={styles.container}>
-  //         <View style={styles.logo}>
-  //           <SVG.HereLogo viewBox="-31 0 150 150" width={200} height={200} />
-  //         </View>
-  //         <Text>Auth</Text>
-  //       </View>
-  //     );
-  //   };
+  const [signInScreen, setSignInScreen] = useState<boolean>(true);
+
   const Temp2 = () => {
     return (
-      //   <SafeAreaView>
       <View style={styles.container}>
         <View style={styles.topSection}>
           <SVG.HereLogo width="200" height="200" />
         </View>
-        <SignIn />
+        {signInScreen ? <SignIn /> : <SignUp />}
+
+        {/* <SignIn2 /> */}
       </View>
-      //   </SafeAreaView>
     );
   };
   return <Temp2 />;
@@ -67,42 +61,17 @@ export default function Auth() {
 
 const styles = StyleSheet.create({
   container: {
-    // display: 'flex',
     flex: 1,
     height: '100%',
     alignItems: 'center',
     backgroundColor: constants.colors.BGC,
   },
   topSection: {
-    // display: 'flex',
     marginRight: WIDTH / 10,
     flex: 1,
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: constants.colors.BGC,
-    // height: '30%',
-  },
-
-  body: {
-    flex: 1,
-    backgroundColor: constants.colors.BGC,
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-  },
-  textlogo: {
-    // fontFamily: 'Montserrat-Regular',
-    fontSize: 40,
-    color: constants.colors.GREEN,
-  },
-  inputText: {
-    height: 52,
-    width: '100%',
-    color: constants.colors.GREY,
-    borderRadius: 10,
-    marginTop: 10,
-    borderWidth: 1,
-    borderColor: constants.colors.GREY,
-    paddingLeft: 10,
   },
 });

@@ -8,13 +8,13 @@
       <feComposite in="SourceGraphic"/>
     </filter>
   </defs>
-  <g id="Group_47" data-name="Group 47" transform="translate(-133.5 -839.612)">
-    <g transform="matrix(1, 0, 0, 1, 133.5, 839.61)" filter="url(#Rectangle_68)">
+  <g id="Group_47" data-name="Group 47" transform="translate(-133.897 -839.754)">
+    <g transform="matrix(1, 0, 0, 1, 133.9, 839.75)" filter="url(#Rectangle_68)">
       <g id="Rectangle_68-2" data-name="Rectangle 68" transform="translate(9 6)" fill="none" stroke="#cec3a6" stroke-width="1">
         <rect width="104.794" height="40.754" rx="20" stroke="none"/>
         <rect x="0.5" y="0.5" width="103.794" height="39.754" rx="19.5" fill="none"/>
       </g>
     </g>
-    <text id="Done" transform="translate(168.766 872.01)" font-size="19" font-family="Montserrat-Regular, Montserrat"><tspan x="0" y="0">Done</tspan></text>
+    <text id="Done" transform="translate(168.897 872.754)" font-size="19" font-family="Montserrat-Regular, Montserrat"><tspan x="0" y="0">Done</tspan></text>
   </g>
 </svg>

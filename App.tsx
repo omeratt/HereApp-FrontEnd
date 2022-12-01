@@ -22,12 +22,15 @@ import {
 
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import MainStack from './src/MainStack';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 I18nManager.forceRTL(true);
 // I18nManager.swapLeftAndRightInRTL(true);
 const App = () => {
   return (
     <>
-      <MainStack />
+      <GestureHandlerRootView style={{flex: 1}}>
+        <MainStack />
+      </GestureHandlerRootView>
     </>
   );
 };

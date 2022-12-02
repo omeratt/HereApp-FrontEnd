@@ -1,6 +1,6 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React from 'react';
-import TextInput from '../components/TextInput';
+import React, {useRef} from 'react';
+import TextInput, {InputHandle} from '../components/TextInput';
 import constants from '../assets/constants';
 import * as Yup from 'yup';
 import {Formik} from 'formik';
@@ -30,6 +30,11 @@ const userInfo = {
   confirmPassword: '',
 };
 export default function SignUpForm({hideScreen, ErrTxt}: props) {
+  const refs = Array.from(Array(3), () => useRef<InputHandle>(null));
+
+  const onSubmitEditing = (index: number) => {
+    refs[index]?.current?.onFocus();
+  };
   const submit = (values: typeof userInfo) => {
     //todo submit values and hide screen with hideScreen function
     console.log(values);
@@ -58,28 +63,34 @@ export default function SignUpForm({hideScreen, ErrTxt}: props) {
             placeholder="Email"
             keyboardType="email-address"
             onBlur={() => setFieldTouched('email')}
+            onSubmitEditing={() => onSubmitEditing(0)}
           />
           <ErrTxt txt={errors.email} touched={touched.email} />
 
           <TextInput
+            ref={refs[0]}
             onChangeText={handleChange('fullName')}
             value={values.fullName}
             placeholder="Full Name"
             keyboardType="name-phone-pad"
             onBlur={() => setFieldTouched('fullName')}
+            onSubmitEditing={() => onSubmitEditing(1)}
           />
           <ErrTxt txt={errors.fullName} touched={touched.fullName} />
 
           <TextInput
+            ref={refs[1]}
             onChangeText={handleChange('password')}
             value={values.password}
             secureTextEntry
             placeholder="Password"
             onBlur={() => setFieldTouched('password')}
+            onSubmitEditing={() => onSubmitEditing(2)}
           />
           <ErrTxt txt={errors.password} touched={touched.password} />
 
           <TextInput
+            ref={refs[2]}
             onChangeText={handleChange('confirmPassword')}
             value={values.confirmPassword}
             secureTextEntry

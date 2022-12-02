@@ -6,24 +6,41 @@ import {
   TextInputProps,
   Dimensions,
 } from 'react-native';
-import React from 'react';
+import React, {forwardRef, useImperativeHandle, useRef, useState} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import constants from '../assets/constants';
 
-export default function TextInput(props: TextInputProps) {
-  const [isSecurePass, setSecurePass] = React.useState<boolean>(
+export interface InputHandle {
+  getValue: () => string;
+  onFocus: () => void;
+}
+const TextInput = forwardRef<InputHandle, TextInputProps>((props, ref) => {
+  const [isSecurePass, setSecurePass] = useState(
     props.secureTextEntry ? true : false,
   );
+  const [value, setValue] = useState('');
+  const textInputRef = useRef<Input>(null);
   const handleEyeIconPress = () => {
     setSecurePass(!isSecurePass);
   };
+  useImperativeHandle(ref, () => ({
+    getValue: () => value,
+    onFocus: () => textInputRef.current?.focus(),
+  }));
   return (
     <View style={styles.container}>
       <Input
         {...props}
-        style={[styles.textInput, props.style]}
+        style={
+          props.value?.length == 0
+            ? [styles.textInput, props.style, styles.placeHolder]
+            : [styles.textInput, props.style]
+        }
         secureTextEntry={isSecurePass}
-        placeholderTextColor={constants.colors.BGC}
+        placeholderTextColor={constants.colors.GREY}
+        returnKeyType={props.onSubmitEditing ? 'next' : 'done'}
+        blurOnSubmit={props.onSubmitEditing ? false : true}
+        ref={textInputRef}
       />
 
       {props.secureTextEntry && (
@@ -36,8 +53,8 @@ export default function TextInput(props: TextInputProps) {
       )}
     </View>
   );
-}
-
+});
+export default TextInput;
 const styles = StyleSheet.create({
   container: {
     // width: '100%',
@@ -58,8 +75,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     color: constants.colors.BGC,
     right: 0.7 * constants.WIDTH - 20,
-    // flex: 1,
-    // fontSize: 40,
-    // textAlign: 'right',
+  },
+  placeHolder: {
+    fontWeight: '300',
   },
 });

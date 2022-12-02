@@ -1,9 +1,10 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
-import TextInput from '../components/TextInput';
+import TextInput, {InputHandle} from '../components/TextInput';
 import constants from '../assets/constants';
 import * as Yup from 'yup';
 import {Formik} from 'formik';
+
 interface props {
   hideScreen: () => void;
   ErrTxt: ({txt}: any, {touched}: any) => JSX.Element | any;
@@ -29,11 +30,17 @@ const userInfo = {
   password: '',
   confirmPassword: '',
 };
+
 export default function SignInForm({hideScreen, ErrTxt}: props) {
+  const SecondInputRef = React.useRef<InputHandle>(null);
+  const onSubmitEditing = () => {
+    SecondInputRef?.current?.onFocus();
+  };
   const submit = (values: typeof userInfo) => {
     //todo submit values and hide screen with hideScreen function
     console.log(values);
   };
+
   return (
     <Formik
       initialValues={userInfo}
@@ -55,10 +62,12 @@ export default function SignInForm({hideScreen, ErrTxt}: props) {
             placeholder="Email"
             keyboardType="email-address"
             onBlur={() => setFieldTouched('email')}
+            onSubmitEditing={onSubmitEditing}
           />
           <ErrTxt txt={errors.email} touched={touched.email} />
 
           <TextInput
+            ref={SecondInputRef}
             onChangeText={handleChange('password')}
             value={values.password}
             secureTextEntry

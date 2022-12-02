@@ -1,7 +1,6 @@
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
-import React, {Ref, RefObject, useEffect} from 'react';
+import {ListRenderItem, ScrollView, StyleSheet, Text, View} from 'react-native';
+import React, {useEffect} from 'react';
 import constants from '../assets/constants';
-import TextInput from '../components/TextInput';
 import {TouchableOpacity} from 'react-native';
 import SVG from '../assets/svg';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -12,6 +11,8 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import {FlatList} from 'react-native-gesture-handler';
+import SignInForm from './SignInForm';
+import SignUpForm from './SignUpForm';
 
 const ZERO = 0.00000000000000001;
 const SPRING_CONFIG: WithSpringConfig = {
@@ -22,79 +23,77 @@ const SPRING_CONFIG: WithSpringConfig = {
   stiffness: 500,
   mass: 130,
 };
-interface screenTxt {
-  signIn: boolean;
-  forgotTxt: string | undefined;
-  buttonTxt: string;
-  navigationTxt: string;
-  bottomTxt: string;
+interface RenderItemProps {
+  navigationTxt?: string;
+  bottomTxt?: string;
+  nextPage: () => void;
+  component?: JSX.Element;
 }
-const screenText: screenTxt[] = [
-  {
-    signIn: true,
-    forgotTxt: 'Forgot Password ?',
-    buttonTxt: 'Sign In',
-    navigationTxt: 'Sign up',
-    bottomTxt: "Don't have an account?",
-  },
-  {
-    signIn: false,
-    forgotTxt: undefined,
-    buttonTxt: 'Sign Up',
-    navigationTxt: 'Sign in',
-    bottomTxt: 'Already have an account?',
-  },
-];
-export default function SignIn() {
+
+export default function AuthModal() {
   const ref = React.useRef<FlatList>(null);
   const flex = useSharedValue(ZERO);
   const style = useAnimatedStyle(() => {
     return {flex: flex.value};
   });
-
+  const transformValue = (toValue: number, duration: number = 130) => {
+    flex.value = withSpring(toValue, {...SPRING_CONFIG, mass: duration});
+  };
   useEffect(() => {
     const timer = setTimeout(() => {
-      flex.value = withSpring(1.7, SPRING_CONFIG);
+      transformValue(1.7);
     }, 500);
     return () => clearTimeout(timer);
   }, []);
   const goToSignUp = () => {
     ref.current?.scrollToIndex({index: 1, animated: true});
-    flex.value = withSpring(5, {...SPRING_CONFIG, mass: 1});
+    transformValue(5, 1.5);
   };
   const goToSignIn = () => {
     ref.current?.scrollToIndex({index: 0});
-
-    flex.value = withSpring(1.7, {...SPRING_CONFIG, mass: 1});
+    transformValue(1.7, 1.5);
   };
 
-  const renderItem = ({item}: any) => (
+  const hideScreen = () => {
+    transformValue(ZERO, 1.5);
+  };
+  const ErrTxt = ({txt, touched}: {txt: any; touched: boolean}) => {
+    if (touched && txt) {
+      return (
+        <View
+          style={{
+            alignItems: 'flex-end',
+            width: '70%',
+            padding: '1%',
+          }}>
+          <Text style={[styles.errors]}>{txt}</Text>
+        </View>
+      );
+    } else null;
+  };
+  const screenData: RenderItemProps[] = [
+    {
+      navigationTxt: 'Sign up',
+      component: <SignInForm hideScreen={hideScreen} ErrTxt={ErrTxt} />,
+      bottomTxt: "Don't have an account?",
+      nextPage: goToSignUp,
+    },
+    {
+      navigationTxt: 'Sign in',
+      component: <SignUpForm hideScreen={hideScreen} ErrTxt={ErrTxt} />,
+      bottomTxt: 'Already have an account?',
+      nextPage: goToSignIn,
+    },
+  ];
+
+  const renderItem: ListRenderItem<RenderItemProps> = ({item}) => (
     <Animated.View style={[styles.container, style]}>
       <ScrollView
         style={{width: '100%'}}
         contentContainerStyle={[{flexGrow: 2, alignItems: 'center'}]}>
-        <TextInput placeholder="Email" keyboardType="email-address" />
-        <TextInput secureTextEntry placeholder="Password" />
-        {item.forgotTxt && (
-          <View
-            style={{marginTop: '10%', width: '70%', alignItems: 'flex-end'}}>
-            <Text style={[styles.forgotPassword]}>{item.forgotTxt}</Text>
-          </View>
-        )}
-
-        <View style={{marginTop: '10%'}}>
-          <TouchableOpacity style={styles.button}>
-            <Text style={[styles.text]}>{item.buttonTxt}</Text>
-          </TouchableOpacity>
-        </View>
+        {item.component}
         <View style={styles.bottomContainer}>
-          {/* <TouchableOpacity>
-    <SVG.DoneButton fill={constants.colors.BGC} />
-</TouchableOpacity> */}
-          <TouchableOpacity
-            onPress={() => {
-              item.signIn ? goToSignUp() : goToSignIn();
-            }}>
+          <TouchableOpacity onPress={item.nextPage}>
             <Text style={[styles.text, {color: constants.colors.UNDER_LINE}]}>
               {item.navigationTxt}
             </Text>
@@ -109,7 +108,7 @@ export default function SignIn() {
       <FlatList
         ref={ref}
         renderItem={renderItem}
-        data={screenText}
+        data={screenData}
         horizontal
         inverted
         scrollEnabled={false}
@@ -124,25 +123,19 @@ const styles = StyleSheet.create({
     width: constants.WIDTH,
   },
   flatList: {
-    // flex: 1,
     width: constants.WIDTH,
     backgroundColor: constants.colors.OFF_WHITE,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     alignItems: 'center',
-    // justifyContent: 'center',
-    // alignItems: 'center',
   },
   bottomContainer: {
-    // marginTop: '5%',
-    // backgroundColor: constants.colors.BGC,
     flex: 1,
     paddingBottom: '10%',
     alignItems: 'flex-end',
     justifyContent: 'space-between',
     width: '70%',
     flexDirection: 'row',
-    // top: 0,
   },
   button: {
     borderRadius: 20,
@@ -163,5 +156,11 @@ const styles = StyleSheet.create({
     color: constants.colors.BGC,
     paddingLeft: '1%',
     fontSize: 13,
+  },
+  errors: {
+    color: 'red',
+    textAlign: 'right',
+    fontSize: 12,
+    fontWeight: '400',
   },
 });

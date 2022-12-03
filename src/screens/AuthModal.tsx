@@ -15,7 +15,7 @@ import SignInForm from './SignInForm';
 import SignUpForm from './SignUpForm';
 
 const ZERO = 0.00000000000000001;
-const SPRING_CONFIG: WithSpringConfig = {
+export const SPRING_CONFIG: WithSpringConfig = {
   damping: 80,
   overshootClamping: true,
   restDisplacementThreshold: 0.1,

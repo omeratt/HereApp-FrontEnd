@@ -48,6 +48,11 @@ export default function Line({
       duration: 2000,
     });
   };
+  const endAnimation = () => {
+    animation.value = withTiming(0, {
+      duration: 2000,
+    });
+  };
   const inner = React.useCallback(() => {
     startAnimation();
   }, []);

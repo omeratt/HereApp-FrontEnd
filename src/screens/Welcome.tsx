@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
 import constants from '../assets/constants';
 import Line from '../components/Line';
@@ -60,15 +60,38 @@ export default function Welcome() {
           style={[
             {
               width: '79%',
-              height: '115%',
-              justifyContent: 'center',
-              alignItems: 'center',
-              // opacity: 0.5,
-              // transform: [{translateX: -260}],
+              // height: '100%',
+              justifyContent: 'flex-start',
+              alignItems: 'flex-end',
+              // backgroundColor: 'blue',
+              paddingRight: '10%',
+              // display: 'flex',
             },
             style,
           ]}>
-          <SVG.Hi width={220} height={220} />
+          <View
+            style={{
+              // height: '100%',
+              // backgroundColor: 'white',
+              justifyContent: 'flex-start',
+              alignItems: 'flex-start',
+              // marginBottom: '30%',
+            }}>
+            <SVG.Hi width={210} height={220} />
+          </View>
+          <TouchableOpacity
+            style={{
+              height: '20%',
+              width: 150,
+              // backgroundColor: 'red',
+              // justifyContent: 'flex-start',
+              alignItems: 'flex-end',
+              // marginLeft: '30%',
+              transform: [{translateX: -8}, {translateY: 10}],
+            }}
+            onPress={() => {}}>
+            <SVG.StartButton viewBox="0 0 200 200" width={150} height={150} />
+          </TouchableOpacity>
         </Animated.View>
       </View>
 
@@ -79,7 +102,7 @@ export default function Welcome() {
           width: '79%',
           height: '23.6%',
         }}>
-        <Line vertical lengthPercentage={77} />
+        <Line vertical lengthPercentage={45} />
       </View>
       <View style={[styles.cubeContainer, {height: '8.8%'}]}>
         <View style={styles.thirdLine}>

@@ -4,6 +4,7 @@ const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
 
 const constants = {
+  baseUrl: 'https://here.cyclic.app/',
   colors: {
     GREEN: '#D0FD0C',
     BLACK: '#000000',

@@ -23,13 +23,20 @@ import {
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import MainStack from './src/MainStack';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {Provider} from 'react-redux';
+import {persistor, store} from './src/app/store';
+import {PersistGate} from 'redux-persist/integration/react';
 I18nManager.forceRTL(true);
 // I18nManager.swapLeftAndRightInRTL(true);
 const App = () => {
   return (
     <>
       <GestureHandlerRootView style={{flex: 1}}>
-        <MainStack />
+        <PersistGate persistor={persistor} loading={<Text>Loading...</Text>}>
+          <Provider store={store}>
+            <MainStack />
+          </Provider>
+        </PersistGate>
       </GestureHandlerRootView>
     </>
   );

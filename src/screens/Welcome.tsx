@@ -9,8 +9,14 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import {selectUser, setUser} from '../app/Reducers/User/userSlice';
+import {useAppDispatch, useAppSelector} from '../app/hooks';
+import {RootState} from '../app/store';
 
 export default function Welcome() {
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(selectUser);
+  console.log(user);
   const slide = useSharedValue(-260);
 
   const transformValue = () => {
@@ -89,7 +95,9 @@ export default function Welcome() {
               // marginLeft: '30%',
               transform: [{translateX: -8}, {translateY: 10}],
             }}
-            onPress={() => {}}>
+            onPress={() => {
+              dispatch(setUser({name: 'omer'}));
+            }}>
             <SVG.StartButton viewBox="0 0 200 200" width={150} height={150} />
           </TouchableOpacity>
         </Animated.View>

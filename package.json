@@ -10,11 +10,13 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^1.17.11",
     "@react-navigation/bottom-tabs": "^6.4.3",
     "@react-navigation/drawer": "^6.5.3",
     "@react-navigation/native": "^6.0.16",
     "@react-navigation/native-stack": "^6.9.4",
     "@reduxjs/toolkit": "^1.9.1",
+    "@types/react-redux": "^7.1.24",
     "formik": "^2.2.9",
     "react": "18.1.0",
     "react-native": "0.70.6",
@@ -25,6 +27,8 @@
     "react-native-screens": "^3.18.2",
     "react-native-svg": "^13.6.0",
     "react-native-vector-icons": "^9.2.0",
+    "react-redux": "^8.0.5",
+    "redux-persist": "^6.0.0",
     "yup": "^0.32.11"
   },
   "devDependencies": {
@@ -37,6 +41,7 @@
     "@types/react-native": "^0.70.6",
     "@types/react-native-vector-icons": "^6.4.12",
     "@types/react-test-renderer": "^18.0.0",
+    "@types/redux-persist": "^4.3.1",
     "@typescript-eslint/eslint-plugin": "^5.37.0",
     "@typescript-eslint/parser": "^5.37.0",
     "babel-jest": "^26.6.3",

@@ -11,6 +11,7 @@ export interface UserState {
   isSignIn?: boolean;
   img?: string;
   tasks?: TaskType[];
+  token?: string;
 }
 export interface TaskType {
   _id?: string;
@@ -25,6 +26,7 @@ const initialState: UserState = {
   password: '',
   img: undefined,
   isSignIn: false,
+  token: '',
 };
 
 export const userSlice = createSlice({
@@ -43,12 +45,21 @@ export const userSlice = createSlice({
       state = {...state, ...action.payload};
       return state;
     },
+    login: (state, action: PayloadAction<UserState>) => {
+      state = {...state, ...action.payload};
+      return state;
+    },
+    logout: (state, action: PayloadAction<UserState>) => {
+      state = initialState;
+      return state;
+    },
   },
 });
 
-export const {setUser} = userSlice.actions;
+export const {setUser, login, logout} = userSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectUser = (state: RootState) => state.reducer.user;
+export const selectUserToken = (state: RootState) => state.reducer.user.token;
 
 export default userSlice.reducer;

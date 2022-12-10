@@ -13,6 +13,7 @@ import {
 import userSlice from './Reducers/User/userSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {userApi} from './api/userApi';
+import {setupListeners} from '@reduxjs/toolkit/dist/query';
 // ...
 
 const persistConfig = {
@@ -38,6 +39,7 @@ export const store = configureStore({
       },
     }).concat(userApi.middleware),
 });
+setupListeners(store.dispatch);
 export let persistor = persistStore(store);
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>;

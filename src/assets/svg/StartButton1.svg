@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="177" height="69" viewBox="0 0 177 69">
+  <defs>
+    <filter id="Rectangle_158" x="0" y="0" width="177" height="69" filterUnits="userSpaceOnUse">
+      <feOffset dy="3" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feFlood flood-opacity="0.161"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="Group_130" data-name="Group 130" transform="translate(-21 -513.5)">
+    <g transform="matrix(1, 0, 0, 1, 21, 513.5)" filter="url(#Rectangle_158)">
+      <g id="Rectangle_158-2" data-name="Rectangle 158" transform="translate(9 6)" fill="none" stroke="#d0fd0c" stroke-width="1">
+        <rect width="159" height="51" rx="19" stroke="none"/>
+        <rect x="0.5" y="0.5" width="158" height="50" rx="18.5" fill="none"/>
+      </g>
+    </g>
+    <text id="Let_s_start" data-name="Let’s start" transform="translate(96 551.564)" fill="#f5f1e6" stroke="#f5f1e6" stroke-width="1" font-size="20" font-family="Montserrat-Thin, Montserrat" font-weight="200"><tspan x="-46.36" y="0">Let’s start</tspan></text>
+    <path id="Icon_ionic-ios-arrow-back" data-name="Icon ionic-ios-arrow-back" d="M16.28,12.489,11.515,7.727A.9.9,0,1,1,12.79,6.457l5.4,5.395a.9.9,0,0,1,.026,1.241l-5.421,5.432a.9.9,0,1,1-1.275-1.271Z" transform="translate(158.247 532.074)" fill="#f5f1e6"/>
+  </g>
+</svg>

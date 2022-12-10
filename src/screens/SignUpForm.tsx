@@ -4,6 +4,8 @@ import TextInput, {InputHandle} from '../components/TextInput';
 import constants from '../assets/constants';
 import * as Yup from 'yup';
 import {Formik} from 'formik';
+import {useSignupMutation} from '../app/api/userApi';
+
 interface props {
   hideScreen: () => void;
   ErrTxt: ({txt}: any, {touched}: any) => JSX.Element | any;
@@ -31,14 +33,21 @@ const userInfo = {
 };
 export default function SignUpForm({hideScreen, ErrTxt}: props) {
   const refs = Array.from(Array(3), () => useRef<InputHandle>(null));
+  const [signup, {isLoading, data}] = useSignupMutation();
 
   const onSubmitEditing = (index: number) => {
     refs[index]?.current?.onFocus();
   };
-  const submit = (values: typeof userInfo) => {
-    //todo submit values and hide screen with hideScreen function
+
+  const submit = async (values: typeof userInfo) => {
+    //TODO: submit values and hide screen with hideScreen function
+
     console.log(values);
+    await signup(values);
   };
+  React.useEffect(() => {
+    console.log(data);
+  }, [isLoading]);
   return (
     <Formik
       initialValues={userInfo}

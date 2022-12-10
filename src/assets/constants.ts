@@ -5,6 +5,7 @@ const HEIGHT = Dimensions.get('window').height;
 
 const constants = {
   baseUrl: 'https://here.cyclic.app/',
+  localHost: 'http://localhost:3000/',
   colors: {
     GREEN: '#D0FD0C',
     BLACK: '#000000',

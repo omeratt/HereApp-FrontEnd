@@ -74,6 +74,7 @@ export default function AuthModal() {
   };
   const screenData: RenderItemProps[] = [
     {
+      //TODO: loading
       navigationTxt: 'Sign up',
       component: (
         <SignInForm
@@ -86,6 +87,7 @@ export default function AuthModal() {
       nextPage: goToSignUp,
     },
     {
+      //TODO: loading
       navigationTxt: 'Sign in',
       component: (
         <SignUpForm

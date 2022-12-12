@@ -25,7 +25,7 @@ export default function Auth() {
           style={styles.Logo}>
           HERE
         </Text> */}
-        <SVG.HereLogo width="200" height="200" />
+        <SVG.HereLogo width="70%" height="50%" />
       </View>
       <AuthModal />
     </View>
@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     backgroundColor: constants.colors.BGC,
   },
   topSection: {
-    marginRight: WIDTH / 10,
+    // marginRight: WIDTH / 10,
     flex: 1,
     width: '100%',
     alignItems: 'center',

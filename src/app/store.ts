@@ -19,7 +19,7 @@ import {setupListeners} from '@reduxjs/toolkit/dist/query';
 const persistConfig = {
   key: 'userReducer',
   storage: AsyncStorage,
-  whiteList: ['name'],
+  //   whiteList: ['name'],
   //   version: 1,
 };
 
@@ -29,6 +29,7 @@ export const store = configureStore({
   reducer: {
     [userApi.reducerPath]: userApi.reducer,
     reducer: rootReducer,
+
     // comments: commentsReducer,
     // users: usersReducer,
   },

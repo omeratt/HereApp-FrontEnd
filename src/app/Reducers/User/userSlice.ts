@@ -49,8 +49,8 @@ export const userSlice = createSlice({
       state = {...state, ...action.payload};
       return state;
     },
-    logout: (state, action: PayloadAction<UserState>) => {
-      state = initialState;
+    logout: state => {
+      state = {...initialState};
       return state;
     },
   },
@@ -61,5 +61,6 @@ export const {setUser, login, logout} = userSlice.actions;
 // Other code such as selectors can use the imported `RootState` type
 export const selectUser = (state: RootState) => state.reducer.user;
 export const selectUserToken = (state: RootState) => state.reducer.user.token;
+export const selectIsSignIn = (state: RootState) => state.reducer.user.isSignIn;
 
 export default userSlice.reducer;

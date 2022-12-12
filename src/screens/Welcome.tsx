@@ -1,5 +1,5 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import constants from '../assets/constants';
 import Line from '../components/Line';
 import SVG from '../assets/svg';
@@ -9,14 +9,15 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import {selectUser, setUser} from '../app/Reducers/User/userSlice';
+import {logout, selectUser, setUser} from '../app/Reducers/User/userSlice';
 import {useAppDispatch, useAppSelector} from '../app/hooks';
 import {RootState} from '../app/store';
+import {useLogoutMutation} from '../app/api/userApi';
 
 export default function Welcome() {
   const dispatch = useAppDispatch();
-  const user = useAppSelector(selectUser);
-  console.log(user);
+  // const user = useAppSelector(selectUser);
+  // console.log(user);
   const slide = useSharedValue(-260);
 
   const transformValue = () => {
@@ -34,8 +35,25 @@ export default function Welcome() {
       slide.value = -260;
     };
   }, []);
+
+  const [Logout, {isLoading, data, isSuccess, isError, error}] =
+    useLogoutMutation();
+  useEffect(() => {
+    if (data) {
+      console.log('logout', data);
+    }
+    if (error) {
+      console.log('logoutError', error);
+    }
+  }, [data, error]);
+
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+        style={{alignItems: 'center', justifyContent: 'center'}}
+        onPress={async () => await Logout(null)}>
+        <Text>logout</Text>
+      </TouchableOpacity>
       <View style={[styles.cubeContainer, {height: '11.2%'}]}>
         <View
           style={{
@@ -96,7 +114,7 @@ export default function Welcome() {
               transform: [{translateX: -8}, {translateY: 10}],
             }}
             onPress={() => {
-              dispatch(setUser({name: 'omer'}));
+              dispatch(logout());
             }}>
             <SVG.StartButton viewBox="0 0 200 200" width={150} height={150} />
           </TouchableOpacity>

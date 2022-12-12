@@ -1,68 +1,106 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import constants from '../../assets/constants';
+import {login, logout} from '../Reducers/User/userSlice';
+import {store} from '../store';
+import CookieManager from '@react-native-cookies/cookies';
 
 export const userApi = createApi({
   reducerPath: 'userApi',
-  baseQuery: fetchBaseQuery({baseUrl: 'localhost:3000/signup'}),
-  tagTypes: ['user'],
+  baseQuery: fetchBaseQuery({baseUrl: constants.BASE_URL}),
+
+  tagTypes: ['Users', 'Tasks'],
   endpoints: builder => ({
+    home: builder.query({
+      query: () => '/',
+    }),
     signup: builder.mutation(
       {
-        query: (user: any) => ({
-          url: '/',
-          //   body: JSON.stringify(user),
-          //   credentials: 'include',
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
+        query: user => ({
+          url: 'signup',
+          body: user,
+          credentials: 'include',
+          method: 'post',
         }),
-        transformResponse: (response: any, meta, arg) => response.data,
+        transformResponse: (response: any, meta, arg) => {
+          return response.data;
+        },
+        // invalidatesTags: ['Users'],
+        // providesTags:['Users']
       },
 
       //   providesTags: () => 'user',
     ),
-    // setUser: builder.mutation({
-    //     query: () => ({
+    login: builder.mutation({
+      query: user => ({
+        url: 'login',
+        body: user,
+        credentials: 'include',
+        method: 'post',
+      }),
+      transformResponse: async (response: any, meta, arg) => {
+        store?.dispatch(
+          login({...response.data, isSignIn: response?.data.signIn}),
+        );
+        // console.log(response, meta, arg);
+        // console.log(meta);
+        // console.log(arg);
+        const {accessToken, refreshToken} = response.data;
+        await CookieManager.set(
+          constants.BASE_URL,
+          {
+            name: 'accessToken',
+            value: accessToken,
+            httpOnly: true,
+          },
+          true,
+        );
 
-    //     }),
-
-    //     //   providesTags
-    //   }),
+        await CookieManager.set(
+          constants.BASE_URL,
+          {
+            name: 'refreshToken',
+            value: refreshToken,
+            httpOnly: true,
+          },
+          true,
+        );
+        return response.data;
+      },
+      invalidatesTags: ['Users'],
+      // providesTags:['Users']
+    }),
+    myProfile: builder.query({
+      query: () => ({
+        url: 'user/myProfile',
+      }),
+      transformResponse: (response: any) => {
+        //   store?.dispatch(login(response.data));
+        return response.data;
+      },
+      transformErrorResponse: (response: any) => {
+        return response.data;
+      },
+      providesTags: ['Users'],
+    }),
+    logout: builder.mutation({
+      query: () => ({
+        url: 'logout',
+        credentials: 'include',
+        method: 'post',
+      }),
+      transformResponse: (response: any, meta, arg) => {
+        // store?.dispatch(login(response.data));
+        store?.dispatch(logout());
+        CookieManager.clearAll();
+        return response.data;
+      },
+      invalidatesTags: ['Users'],
+    }),
   }),
 });
-export const {useSignupMutation} = userApi;
-
-// import constants from '../../assets/constants';
-// import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-// // import { logOut} from '../../features/auth/authSlice';
-
-// const baseQuery = fetchBaseQuery({
-//   baseUrl: constants.baseUrl,
-//   credentials: 'include',
-// });
-
-// const baseQueryWithReAuth = async (args: any, api: any, extraOptions: any) => {
-//   let result = await baseQuery(args, api, extraOptions);
-
-//   if (result?.error?.status === 403) {
-//     console.log('sending refresh token');
-//     // send refresh token to get new access token
-//     const refreshResult = await baseQuery('/refresh', api, extraOptions);
-//     console.log(refreshResult);
-//     // if (refreshResult?.data) {
-//     //   const user = api.getState().auth.user;
-//     //   // store the new token
-//     //   api.dispatch(setCredentials({...refreshResult.data, user}));
-//     //   // retry the original query with new access token
-//     //   result = await baseQuery(args, api, extraOptions);
-//     // } else {
-//     //   api.dispatch(logOut());
-//     // }
-//   }
-
-//   return result;
-// };
-
-// export const apiSlice = createApi({
-//   baseQuery: baseQueryWithReAuth,
-//   endpoints: builder => ({}),
-// });
+export const {
+  useSignupMutation,
+  useLoginMutation,
+  useMyProfileQuery,
+  useLogoutMutation,
+} = userApi;

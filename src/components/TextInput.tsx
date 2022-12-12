@@ -13,6 +13,7 @@ import constants from '../assets/constants';
 export interface InputHandle {
   getValue: () => string;
   onFocus: () => void;
+  setText: (value: string) => void;
 }
 const TextInput = forwardRef<InputHandle, TextInputProps>((props, ref) => {
   const [isSecurePass, setSecurePass] = useState(
@@ -26,6 +27,9 @@ const TextInput = forwardRef<InputHandle, TextInputProps>((props, ref) => {
   useImperativeHandle(ref, () => ({
     getValue: () => value,
     onFocus: () => textInputRef.current?.focus(),
+    setText: (value: string) => {
+      textInputRef.current?.setNativeProps({text: value});
+    },
   }));
   return (
     <View style={styles.container}>

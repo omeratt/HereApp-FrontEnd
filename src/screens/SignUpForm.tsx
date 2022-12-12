@@ -1,14 +1,19 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React, {useRef} from 'react';
+import React, {Dispatch, SetStateAction, useRef} from 'react';
 import TextInput, {InputHandle} from '../components/TextInput';
 import constants from '../assets/constants';
 import * as Yup from 'yup';
 import {Formik} from 'formik';
 import {useSignupMutation} from '../app/api/userApi';
+import {useDispatch} from 'react-redux';
+import {selectUser} from '../app/Reducers/User/userSlice';
+import {useAppSelector} from '../app/hooks';
 
 interface props {
   hideScreen: () => void;
   ErrTxt: ({txt}: any, {touched}: any) => JSX.Element | any;
+  goToSignIn: () => void;
+  setEmailFromSignUp: Dispatch<SetStateAction<string>>;
 }
 const validationSchema = Yup.object({
   fullName: Yup.string()
@@ -31,23 +36,34 @@ const userInfo = {
   password: '',
   confirmPassword: '',
 };
-export default function SignUpForm({hideScreen, ErrTxt}: props) {
+export default function SignUpForm({
+  hideScreen,
+  ErrTxt,
+  goToSignIn,
+  setEmailFromSignUp,
+}: props) {
   const refs = Array.from(Array(3), () => useRef<InputHandle>(null));
-  const [signup, {isLoading, data}] = useSignupMutation();
-
   const onSubmitEditing = (index: number) => {
     refs[index]?.current?.onFocus();
   };
 
-  const submit = async (values: typeof userInfo) => {
-    //TODO: submit values and hide screen with hideScreen function
+  const [signup, {isLoading, data, isSuccess, isError, error}] =
+    useSignupMutation();
 
-    console.log(values);
-    await signup(values);
+  const submit = async (values: typeof userInfo) => {
+    try {
+      const data = await signup(values).unwrap();
+      setEmailFromSignUp(values.email);
+      goToSignIn();
+    } catch (err) {
+      console.log('error from signup', err);
+    }
   };
-  React.useEffect(() => {
-    console.log(data);
-  }, [isLoading]);
+  // React.useEffect(() => {
+  //   if (isSuccess) {
+  //   }
+  // }, [data, error]);
+
   return (
     <Formik
       initialValues={userInfo}

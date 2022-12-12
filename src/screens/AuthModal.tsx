@@ -1,5 +1,5 @@
 import {ListRenderItem, ScrollView, StyleSheet, Text, View} from 'react-native';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import constants from '../assets/constants';
 import {TouchableOpacity} from 'react-native';
 import SVG from '../assets/svg';
@@ -31,6 +31,7 @@ interface RenderItemProps {
 }
 
 export default function AuthModal() {
+  const [emailFromSignUp, setEmailFromSignUp] = useState('');
   const ref = React.useRef<FlatList>(null);
   const flex = useSharedValue(ZERO);
   const style = useAnimatedStyle(() => {
@@ -74,13 +75,26 @@ export default function AuthModal() {
   const screenData: RenderItemProps[] = [
     {
       navigationTxt: 'Sign up',
-      component: <SignInForm hideScreen={hideScreen} ErrTxt={ErrTxt} />,
+      component: (
+        <SignInForm
+          hideScreen={hideScreen}
+          ErrTxt={ErrTxt}
+          emailFromSignUp={emailFromSignUp}
+        />
+      ),
       bottomTxt: "Don't have an account?",
       nextPage: goToSignUp,
     },
     {
       navigationTxt: 'Sign in',
-      component: <SignUpForm hideScreen={hideScreen} ErrTxt={ErrTxt} />,
+      component: (
+        <SignUpForm
+          hideScreen={hideScreen}
+          ErrTxt={ErrTxt}
+          goToSignIn={goToSignIn}
+          setEmailFromSignUp={setEmailFromSignUp}
+        />
+      ),
       bottomTxt: 'Already have an account?',
       nextPage: goToSignIn,
     },

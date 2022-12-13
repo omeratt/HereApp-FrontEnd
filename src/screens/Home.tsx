@@ -82,7 +82,9 @@ const Home = () => {
             {dates.map(date => (
               <View key={date.key} style={styles.dateContent}>
                 {/*TODO: horizontal flatlist*/}
-                <Text style={styles.dateText}>{date.dayName}</Text>
+                <Text style={[styles.dateText, {marginBottom: '25%'}]}>
+                  {date.dayName}
+                </Text>
                 <View style={styles.datePicker}>
                   <Text style={styles.dateText}>{date.dayNum}</Text>
                 </View>
@@ -184,6 +186,7 @@ const styles = StyleSheet.create({
   topView: {
     height: '61.9%',
     width: '100%',
+    alignItems: 'center',
     borderRadius: 40,
     borderWidth: 1,
     borderColor: constants.colors.UNDER_LINE,
@@ -239,9 +242,11 @@ const styles = StyleSheet.create({
   date: {
     flexDirection: 'row',
     height: '23.5%',
+    // width: constants.WIDTH,
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'space-between',
-    // backgroundColor: 'yellow',
+    // backgroundColor: constants.colors.BLACK,
   },
   dateContent: {
     width: '11.2%',
@@ -257,8 +262,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   datePicker: {
-    height: '50%',
-    width: `90%`,
+    height: '55%',
+    width: '100%',
     backgroundColor: constants.colors.GREEN,
     borderRadius: 800,
     alignItems: 'center',
@@ -310,6 +315,8 @@ const styles = StyleSheet.create({
     backgroundColor: constants.colors.GREEN,
     height: '45%',
     width: '8.5%',
+    borderWidth: 1,
+    borderColor: constants.colors.UNDER_LINE,
     borderRadius: 800,
   },
   myListContainer: {

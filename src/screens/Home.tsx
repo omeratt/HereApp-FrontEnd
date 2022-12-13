@@ -27,7 +27,11 @@ const Home = () => {
       <View style={styles.topView}>
         <View style={styles.task}>
           <View style={styles.today}>
-            <Text style={styles.plusIcon}>+</Text>
+            {/* <Text style={styles.plusIcon}>+</Text> */}
+            <SVG.plusIconOutlined
+              style={styles.todayPlusIcon}
+              fill={constants.colors.BGC}
+            />
             <Text style={styles.taskTitle}>Today</Text>
             <SignOut />
           </View>
@@ -42,7 +46,11 @@ const Home = () => {
         </View>
         <View style={styles.myListContainer}>
           <View style={styles.myList}>
-            <Text style={styles.plusIcon}>+</Text>
+            {/* <Text style={styles.plusIcon}>+</Text> */}
+            <SVG.plusIconOutlined
+              style={styles.plusIcon}
+              fill={constants.colors.BGC}
+            />
             <Text style={styles.myListTitle}>My lists</Text>
           </View>
           <View style={styles.myListCategory}>
@@ -52,7 +60,11 @@ const Home = () => {
           </View>
         </View>
       </View>
-      <View style={styles.middleView}></View>
+      <View style={styles.middleView}>
+        <View style={styles.box}></View>
+        <View style={styles.box}></View>
+        <View style={styles.box}></View>
+      </View>
       <View style={styles.bottomView}>
         <SVG.Search height="100%" width="30%" />
         <SVG.Search height="100%" width="30%" />
@@ -79,12 +91,26 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     borderWidth: 1,
     borderColor: constants.colors.UNDER_LINE,
-    // justifyContent: 'space-evenly',
   },
   middleView: {
-    height: '21.5%',
+    height: '22.5%',
     width: '100%',
+    flexDirection: 'row',
+    // alignItems: 'center',
+    // backgroundColor: 'black',
+    justifyContent: 'space-around',
+    // rowGap: 1,
   },
+  box: {
+    flex: 1,
+    margin: '1%',
+    // display: 'flex',
+    // width: '33%',
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: constants.colors.UNDER_LINE,
+  },
+  bottomPlusIcon: {},
   bottomView: {
     // alignContent: 'center',
     alignItems: 'center',
@@ -106,11 +132,11 @@ const styles = StyleSheet.create({
     color: constants.colors.BLACK,
     fontSize: 40,
   },
-  plusIcon: {
+  todayPlusIcon: {
     position: 'absolute',
     color: constants.colors.BLACK,
-    left: '6.5%',
-    top: '3%',
+    left: 0,
+    top: 0,
   },
   dateContainer: {},
   date: {

@@ -4,6 +4,7 @@ import StartButton from './StartButton.svg';
 import Hi from './Hi.svg';
 import Search from './Search.svg';
 import Timer from './Timer.svg';
+import plusIconOutlined from './plusIconOutlined.svg';
 
 const SVG = {
   HereLogo,
@@ -12,5 +13,6 @@ const SVG = {
   Hi,
   Search,
   Timer,
+  plusIconOutlined,
 };
 export default SVG;

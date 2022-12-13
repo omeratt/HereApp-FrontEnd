@@ -90,11 +90,11 @@ const Home = () => {
             ))}
           </View>
           <View style={styles.taskListContainer}>
-            <View style={styles.taskListHighlight}></View>
             <View style={styles.taskListContent}>
               <View style={styles.taskContentTitle}></View>
               <View style={styles.taskContentBody}></View>
             </View>
+            <View style={styles.taskListHighlight}></View>
           </View>
         </View>
         <View style={styles.myListContainer}>
@@ -197,7 +197,9 @@ const styles = StyleSheet.create({
     padding: '5%',
     position: 'relative',
   },
-  today: {},
+  today: {
+    backgroundColor: 'blue',
+  },
   taskTitle: {
     fontFamily: constants.Fonts.paragraph,
     color: constants.colors.BLACK,
@@ -214,17 +216,20 @@ const styles = StyleSheet.create({
     height: '23.5%',
     alignItems: 'center',
     justifyContent: 'space-between',
+    backgroundColor: 'yellow',
   },
   dateContent: {
-    width: '11%',
+    width: '11.2%',
     alignItems: 'center',
     flexDirection: 'column',
     margin: 5,
+    alignContent: 'center',
   },
   dateText: {
     fontFamily: constants.Fonts.text,
     color: constants.colors.BLACK,
-    fontSize: 15,
+    fontSize: constants.WIDTH / 29,
+    textAlign: 'center',
   },
   datePicker: {
     height: '50%',
@@ -236,22 +241,39 @@ const styles = StyleSheet.create({
   },
   taskListContainer: {
     flexDirection: 'row',
-    height: '100%',
-    backgroundColor: 'red',
+    height: `${100 - 23.5 - 10}%`,
+    // padding: '10%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    // backgroundColor: 'blue',
+    // alignContent: 'center',
+    // backgroundColor: 'red',
   },
   taskListContent: {
+    height: '31%',
     borderRadius: 25,
     borderWidth: 1,
     borderColor: constants.colors.UNDER_LINE,
+    width: '80%',
+    marginRight: '3%',
+    position: 'relative',
   },
   taskContentTitle: {},
   taskContentBody: {},
-  taskListHighlight: {backgroundColor: constants.colors.GREEN},
+  taskListHighlight: {
+    position: 'absolute',
+    right: 0,
+    backgroundColor: constants.colors.GREEN,
+    height: '15%',
+    width: '10%',
+    borderRadius: 800,
+  },
   myListContainer: {
+    height: '24.5%',
     paddingLeft: '5%',
     paddingRight: '5%',
     paddingTop: '3%',
-    position: 'relative',
+    // backgroundColor: 'blue',
   },
   myList: {marginBottom: 6},
   myListTitle: {

@@ -4,6 +4,44 @@ import constants from '../assets/constants';
 import SVG from '../assets/svg';
 import {useLogoutMutation} from '../app/api/userApi';
 
+const dates = [
+  {
+    dayName: 'Mon',
+
+    dayNum: '20',
+  },
+  {
+    dayName: 'Tue',
+
+    dayNum: '21',
+  },
+  {
+    dayName: 'Wed',
+
+    dayNum: '22',
+  },
+  {
+    dayName: 'Thu',
+
+    dayNum: '23',
+  },
+  {
+    dayName: 'Fri',
+
+    dayNum: '24',
+  },
+  {
+    dayName: 'Sat',
+
+    dayNum: '25',
+  },
+  {
+    dayName: 'Sun',
+
+    dayNum: '26',
+  },
+];
+
 const Home = () => {
   const [Logout, {isLoading, data, isSuccess, isError, error}] =
     useLogoutMutation();
@@ -17,36 +55,50 @@ const Home = () => {
   }, [data, error]);
   const SignOut = () => (
     <TouchableOpacity
-      style={{alignItems: 'center', justifyContent: 'center'}}
+      style={{
+        position: 'absolute',
+        top: 0,
+        right: '50%',
+      }}
       onPress={async () => await Logout(null)}>
       <Text style={{color: 'black'}}>logout</Text>
     </TouchableOpacity>
   );
   return (
     <View style={styles.container}>
+      <SignOut />
       <View style={styles.topView}>
         <View style={styles.task}>
           <View style={styles.today}>
-            {/* <Text style={styles.plusIcon}>+</Text> */}
             <SVG.plusIconOutlined
-              style={styles.todayPlusIcon}
+              style={styles.plusIcon}
               fill={constants.colors.BGC}
             />
             <Text style={styles.taskTitle}>Today</Text>
-            <SignOut />
           </View>
           <View style={styles.date}>
-            <View style={styles.dateContent}>
-              {/*TODO: horizontal flatlist*/}
-              {/* <Text style={{color: 'black'}}>mon</Text>
-              <Text style={{color: 'black'}}>25</Text> */}
+            {dates.map(date => (
+              <>
+                <View style={styles.dateContent}>
+                  {/*TODO: horizontal flatlist*/}
+                  <Text style={styles.dateText}>{date.dayName}</Text>
+                  <View style={styles.datePicker}>
+                    <Text style={styles.dateText}>{date.dayNum}</Text>
+                  </View>
+                </View>
+              </>
+            ))}
+          </View>
+          <View style={styles.taskListContainer}>
+            <View style={styles.taskListHighlight}></View>
+            <View style={styles.taskListContent}>
+              <View style={styles.taskContentTitle}></View>
+              <View style={styles.taskContentBody}></View>
             </View>
           </View>
-          {/*TODO: vertical flatlist*/}
         </View>
         <View style={styles.myListContainer}>
           <View style={styles.myList}>
-            {/* <Text style={styles.plusIcon}>+</Text> */}
             <SVG.plusIconOutlined
               style={styles.plusIcon}
               fill={constants.colors.BGC}
@@ -61,8 +113,26 @@ const Home = () => {
         </View>
       </View>
       <View style={styles.middleView}>
-        <View style={styles.box}></View>
-        <View style={styles.box}></View>
+        <View style={styles.box}>
+          <View style={styles.topBox}></View>
+          <View style={styles.bottomPlusBox}>
+            <SVG.plusIconOutlined
+              style={styles.boxPlusIcon}
+              fill={constants.colors.BGC}
+              height="80%"
+            />
+          </View>
+        </View>
+        <View style={styles.box}>
+          <View style={styles.topBox}></View>
+          <View style={styles.bottomPlusBox}>
+            <SVG.plusIconOutlined
+              style={styles.boxPlusIcon}
+              fill={constants.colors.BGC}
+              height="80%"
+            />
+          </View>
+        </View>
         <View style={styles.box}></View>
       </View>
       <View style={styles.bottomView}>
@@ -96,23 +166,24 @@ const styles = StyleSheet.create({
     height: '22.5%',
     width: '100%',
     flexDirection: 'row',
-    // alignItems: 'center',
-    // backgroundColor: 'black',
     justifyContent: 'space-around',
-    // rowGap: 1,
   },
   box: {
     flex: 1,
     margin: '1%',
-    // display: 'flex',
-    // width: '33%',
+    padding: '1%',
     borderRadius: 25,
     borderWidth: 1,
     borderColor: constants.colors.UNDER_LINE,
   },
-  bottomPlusIcon: {},
+  topBox: {
+    height: '85%',
+  },
+  bottomPlusBox: {
+    height: '15%',
+  },
+  boxPlusIcon: {},
   bottomView: {
-    // alignContent: 'center',
     alignItems: 'center',
     justifyContent: 'center',
     height: '8.7%',
@@ -132,23 +203,50 @@ const styles = StyleSheet.create({
     color: constants.colors.BLACK,
     fontSize: 40,
   },
-  todayPlusIcon: {
+  plusIcon: {
     position: 'absolute',
     color: constants.colors.BLACK,
     left: 0,
     top: 0,
   },
-  dateContainer: {},
   date: {
+    flexDirection: 'row',
     height: '23.5%',
-    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  dateContent: {
+    width: '11%',
+    alignItems: 'center',
+    flexDirection: 'column',
+    margin: 5,
+  },
+  dateText: {
+    fontFamily: constants.Fonts.text,
+    color: constants.colors.BLACK,
+    fontSize: 15,
+  },
+  datePicker: {
+    height: '50%',
+    width: '100%',
+    backgroundColor: constants.colors.GREEN,
+    borderRadius: 800,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  taskListContainer: {
+    flexDirection: 'row',
+    height: '100%',
+    backgroundColor: 'red',
+  },
+  taskListContent: {
+    borderRadius: 25,
     borderWidth: 1,
     borderColor: constants.colors.UNDER_LINE,
   },
-  dateContent: {
-    flexDirection: 'column',
-  },
-  taskList: {flexDirection: 'column'},
+  taskContentTitle: {},
+  taskContentBody: {},
+  taskListHighlight: {backgroundColor: constants.colors.GREEN},
   myListContainer: {
     paddingLeft: '5%',
     paddingRight: '5%',

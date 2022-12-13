@@ -12,11 +12,13 @@ interface props {
   lengthPercentage?: number;
   vertical?: boolean;
   style?: {};
+  lineColor?: string;
 }
 export default function Line({
   lengthPercentage = 100,
   vertical = false,
   style,
+  lineColor = constants.colors.GREY,
 }: props) {
   const animation = useSharedValue(0);
 
@@ -66,7 +68,7 @@ export default function Line({
   return (
     <Animated.View
       style={[
-        styles.line,
+        {backgroundColor: lineColor},
         vertical
           ? {
               width: 2,
@@ -80,6 +82,6 @@ export default function Line({
 
 const styles = StyleSheet.create({
   line: {
-    backgroundColor: constants.colors.GREY,
+    // backgroundColor: constants.colors.GREY,
   },
 });

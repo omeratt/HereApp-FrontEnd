@@ -3,6 +3,7 @@ import React, {useEffect} from 'react';
 import constants from '../assets/constants';
 import SVG from '../assets/svg';
 import {useLogoutMutation} from '../app/api/userApi';
+import NewTask from '../components/NewTask';
 
 const dates = [
   {
@@ -66,6 +67,7 @@ const Home = () => {
   );
   return (
     <View style={styles.container}>
+      <NewTask />
       <SignOut />
       <View style={styles.topView}>
         <View style={styles.task}>
@@ -114,16 +116,11 @@ const Home = () => {
           </View>
           <View style={styles.categoryContainer}>
             <View style={styles.myListCategory}>
-              <Text
-                // numberOfLines={2}
-                // adjustsFontSizeToFit
-                // lineBreakMode="tail"
-                style={styles.listTxt}>
-                Shopping list
-              </Text>
+              {/* maximum of char = 19 in formik and backend*/}
+              <Text style={styles.listTxt}>House to do's</Text>
             </View>
             <View style={styles.myListCategory}>
-              <Text style={styles.listTxt}>Shopping list</Text>
+              <Text style={styles.listTxt}>House to do's</Text>
             </View>
             <View style={styles.myListCategory}>
               <Text style={styles.listTxt}>Shopping list</Text>
@@ -155,17 +152,17 @@ const Home = () => {
         <View style={styles.box}></View>
       </View>
       <View style={styles.bottomView}>
-        <View style={{width: '33.33%'}}>
+        <View style={{width: '35.33%'}}>
           <SVG.Timer fill={constants.colors.BLACK} height="100%" width="100%" />
         </View>
-        <View style={{width: '33.33%'}}>
+        <View style={{width: '35.33%'}}>
           <SVG.BoxIcon
             fill={constants.colors.BLACK}
             height="100%"
             width="100%"
           />
         </View>
-        <View style={{width: '33.33%'}}>
+        <View style={{width: '35.33%'}}>
           <SVG.Search height="100%" width="100%" />
         </View>
       </View>
@@ -180,7 +177,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     flex: 1,
     backgroundColor: constants.colors.OFF_WHITE,
-    padding: '3%',
+    padding: '2.2%',
     justifyContent: 'space-evenly',
     alignItems: 'center',
   },
@@ -212,14 +209,7 @@ const styles = StyleSheet.create({
     height: '15%',
   },
   boxPlusIcon: {},
-  bottomView: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '9.7%',
-    width: '65%',
-    flexDirection: 'row',
-    // backgroundColor: 'blue',
-  },
+
   task: {
     height: '75.5%',
     borderColor: constants.colors.UNDER_LINE,
@@ -359,14 +349,15 @@ const styles = StyleSheet.create({
   listTxt: {
     color: constants.colors.BLACK,
     textAlign: 'center',
-    fontSize: constants.WIDTH * 0.035,
+    fontSize: constants.WIDTH * 0.033,
     fontFamily: constants.Fonts.text,
   },
-  bottomBox: {
-    height: 50,
-    width: 50,
-    borderBottomColor: constants.colors.UNDER_LINE,
-    borderRadius: 15,
-    borderWidth: 1,
+  bottomView: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '10.7%',
+    width: '65%',
+    flexDirection: 'row',
+    // backgroundColor: 'blue',
   },
 });

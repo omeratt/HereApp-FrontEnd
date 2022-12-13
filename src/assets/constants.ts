@@ -4,8 +4,8 @@ const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
 
 const constants = {
-  // BASE_URL: 'https://here.cyclic.app/',
-  BASE_URL: 'https://here-app.onrender.com/',
+  BASE_URL: 'https://here.cyclic.app/',
+  // BASE_URL: 'https://here-app.onrender.com/',
   /***************** Eliran ***************/
   // BASE_URL: 'http://192.168.1.32:3000/',
 

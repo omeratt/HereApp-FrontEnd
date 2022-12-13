@@ -36,24 +36,8 @@ export default function Welcome() {
     };
   }, []);
 
-  const [Logout, {isLoading, data, isSuccess, isError, error}] =
-    useLogoutMutation();
-  useEffect(() => {
-    if (data) {
-      console.log('logout', data);
-    }
-    if (error) {
-      console.log('logoutError', error);
-    }
-  }, [data, error]);
-
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={{alignItems: 'center', justifyContent: 'center'}}
-        onPress={async () => await Logout(null)}>
-        <Text>logout</Text>
-      </TouchableOpacity>
       <View style={[styles.cubeContainer, {height: '11.2%'}]}>
         <View
           style={{

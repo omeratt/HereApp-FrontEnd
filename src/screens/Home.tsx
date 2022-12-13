@@ -1,9 +1,27 @@
-import {StyleSheet, Text, View} from 'react-native';
-import React from 'react';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, {useEffect} from 'react';
 import constants from '../assets/constants';
 import SVG from '../assets/svg';
+import {useLogoutMutation} from '../app/api/userApi';
 
 const Home = () => {
+  const [Logout, {isLoading, data, isSuccess, isError, error}] =
+    useLogoutMutation();
+  useEffect(() => {
+    if (data) {
+      console.log('logout', data);
+    }
+    if (error) {
+      console.log('logoutError', error);
+    }
+  }, [data, error]);
+  const SignOut = () => (
+    <TouchableOpacity
+      style={{alignItems: 'center', justifyContent: 'center'}}
+      onPress={async () => await Logout(null)}>
+      <Text style={{color: 'black'}}>logout</Text>
+    </TouchableOpacity>
+  );
   return (
     <View style={styles.container}>
       <View style={styles.topView}>
@@ -11,6 +29,7 @@ const Home = () => {
           <View style={styles.today}>
             <Text style={styles.plusIcon}>+</Text>
             <Text style={styles.taskTitle}>Today</Text>
+            <SignOut />
           </View>
           <View style={styles.date}>
             <View style={styles.dateContent}>

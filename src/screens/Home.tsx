@@ -7,37 +7,37 @@ import {useLogoutMutation} from '../app/api/userApi';
 const dates = [
   {
     dayName: 'Mon',
-
     dayNum: '20',
+    key: 'asd123',
   },
   {
     dayName: 'Tue',
-
+    key: '123312asd',
     dayNum: '21',
   },
   {
     dayName: 'Wed',
-
+    key: 'asd1gsd',
     dayNum: '22',
   },
   {
     dayName: 'Thu',
-
+    key: 'adgasd3',
     dayNum: '23',
   },
   {
     dayName: 'Fri',
-
+    key: 'hderh341',
     dayNum: '24',
   },
   {
     dayName: 'Sat',
-
+    key: 'as32tasgz',
     dayNum: '25',
   },
   {
+    key: 'asf32tgzg',
     dayName: 'Sun',
-
     dayNum: '26',
   },
 ];
@@ -78,15 +78,13 @@ const Home = () => {
           </View>
           <View style={styles.date}>
             {dates.map(date => (
-              <>
-                <View style={styles.dateContent}>
-                  {/*TODO: horizontal flatlist*/}
-                  <Text style={styles.dateText}>{date.dayName}</Text>
-                  <View style={styles.datePicker}>
-                    <Text style={styles.dateText}>{date.dayNum}</Text>
-                  </View>
+              <View key={date.key} style={styles.dateContent}>
+                {/*TODO: horizontal flatlist*/}
+                <Text style={styles.dateText}>{date.dayName}</Text>
+                <View style={styles.datePicker}>
+                  <Text style={styles.dateText}>{date.dayNum}</Text>
                 </View>
-              </>
+              </View>
             ))}
           </View>
           <View style={styles.taskListColumnContainer}>
@@ -109,15 +107,27 @@ const Home = () => {
         <View style={styles.myListContainer}>
           <View style={styles.myList}>
             <SVG.plusIconOutlined
-              style={styles.plusIcon}
+              style={styles.myListPlusIcon}
               fill={constants.colors.BGC}
             />
             <Text style={styles.myListTitle}>My lists</Text>
           </View>
-          <View style={styles.myListCategory}>
-            <Text style={{color: 'black', textAlign: 'center'}}>
-              home todo's
-            </Text>
+          <View style={styles.categoryContainer}>
+            <View style={styles.myListCategory}>
+              <Text
+                // numberOfLines={2}
+                // adjustsFontSizeToFit
+                // lineBreakMode="tail"
+                style={styles.listTxt}>
+                Shopping list
+              </Text>
+            </View>
+            <View style={styles.myListCategory}>
+              <Text style={styles.listTxt}>Shopping list</Text>
+            </View>
+            <View style={styles.myListCategory}>
+              <Text style={styles.listTxt}>Shopping list</Text>
+            </View>
           </View>
         </View>
       </View>
@@ -145,9 +155,19 @@ const Home = () => {
         <View style={styles.box}></View>
       </View>
       <View style={styles.bottomView}>
-        <SVG.Search height="100%" />
-        <SVG.BoxIcon fill={constants.colors.BLACK} height="100%" />
-        <SVG.Timer fill={constants.colors.BLACK} height="100%" />
+        <View style={{width: '33.33%'}}>
+          <SVG.Timer fill={constants.colors.BLACK} height="100%" width="100%" />
+        </View>
+        <View style={{width: '33.33%'}}>
+          <SVG.BoxIcon
+            fill={constants.colors.BLACK}
+            height="100%"
+            width="100%"
+          />
+        </View>
+        <View style={{width: '33.33%'}}>
+          <SVG.Search height="100%" width="100%" />
+        </View>
       </View>
     </View>
   );
@@ -195,8 +215,8 @@ const styles = StyleSheet.create({
   bottomView: {
     alignItems: 'center',
     justifyContent: 'center',
-    height: '8.7%',
-    width: '40%',
+    height: '9.7%',
+    width: '65%',
     flexDirection: 'row',
     // backgroundColor: 'blue',
   },
@@ -220,6 +240,11 @@ const styles = StyleSheet.create({
     color: constants.colors.BLACK,
     left: 0,
     top: 0,
+  },
+  myListPlusIcon: {
+    position: 'absolute',
+    color: constants.colors.BLACK,
+    left: '6.5%',
   },
   date: {
     flexDirection: 'row',
@@ -299,24 +324,43 @@ const styles = StyleSheet.create({
   },
   myListContainer: {
     height: '24.5%',
-    paddingLeft: '5%',
-    paddingRight: '5%',
+
     paddingTop: '3%',
     // backgroundColor: 'blue',
   },
-  myList: {marginBottom: 6},
+  myList: {
+    marginBottom: 6,
+    paddingLeft: '5%',
+    paddingRight: '5%',
+  },
   myListTitle: {
     fontFamily: constants.Fonts.paragraph,
     color: constants.colors.BLACK,
     fontSize: 25,
   },
+  categoryContainer: {
+    flexDirection: 'row',
+    width: '100%',
+    alignContent: 'center',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    // backgroundColor: constants.colors.BLACK,
+  },
   myListCategory: {
-    height: '23.5%',
+    height: '80.5%',
+    width: '31%',
+    padding: '0.1%',
     borderRadius: 40,
     borderWidth: 1,
     borderColor: constants.colors.UNDER_LINE,
     justifyContent: 'center',
     alignContent: 'center',
+  },
+  listTxt: {
+    color: constants.colors.BLACK,
+    textAlign: 'center',
+    fontSize: constants.WIDTH * 0.035,
+    fontFamily: constants.Fonts.text,
   },
   bottomBox: {
     height: 50,

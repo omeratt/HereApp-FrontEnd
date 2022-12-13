@@ -89,12 +89,21 @@ const Home = () => {
               </>
             ))}
           </View>
-          <View style={styles.taskListContainer}>
-            <View style={styles.taskListContent}>
-              <View style={styles.taskContentTitle}></View>
-              <View style={styles.taskContentBody}></View>
+          <View style={styles.taskListColumnContainer}>
+            <View style={styles.taskListContainer}>
+              <View style={styles.taskListContent}>
+                <Text style={styles.taskContentTitle}>Home work</Text>
+                <Text style={styles.taskContentBody}>Finish with...</Text>
+              </View>
+              <View style={styles.taskListHighlight}></View>
             </View>
-            <View style={styles.taskListHighlight}></View>
+            <View style={styles.taskListContainer}>
+              <View style={styles.taskListContent}>
+                <Text style={styles.taskContentTitle}>Home work</Text>
+                <Text style={styles.taskContentBody}>Finish with...</Text>
+              </View>
+              <View style={styles.taskListHighlight}></View>
+            </View>
           </View>
         </View>
         <View style={styles.myListContainer}>
@@ -136,9 +145,9 @@ const Home = () => {
         <View style={styles.box}></View>
       </View>
       <View style={styles.bottomView}>
-        <SVG.Search height="100%" width="30%" />
-        <SVG.Search height="100%" width="30%" />
-        <SVG.Timer fill={constants.colors.BLACK} height="100%" width="30%" />
+        <SVG.Search height="100%" />
+        <SVG.BoxIcon fill={constants.colors.BLACK} height="100%" />
+        <SVG.Timer fill={constants.colors.BLACK} height="100%" />
       </View>
     </View>
   );
@@ -187,8 +196,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     height: '8.7%',
-    width: '60%',
+    width: '40%',
     flexDirection: 'row',
+    // backgroundColor: 'blue',
   },
   task: {
     height: '75.5%',
@@ -198,7 +208,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   today: {
-    backgroundColor: 'blue',
+    // backgroundColor: 'blue',
   },
   taskTitle: {
     fontFamily: constants.Fonts.paragraph,
@@ -216,7 +226,7 @@ const styles = StyleSheet.create({
     height: '23.5%',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'yellow',
+    // backgroundColor: 'yellow',
   },
   dateContent: {
     width: '11.2%',
@@ -233,15 +243,23 @@ const styles = StyleSheet.create({
   },
   datePicker: {
     height: '50%',
-    width: '100%',
+    width: `90%`,
     backgroundColor: constants.colors.GREEN,
     borderRadius: 800,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  taskListContainer: {
-    flexDirection: 'row',
+  taskListColumnContainer: {
     height: `${100 - 23.5 - 10}%`,
+    // backgroundColor: 'red',
+    justifyContent: 'center',
+    paddingBottom: '10%',
+    paddingTop: '10%',
+  },
+  taskListContainer: {
+    marginTop: '2.5%',
+    height: `42%`,
+    flexDirection: 'row',
     // padding: '10%',
     justifyContent: 'center',
     alignItems: 'center',
@@ -250,22 +268,33 @@ const styles = StyleSheet.create({
     // backgroundColor: 'red',
   },
   taskListContent: {
-    height: '31%',
-    borderRadius: 25,
+    height: '100%',
+    borderRadius: 17,
     borderWidth: 1,
     borderColor: constants.colors.UNDER_LINE,
     width: '80%',
     marginRight: '3%',
     position: 'relative',
+    padding: '3%',
   },
-  taskContentTitle: {},
-  taskContentBody: {},
+  taskContentTitle: {
+    fontFamily: constants.Fonts.text,
+    fontWeight: 'bold',
+    fontSize: 14,
+    color: constants.colors.BLACK,
+  },
+  taskContentBody: {
+    fontFamily: constants.Fonts.text,
+    // fontWeight: '700',
+    fontSize: 12.5,
+    color: constants.colors.UNDER_LINE,
+  },
   taskListHighlight: {
     position: 'absolute',
     right: 0,
     backgroundColor: constants.colors.GREEN,
-    height: '15%',
-    width: '10%',
+    height: '45%',
+    width: '8.5%',
     borderRadius: 800,
   },
   myListContainer: {

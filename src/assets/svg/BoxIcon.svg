@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="89" height="87" viewBox="0 0 89 87">
+  <defs>
+    <filter id="Rectangle_71" x="0" y="0" width="89" height="87" filterUnits="userSpaceOnUse">
+      <feOffset dy="3" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feFlood flood-opacity="0.161"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="Group_135" data-name="Group 135" transform="translate(-162 -800)">
+    <path id="Path_60" data-name="Path 60" d="M4.905,10.44,18,18.015,31.095,10.44" transform="translate(189 822.438)" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/>
+    <path id="Path_61" data-name="Path 61" d="M18,33.12V18" transform="translate(189 822.438)" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/>
+    <g transform="matrix(1, 0, 0, 1, 162, 800)" filter="url(#Rectangle_71)">
+      <g id="Rectangle_71-2" data-name="Rectangle 71" transform="translate(80 6) rotate(90)" fill="none" stroke="#cec3a6" stroke-width="1">
+        <rect width="69" height="71" rx="23" stroke="none"/>
+        <rect x="0.5" y="0.5" width="68" height="70" rx="22.5" fill="none"/>
+      </g>
+    </g>
+    <path id="Path_59" data-name="Path 59" d="M31.5,24V12A3,3,0,0,0,30,9.4l-10.5-6a3,3,0,0,0-3,0L6,9.4A3,3,0,0,0,4.5,12V24A3,3,0,0,0,6,26.595l10.5,6a3,3,0,0,0,3,0l10.5-6A3,3,0,0,0,31.5,24Z" transform="translate(189 822.438)" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/>
+  </g>
+</svg>

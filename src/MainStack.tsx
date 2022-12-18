@@ -36,11 +36,11 @@ export default function MainStack() {
       <Stack.Navigator initialRouteName="Auth">
         {isSignIn ? (
           <>
-            <Stack.Screen
+            {/* <Stack.Screen
               name="DateList"
               component={DateList}
               options={{headerShown: false}}
-            />
+            /> */}
             <Stack.Screen
               name="HomePage"
               component={Home}

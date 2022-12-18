@@ -20,7 +20,8 @@ const constants = {
     UNDER_LINE: '#B9AB85',
   },
   Fonts: {
-    paragraph: 'Report-Regular',
+    // paragraph: 'Report-Regular',
+    paragraph: 'SansSerifFLF',
     text: 'Montserrat-Regular',
     button: 'Montserrat-Thin',
     italic: 'Montserrat-MediumItalic',

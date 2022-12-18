@@ -1,9 +1,20 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import constants from '../assets/constants';
 import SVG from '../assets/svg';
 import {useLogoutMutation} from '../app/api/userApi';
 import NewTask from '../components/NewTask';
+import Animated, {
+  FadeIn,
+  FadeInUp,
+  FadeOutUp,
+  FadingTransition,
+  FlipInYRight,
+  ZoomInEasyDown,
+} from 'react-native-reanimated';
+import {useGetTasksQuery} from '../app/api/taskApi';
+import DisplayTask from '../components/DisplayTask';
+// import {TouchableOpacity} from 'react-native-gesture-handler';
 
 const dates = [
   {
@@ -46,6 +57,14 @@ const dates = [
 const Home = () => {
   const [Logout, {isLoading, data, isSuccess, isError, error}] =
     useLogoutMutation();
+  const [isModalVisible, setModalVisible] = useState(false);
+  const {
+    isLoading: taskLoading,
+    data: tasks,
+    isSuccess: taskSuccess,
+    isError: taskIsError,
+    error: tasksError,
+  } = useGetTasksQuery('');
   useEffect(() => {
     if (data) {
       console.log('logout', data);
@@ -54,6 +73,14 @@ const Home = () => {
       console.log('logoutError', error);
     }
   }, [data, error]);
+  useEffect(() => {
+    if (tasks) {
+      console.log('getting tasks', tasks);
+    }
+    if (error) {
+      console.log('error getting tasks', error);
+    }
+  }, [tasks, tasksError]);
   const SignOut = () => (
     <TouchableOpacity
       style={{
@@ -66,16 +93,37 @@ const Home = () => {
     </TouchableOpacity>
   );
   return (
-    <View style={styles.container}>
-      <NewTask />
+    <Animated.View
+      entering={FadeIn}
+      exiting={FadeOutUp}
+      style={styles.container}>
       <SignOut />
       <View style={styles.topView}>
         <View style={styles.task}>
           <View style={styles.today}>
-            <SVG.plusIconOutlined
-              style={styles.plusIcon}
-              fill={constants.colors.BGC}
-            />
+            <TouchableOpacity
+              onPress={() => setModalVisible(!isModalVisible)}
+              // onPressIn={() => setModalVisible(!isModalVisible)}
+              style={[
+                // styles.plusIcon,
+                {
+                  // backgroundColor: 'green',
+                  // width: 25,
+                  // height: 25,
+                  zIndex: 1,
+                  // position: 'absolute',
+                },
+              ]}>
+              <SVG.plusIconOutlined
+                // onPress={() => setModalVisible(!isModalVisible)}
+                // onPress={() => setModalVisible(!isModalVisible)}
+                // onPressIn={() => setModalVisible(!isModalVisible)}
+                style={[styles.plusIcon]}
+                // height={50}
+                // width={50}
+                fill={constants.colors.BGC}
+              />
+            </TouchableOpacity>
             <Text style={styles.taskTitle}>Today</Text>
           </View>
           <View style={styles.date}>
@@ -92,20 +140,14 @@ const Home = () => {
             ))}
           </View>
           <View style={styles.taskListColumnContainer}>
-            <View style={styles.taskListContainer}>
+            <DisplayTask data={tasks} />
+            {/* <View style={styles.taskListContainer}>
               <View style={styles.taskListContent}>
                 <Text style={styles.taskContentTitle}>Home work</Text>
                 <Text style={styles.taskContentBody}>Finish with...</Text>
               </View>
               <View style={styles.taskListHighlight}></View>
-            </View>
-            <View style={styles.taskListContainer}>
-              <View style={styles.taskListContent}>
-                <Text style={styles.taskContentTitle}>Home work</Text>
-                <Text style={styles.taskContentBody}>Finish with...</Text>
-              </View>
-              <View style={styles.taskListHighlight}></View>
-            </View>
+            </View> */}
           </View>
         </View>
         <View style={styles.myListContainer}>
@@ -168,7 +210,11 @@ const Home = () => {
           <SVG.Search height="100%" width="100%" />
         </View>
       </View>
-    </View>
+      <NewTask
+        isModalVisible={isModalVisible}
+        setModalVisible={setModalVisible}
+      />
+    </Animated.View>
   );
 };
 
@@ -184,18 +230,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   topView: {
-    height: '61.9%',
+    height: '63.9%',
     width: '100%',
     alignItems: 'center',
     borderRadius: 40,
     borderWidth: 1,
     borderColor: constants.colors.UNDER_LINE,
+    backgroundColor: constants.colors.OFF_WHITE,
+    elevation: 2,
   },
   middleView: {
     height: '22.5%',
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-around',
+    backgroundColor: constants.colors.OFF_WHITE,
   },
   box: {
     flex: 1,
@@ -204,6 +253,8 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     borderWidth: 1,
     borderColor: constants.colors.UNDER_LINE,
+    backgroundColor: constants.colors.OFF_WHITE,
+    elevation: 2,
   },
   topBox: {
     height: '85%',
@@ -222,22 +273,32 @@ const styles = StyleSheet.create({
   },
   today: {
     // backgroundColor: 'blue',
+    // marginBottom: 5,
+    height: '20%',
   },
   taskTitle: {
     fontFamily: constants.Fonts.paragraph,
     color: constants.colors.BLACK,
-    fontSize: 40,
+    fontSize: 30,
+    zIndex: 0,
   },
   plusIcon: {
     position: 'absolute',
     color: constants.colors.BLACK,
     left: 0,
     top: 0,
+    borderRadius: 9999,
+    backgroundColor: constants.colors.OFF_WHITE,
+    elevation: 6,
   },
   myListPlusIcon: {
     position: 'absolute',
     color: constants.colors.BLACK,
     left: '6.5%',
+    borderRadius: 9999,
+
+    backgroundColor: constants.colors.OFF_WHITE,
+    elevation: 5,
   },
   date: {
     flexDirection: 'row',
@@ -246,14 +307,19 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'space-between',
+
     // backgroundColor: constants.colors.BLACK,
   },
   dateContent: {
     width: '11.2%',
+    // height: '70%',
     alignItems: 'center',
     flexDirection: 'column',
     margin: 5,
     alignContent: 'center',
+    borderRadius: 9999,
+    // backgroundColor: constants.colors.OFF_WHITE,
+    // elevation: 2,
   },
   dateText: {
     fontFamily: constants.Fonts.text,
@@ -268,16 +334,17 @@ const styles = StyleSheet.create({
     borderRadius: 800,
     alignItems: 'center',
     justifyContent: 'center',
+    elevation: 5,
   },
   taskListColumnContainer: {
-    height: `${100 - 23.5 - 10}%`,
-    // backgroundColor: 'red',
-    justifyContent: 'center',
-    paddingBottom: '10%',
-    paddingTop: '10%',
+    height: `${100 - 23.5 - 15}%`,
+    // backgroundColor: 'green',
+    // justifyContent: 'flex-end',
+    // paddingBottom: '6%',
+    // paddingTop: '6%',
   },
   taskListContainer: {
-    marginTop: '2.5%',
+    // marginTop: '2.5%',
     height: `42%`,
     flexDirection: 'row',
     // padding: '10%',
@@ -321,7 +388,6 @@ const styles = StyleSheet.create({
   },
   myListContainer: {
     height: '24.5%',
-
     paddingTop: '3%',
     // backgroundColor: 'blue',
   },
@@ -333,7 +399,8 @@ const styles = StyleSheet.create({
   myListTitle: {
     fontFamily: constants.Fonts.paragraph,
     color: constants.colors.BLACK,
-    fontSize: 25,
+    fontSize: 22,
+    // fontWeight: '600',
   },
   categoryContainer: {
     flexDirection: 'row',
@@ -352,6 +419,8 @@ const styles = StyleSheet.create({
     borderColor: constants.colors.UNDER_LINE,
     justifyContent: 'center',
     alignContent: 'center',
+    backgroundColor: constants.colors.OFF_WHITE,
+    elevation: 5,
   },
   listTxt: {
     color: constants.colors.BLACK,
@@ -365,6 +434,7 @@ const styles = StyleSheet.create({
     height: '10.7%',
     width: '65%',
     flexDirection: 'row',
+
     // backgroundColor: 'blue',
   },
 });

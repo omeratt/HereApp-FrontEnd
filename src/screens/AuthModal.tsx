@@ -14,7 +14,7 @@ import {FlatList} from 'react-native-gesture-handler';
 import SignInForm from './SignInForm';
 import SignUpForm from './SignUpForm';
 
-const ZERO = 0.00000000000000001;
+export const ZERO = 0.00000000000000001;
 export const SPRING_CONFIG: WithSpringConfig = {
   damping: 80,
   overshootClamping: true,

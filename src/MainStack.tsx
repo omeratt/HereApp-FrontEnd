@@ -8,6 +8,8 @@ import {useMyProfileQuery} from './app/api/userApi';
 import {useAppSelector} from './app/hooks';
 import {selectIsSignIn} from './app/Reducers/User/userSlice';
 import Home from './screens/Home';
+import DateSelect from './components/DateSelect';
+import DateList from './components/DateList';
 
 const Stack = createNativeStackNavigator();
 
@@ -34,6 +36,11 @@ export default function MainStack() {
       <Stack.Navigator initialRouteName="Auth">
         {isSignIn ? (
           <>
+            <Stack.Screen
+              name="DateList"
+              component={DateList}
+              options={{headerShown: false}}
+            />
             <Stack.Screen
               name="HomePage"
               component={Home}

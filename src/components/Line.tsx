@@ -76,12 +76,13 @@ export default function Line({
     <Animated.View
       style={[
         {backgroundColor: lineColor},
-        rotate180 && {transform: [{rotate: '180deg'}]},
+        rotate180 && {alignSelf: 'flex-end'},
         // vertical
         //   ? {
         //       width: strength,
         //     }
         //   : {height: strength},
+
         animatedStyle,
         style,
       ]}></Animated.View>

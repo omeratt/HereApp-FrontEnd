@@ -12,7 +12,6 @@ import constants from '../assets/constants';
 import {Dimensions} from 'react-native';
 import AuthModal from './AuthModal';
 
-const WIDTH = Dimensions.get('window').width;
 export default function Auth() {
   return (
     <View style={styles.container}>

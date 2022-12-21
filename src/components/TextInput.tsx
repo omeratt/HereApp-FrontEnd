@@ -5,6 +5,7 @@ import {
   TextInput as Input,
   TextInputProps,
   Dimensions,
+  Keyboard,
 } from 'react-native';
 import React, {forwardRef, useImperativeHandle, useRef, useState} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -31,6 +32,9 @@ const TextInput = forwardRef<InputHandle, TextInputProps>((props, ref) => {
       textInputRef.current?.setNativeProps({text: value});
     },
   }));
+  Keyboard.addListener('keyboardDidHide', () => {
+    textInputRef?.current?.blur();
+  });
   return (
     <View style={styles.container}>
       <Input

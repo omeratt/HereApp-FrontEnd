@@ -314,16 +314,15 @@ const Home = () => {
           // android_keyboardInputMode="adjustResize"
           // keyboardBehavior="fillParent"
           // keyboardBlurBehavior="restore"
+          // contentHeight={constants.HEIGHT}
+          keyboardBlurBehavior="restore"
           handleIndicatorStyle={{backgroundColor: constants.colors.UNDER_LINE}}
           handleStyle={{
             backgroundColor: constants.colors.OFF_WHITE,
           }}
           // enableDismissOnClose
           onChange={handleSheetChanges}>
-          <NewTask
-            isModalVisible={isModalVisible}
-            setModalVisible={setModalVisible}
-          />
+          <NewTask closeModal={bottomSheetModalRef.current?.dismiss} />
         </BottomSheetModal>
       </BottomSheetModalProvider>
     </Animated.View>

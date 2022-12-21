@@ -6,20 +6,22 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 import Animated, {
   FadeInUp,
   SlideInDown,
   SlideInRight,
+  SlideOutRight,
 } from 'react-native-reanimated';
 import constants from '../assets/constants';
 import CircleCheckBox from './CircleCheckBox';
 import {CheckBox} from '@rneui/themed';
 import Modal from 'react-native-modal';
 import {useDeleteTaskMutation} from '../app/api/taskApi';
-
+import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 interface RenderItemProps {
   _id?: string;
   name?: string;
@@ -39,38 +41,73 @@ export default function DisplayTask({data}: props) {
   const onPressDelete = (_id: string) => {
     try {
       DeleteTask(_id).unwrap();
-      setDeleteModalVisible(false);
+      closeDeleteModal();
     } catch (err: any) {
       console.log('err in delete', err);
     }
   };
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+
+  // variables
+  const snapPoints = useMemo(() => ['15%', '15%'], []);
+
+  // callbacks
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
+  const closeDeleteModal = useCallback(() => {
+    bottomSheetModalRef.current?.dismiss();
+  }, []);
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log('handleSheetChanges', index);
+  }, []);
   const DeleteModal = ({_id}: {_id: string}) => {
     return (
-      <Modal
-        onSwipeComplete={() => setDeleteModalVisible(false)}
-        onBackdropPress={() => setDeleteModalVisible(false)}
-        swipeDirection="down"
-        isVisible={deleteModalVisible}>
-        <View style={{height: '50%', width: '100%', alignItems: 'center'}}>
-          <Text>Are you sure you want to delete</Text>
+      <BottomSheetModal
+        ref={bottomSheetModalRef}
+        index={1}
+        snapPoints={snapPoints}
+        // contentHeight={constants.HEIGHT}
+        // detached
+        backgroundStyle={{backgroundColor: constants.colors.GREEN}}
+        stackBehavior="replace"
+        // onChange={handleSheetChanges}
+      >
+        <View
+          style={{
+            height: '100%',
+            width: '100%',
+            alignItems: 'center',
+          }}>
+          <Text style={[styles.deleteTxt, {marginBottom: '5%'}]}>
+            Are you sure you want to delete
+          </Text>
           <View
             style={{
-              height: '20%',
+              // height: '100%',
               width: '70%',
               alignItems: 'center',
               justifyContent: 'space-around',
 
               flexDirection: 'row',
             }}>
-            <TouchableOpacity onPress={() => onPressDelete(_id)}>
-              <Text>Yes</Text>
+            <TouchableOpacity
+              style={{
+                // backgroundColor: '#DD3C2E',
+                width: '35%',
+                borderColor: constants.colors.UNDER_LINE,
+                borderRadius: 100,
+                borderWidth: 1,
+              }}
+              onPress={() => onPressDelete(_id)}>
+              <Text style={styles.deleteTxt}>Yes</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setDeleteModalVisible(false)}>
-              <Text>No</Text>
+            <TouchableOpacity style={{width: '35%'}} onPress={closeDeleteModal}>
+              <Text style={styles.deleteTxt}>No</Text>
             </TouchableOpacity>
           </View>
         </View>
-      </Modal>
+      </BottomSheetModal>
     );
   };
   const emptyList = () => {
@@ -82,9 +119,10 @@ export default function DisplayTask({data}: props) {
   const renderItem: ListRenderItem<RenderItemProps> = ({item, index}) => (
     <Animated.View
       style={styles.taskListContainer}
-      entering={SlideInDown.delay(index * 100).duration(1000)}>
+      exiting={SlideOutRight.duration(1500)}
+      entering={SlideInDown.delay(index * 50).duration(500)}>
       <View style={styles.taskListContent}>
-        <TouchableOpacity onLongPress={() => setDeleteModalVisible(true)}>
+        <TouchableOpacity onLongPress={() => handlePresentModalPress()}>
           <Text style={styles.taskContentTitle}>{item.name}</Text>
           <Text style={styles.taskContentBody}>{item.details}</Text>
         </TouchableOpacity>
@@ -117,6 +155,7 @@ export default function DisplayTask({data}: props) {
           uncheckedColor="#F00"
         />
       </View>
+
       <DeleteModal _id={item._id as string} />
     </Animated.View>
   );
@@ -225,5 +264,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: constants.colors.UNDER_LINE,
     borderRadius: 800,
+  },
+  deleteTxt: {
+    color: constants.colors.BGC,
+    fontFamily: constants.Fonts.text,
+    fontSize: 15.5,
+    textAlign: 'center',
   },
 });

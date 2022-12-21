@@ -12,7 +12,6 @@ import constants from '../assets/constants';
 import {Dimensions} from 'react-native';
 import AuthModal from './AuthModal';
 
-const WIDTH = Dimensions.get('window').width;
 export default function Auth() {
   return (
     <View style={styles.container}>
@@ -25,7 +24,7 @@ export default function Auth() {
           style={styles.Logo}>
           HERE
         </Text> */}
-        <SVG.HereLogo width="200" height="200" />
+        <SVG.HereLogo width="70%" height="50%" />
       </View>
       <AuthModal />
     </View>
@@ -40,7 +39,7 @@ const styles = StyleSheet.create({
     backgroundColor: constants.colors.BGC,
   },
   topSection: {
-    marginRight: WIDTH / 10,
+    // marginRight: WIDTH / 10,
     flex: 1,
     width: '100%',
     alignItems: 'center',

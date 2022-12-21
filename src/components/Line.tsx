@@ -11,12 +11,18 @@ import Animated, {
 interface props {
   lengthPercentage?: number;
   vertical?: boolean;
+  rotate180?: boolean;
   style?: {};
+  lineColor?: string;
+  strength?: number;
 }
 export default function Line({
   lengthPercentage = 100,
   vertical = false,
   style,
+  rotate180 = false,
+  lineColor = constants.colors.GREY,
+  strength = 2,
 }: props) {
   const animation = useSharedValue(0);
 
@@ -32,11 +38,14 @@ export default function Line({
     const animatedConfig = vertical
       ? {
           height: height.value + '%',
-          width: 2,
+          width: strength,
+          ...(rotate180 && {transform: [{rotate: '180deg'}]}),
         }
       : {
+          ...(rotate180 && {transform: [{rotate: '180deg'}]}),
+
           width: width.value + '%',
-          height: 2,
+          height: strength,
         };
     return {
       ...animatedConfig,
@@ -66,12 +75,14 @@ export default function Line({
   return (
     <Animated.View
       style={[
-        styles.line,
-        vertical
-          ? {
-              width: 2,
-            }
-          : {height: 2},
+        {backgroundColor: lineColor},
+        rotate180 && {alignSelf: 'flex-end'},
+        // vertical
+        //   ? {
+        //       width: strength,
+        //     }
+        //   : {height: strength},
+
         animatedStyle,
         style,
       ]}></Animated.View>
@@ -80,6 +91,6 @@ export default function Line({
 
 const styles = StyleSheet.create({
   line: {
-    backgroundColor: constants.colors.GREY,
+    // backgroundColor: constants.colors.GREY,
   },
 });

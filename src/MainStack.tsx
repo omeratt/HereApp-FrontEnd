@@ -7,6 +7,9 @@ import Welcome from './screens/Welcome';
 import {useMyProfileQuery} from './app/api/userApi';
 import {useAppSelector} from './app/hooks';
 import {selectIsSignIn} from './app/Reducers/User/userSlice';
+import Home from './screens/Home';
+import DateSelect from './components/DateSelect';
+import DateList from './components/DateList';
 
 const Stack = createNativeStackNavigator();
 
@@ -32,11 +35,23 @@ export default function MainStack() {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Auth">
         {isSignIn ? (
-          <Stack.Screen
-            name="Welcome"
-            component={Welcome}
-            options={{headerShown: false}}
-          />
+          <>
+            {/* <Stack.Screen
+              name="DateList"
+              component={DateList}
+              options={{headerShown: false}}
+            /> */}
+            <Stack.Screen
+              name="Welcome"
+              component={Welcome}
+              options={{headerShown: false}}
+            />
+            <Stack.Screen
+              name="HomePage"
+              component={Home}
+              options={{headerShown: false}}
+            />
+          </>
         ) : (
           <>
             <Stack.Screen
@@ -44,11 +59,6 @@ export default function MainStack() {
               component={Auth}
               options={{headerShown: false}}
             />
-            {/* <Stack.Screen
-            name="Home"
-            component={Home}
-            options={{headerShown: false}}
-          /> */}
           </>
         )}
       </Stack.Navigator>

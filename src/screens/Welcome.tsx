@@ -13,9 +13,11 @@ import {logout, selectUser, setUser} from '../app/Reducers/User/userSlice';
 import {useAppDispatch, useAppSelector} from '../app/hooks';
 import {RootState} from '../app/store';
 import {useLogoutMutation} from '../app/api/userApi';
+import {useNavigation} from '@react-navigation/native';
 
 export default function Welcome() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigation();
   // const user = useAppSelector(selectUser);
   // console.log(user);
   const slide = useSharedValue(-260);
@@ -36,24 +38,8 @@ export default function Welcome() {
     };
   }, []);
 
-  const [Logout, {isLoading, data, isSuccess, isError, error}] =
-    useLogoutMutation();
-  useEffect(() => {
-    if (data) {
-      console.log('logout', data);
-    }
-    if (error) {
-      console.log('logoutError', error);
-    }
-  }, [data, error]);
-
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={{alignItems: 'center', justifyContent: 'center'}}
-        onPress={async () => await Logout(null)}>
-        <Text>logout</Text>
-      </TouchableOpacity>
       <View style={[styles.cubeContainer, {height: '11.2%'}]}>
         <View
           style={{
@@ -114,7 +100,7 @@ export default function Welcome() {
               transform: [{translateX: -8}, {translateY: 10}],
             }}
             onPress={() => {
-              dispatch(logout());
+              navigate.navigate('HomePage' as never);
             }}>
             <SVG.StartButton viewBox="0 0 200 200" width={150} height={150} />
           </TouchableOpacity>

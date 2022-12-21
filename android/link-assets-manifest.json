@@ -20,6 +20,10 @@
     {
       "path": "src/assets/fonts/Report-Regular.ttf",
       "sha1": "bf22b2e6036a9c4827de6abe8d019c5b500ee5d1"
+    },
+    {
+      "path": "src/assets/fonts/SansSerifFLF.otf",
+      "sha1": "4169bb34b552d3ac95580a940a5d4a11dd02dd2c"
     }
   ]
 }

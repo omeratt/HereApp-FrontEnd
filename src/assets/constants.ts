@@ -4,12 +4,13 @@ const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
 
 const constants = {
-  // BASE_URL: 'https://here.cyclic.app/',
+  BASE_URL: 'https://here.cyclic.app/',
+  // BASE_URL: 'https://here-app.onrender.com/',
   /***************** Eliran ***************/
   // BASE_URL: 'http://192.168.1.32:3000/',
 
   /***************** Omer ***************/
-  BASE_URL: 'http://192.168.1.58:3000/',
+  // BASE_URL: 'http://192.168.1.58:3000/',
   colors: {
     GREEN: '#D0FD0C',
     BLACK: '#000000',
@@ -19,7 +20,8 @@ const constants = {
     UNDER_LINE: '#B9AB85',
   },
   Fonts: {
-    paragraph: 'Report-Regular',
+    // paragraph: 'Report-Regular',
+    paragraph: 'SansSerifFLF',
     text: 'Montserrat-Regular',
     button: 'Montserrat-Thin',
     italic: 'Montserrat-MediumItalic',

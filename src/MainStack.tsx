@@ -42,13 +42,13 @@ export default function MainStack() {
               options={{headerShown: false}}
             /> */}
             <Stack.Screen
-              name="HomePage"
-              component={Home}
+              name="Welcome"
+              component={Welcome}
               options={{headerShown: false}}
             />
             <Stack.Screen
-              name="Welcome"
-              component={Welcome}
+              name="HomePage"
+              component={Home}
               options={{headerShown: false}}
             />
           </>
@@ -59,11 +59,6 @@ export default function MainStack() {
               component={Auth}
               options={{headerShown: false}}
             />
-            {/* <Stack.Screen
-            name="Home"
-            component={Home}
-            options={{headerShown: false}}
-          /> */}
           </>
         )}
       </Stack.Navigator>

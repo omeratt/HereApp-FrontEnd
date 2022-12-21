@@ -5,9 +5,10 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import Animated, {
   FadeInUp,
   SlideInDown,
@@ -16,8 +17,11 @@ import Animated, {
 import constants from '../assets/constants';
 import CircleCheckBox from './CircleCheckBox';
 import {CheckBox} from '@rneui/themed';
+import Modal from 'react-native-modal';
+import {useDeleteTaskMutation} from '../app/api/taskApi';
 
 interface RenderItemProps {
+  _id?: string;
   name?: string;
   details?: string;
   expires?: string;
@@ -26,17 +30,64 @@ interface RenderItemProps {
 interface props {
   data: any[];
 }
-const emptyList = () => (
-  <ActivityIndicator size={30} color={constants.colors.GREEN} />
-);
 export default function DisplayTask({data}: props) {
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [
+    DeleteTask,
+    {isLoading, data: responseDelete, isSuccess, isError, error},
+  ] = useDeleteTaskMutation();
+  const onPressDelete = (_id: string) => {
+    try {
+      DeleteTask(_id).unwrap();
+      setDeleteModalVisible(false);
+    } catch (err: any) {
+      console.log('err in delete', err);
+    }
+  };
+  const DeleteModal = ({_id}: {_id: string}) => {
+    return (
+      <Modal
+        onSwipeComplete={() => setDeleteModalVisible(false)}
+        onBackdropPress={() => setDeleteModalVisible(false)}
+        swipeDirection="down"
+        isVisible={deleteModalVisible}>
+        <View style={{height: '50%', width: '100%', alignItems: 'center'}}>
+          <Text>Are you sure you want to delete</Text>
+          <View
+            style={{
+              height: '20%',
+              width: '70%',
+              alignItems: 'center',
+              justifyContent: 'space-around',
+
+              flexDirection: 'row',
+            }}>
+            <TouchableOpacity onPress={() => onPressDelete(_id)}>
+              <Text>Yes</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setDeleteModalVisible(false)}>
+              <Text>No</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+  const emptyList = () => {
+    console.log(data);
+    if (data === undefined)
+      return <ActivityIndicator size={30} color={constants.colors.GREEN} />;
+    else return null;
+  };
   const renderItem: ListRenderItem<RenderItemProps> = ({item, index}) => (
     <Animated.View
       style={styles.taskListContainer}
       entering={SlideInDown.delay(index * 100).duration(1000)}>
       <View style={styles.taskListContent}>
-        <Text style={styles.taskContentTitle}>{item.name}</Text>
-        <Text style={styles.taskContentBody}>{item.details}</Text>
+        <TouchableOpacity onLongPress={() => setDeleteModalVisible(true)}>
+          <Text style={styles.taskContentTitle}>{item.name}</Text>
+          <Text style={styles.taskContentBody}>{item.details}</Text>
+        </TouchableOpacity>
       </View>
       <View>
         <CheckBox
@@ -66,6 +117,7 @@ export default function DisplayTask({data}: props) {
           uncheckedColor="#F00"
         />
       </View>
+      <DeleteModal _id={item._id as string} />
     </Animated.View>
   );
 

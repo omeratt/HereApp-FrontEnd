@@ -1,5 +1,5 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import constants from '../assets/constants';
 import SVG from '../assets/svg';
 import {useLogoutMutation} from '../app/api/userApi';
@@ -12,8 +12,14 @@ import Animated, {
   FlipInYRight,
   ZoomInEasyDown,
 } from 'react-native-reanimated';
-import {useGetTasksQuery} from '../app/api/taskApi';
+import {
+  tasksApi,
+  useGetTasksByDateQuery,
+  useGetTasksQuery,
+} from '../app/api/taskApi';
 import DisplayTask from '../components/DisplayTask';
+import {useAppDispatch} from '../app/hooks';
+import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 // import {TouchableOpacity} from 'react-native-gesture-handler';
 
 const dates = [
@@ -57,14 +63,64 @@ const dates = [
 const Home = () => {
   const [Logout, {isLoading, data, isSuccess, isError, error}] =
     useLogoutMutation();
+
   const [isModalVisible, setModalVisible] = useState(false);
+
+  const [tasks, setTasks] = useState<any[]>([]);
+  const [dates, setDates] = useState<Date[]>([]);
+  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [offset, setOffset] = useState(0);
+  const [isNext, setIsNext] = useState<boolean>(false);
+  const dispatch = useAppDispatch();
   const {
     isLoading: taskLoading,
-    data: tasks,
+    data: tasks1,
     isSuccess: taskSuccess,
     isError: taskIsError,
     error: tasksError,
-  } = useGetTasksQuery('');
+  } = useGetTasksByDateQuery(selectedDate);
+  const datePress = (date: Date) => {
+    setSelectedDate(date.toLocaleDateString().split('.').join('/'));
+    const result = dispatch(
+      tasksApi.endpoints.getTasksByDate.initiate(
+        date.toLocaleDateString().split('.').join('/'),
+      ),
+    )
+      .then(res => {
+        setTasks(res.data);
+      })
+      .catch(err => {
+        console.log('error getting tasks', error);
+      });
+  };
+  useEffect(() => {
+    // Generate the dates for the current week
+    const currentDate = new Date();
+    const currentDayOfWeek = currentDate.getDay();
+    const weekDates = [];
+    for (let i = 0; i < 7; i++) {
+      weekDates.push(
+        new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate() - currentDayOfWeek + i + offset,
+        ),
+      );
+    }
+    setDates(weekDates.reverse());
+    // Set the initial selected date to today
+    setSelectedDate(currentDate.toLocaleDateString().split('.').join('/'));
+  }, [offset]);
+
+  const handleBackPress = () => {
+    setIsNext(false);
+    setOffset(offset - 7);
+  };
+
+  const handleNextPress = () => {
+    setIsNext(true);
+    setOffset(offset + 7);
+  };
   useEffect(() => {
     if (data) {
       console.log('logout', data);
@@ -74,13 +130,14 @@ const Home = () => {
     }
   }, [data, error]);
   useEffect(() => {
-    if (tasks) {
+    if (tasks1) {
       console.log('getting tasks', tasks);
+      setTasks(tasks1);
     }
     if (error) {
       console.log('error getting tasks', error);
     }
-  }, [tasks, tasksError]);
+  }, [tasks1, tasksError]);
   const SignOut = () => (
     <TouchableOpacity
       style={{
@@ -92,6 +149,19 @@ const Home = () => {
       <Text style={{color: 'black'}}>logout</Text>
     </TouchableOpacity>
   );
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+
+  // variables
+  const snapPoints = useMemo(() => ['25%', '100%'], []);
+
+  // callbacks
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log('handleSheetChanges', index);
+  }, []);
+
   return (
     <Animated.View
       entering={FadeIn}
@@ -102,8 +172,8 @@ const Home = () => {
         <View style={styles.task}>
           <View style={styles.today}>
             <TouchableOpacity
-              onPress={() => setModalVisible(!isModalVisible)}
-              // onPressIn={() => setModalVisible(!isModalVisible)}
+              // onPress={() => setModalVisible(!isModalVisible)}
+              onPress={handlePresentModalPress}
               style={[
                 // styles.plusIcon,
                 {
@@ -126,19 +196,45 @@ const Home = () => {
             </TouchableOpacity>
             <Text style={styles.taskTitle}>Today</Text>
           </View>
-          <View style={styles.date}>
-            {dates.map(date => (
-              <View key={date.key} style={styles.dateContent}>
-                {/*TODO: horizontal flatlist*/}
-                <Text style={[styles.dateText, {marginBottom: '25%'}]}>
-                  {date.dayName}
-                </Text>
-                <View style={styles.datePicker}>
-                  <Text style={styles.dateText}>{date.dayNum}</Text>
+          <Animated.View style={styles.date}>
+            {dates.map(date => {
+              const dateString = date.toDateString();
+              return (
+                <View key={dateString} style={styles.dateContent}>
+                  <TouchableOpacity
+                    style={{width: '100%'}}
+                    onPress={() => {
+                      datePress(date);
+                    }}>
+                    {/*TODO: horizontal flatlist*/}
+                    <Text style={[styles.dateText, {marginBottom: '25%'}]}>
+                      {dateString.substring(0, 3)}
+                    </Text>
+                    <View
+                      style={[
+                        styles.datePicker,
+                        {
+                          backgroundColor:
+                            selectedDate ===
+                            date.toLocaleDateString().split('.').join('/')
+                              ? constants.colors.GREEN
+                              : 'transparent',
+                          elevation:
+                            selectedDate ===
+                            date.toLocaleDateString().split('.').join('/')
+                              ? 5
+                              : 0,
+                        },
+                      ]}>
+                      <Text style={styles.dateText}>
+                        {dateString.substring(8, 10)}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
                 </View>
-              </View>
-            ))}
-          </View>
+              );
+            })}
+          </Animated.View>
           <View style={styles.taskListColumnContainer}>
             <DisplayTask data={tasks} />
             {/* <View style={styles.taskListContainer}>
@@ -210,10 +306,26 @@ const Home = () => {
           <SVG.Search height="100%" width="100%" />
         </View>
       </View>
-      <NewTask
-        isModalVisible={isModalVisible}
-        setModalVisible={setModalVisible}
-      />
+      <BottomSheetModalProvider>
+        <BottomSheetModal
+          ref={bottomSheetModalRef}
+          index={1}
+          snapPoints={snapPoints}
+          // android_keyboardInputMode="adjustResize"
+          // keyboardBehavior="fillParent"
+          // keyboardBlurBehavior="restore"
+          handleIndicatorStyle={{backgroundColor: constants.colors.UNDER_LINE}}
+          handleStyle={{
+            backgroundColor: constants.colors.OFF_WHITE,
+          }}
+          // enableDismissOnClose
+          onChange={handleSheetChanges}>
+          <NewTask
+            isModalVisible={isModalVisible}
+            setModalVisible={setModalVisible}
+          />
+        </BottomSheetModal>
+      </BottomSheetModalProvider>
     </Animated.View>
   );
 };
@@ -330,11 +442,10 @@ const styles = StyleSheet.create({
   datePicker: {
     height: '55%',
     width: '100%',
-    backgroundColor: constants.colors.GREEN,
+
     borderRadius: 800,
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 5,
   },
   taskListColumnContainer: {
     height: `${100 - 23.5 - 15}%`,

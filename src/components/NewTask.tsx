@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useCallback, useRef, useState} from 'react';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 import Modal from 'react-native-modal';
 import constants from '../assets/constants';
 import SVG from '../assets/svg';
@@ -29,7 +29,7 @@ import {
 } from 'react-native-keyboard-aware-scroll-view';
 import DateSelect from './DateSelect';
 import {useAddTaskMutation} from '../app/api/taskApi';
-
+import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 const DEFAULT_FLEX = {
   PUSH: 1.2,
   ALL_DAY: 1,
@@ -249,288 +249,230 @@ const NewTask = ({isModalVisible, setModalVisible}: props) => {
     // ref.current?.scrollToPosition(0, 0);
     // reactNode;
   };
+
   return (
-    <Modal
-      animationIn={'bounceInUp'}
-      animationInTiming={1500}
-      isVisible={isModalVisible}
-      onSwipeComplete={() => (setModalVisible(false), setDescription(''))}
-      onBackdropPress={() => setModalVisible(false)}
-      style={styles.container}
-      // avoidKeyboard
-      swipeDirection="down">
-      {/* <ScrollView
-        contentContainerStyle={{
-          // flex: 1,
-          justifyContent: 'center',
-          height: constants.HEIGHT,
-          width: constants.WIDTH,
-          alignItems: 'center',
-          // paddingRight: '3.2%',
-        }}> */}
-      <View style={{height: constants.HEIGHT, width: constants.WIDTH}}>
-        <View
-          style={
-            {
-              // alignSelf: 'center',
-              // flex: 1,
-              // width: constants.WIDTH,
-              // height: constants.HEIGHT,
-            }
-          }>
-          <Animated.View style={styles.container}>
-            {/* <KeyboardAwareScrollView
-            style={
-              {
-                // width: constants.WIDTH,
-                // height: constants.HEIGHT,
-                // backgroundColor: 'yellow',
-                // flex: 1,
-              }
-            }
-            ref={ref}> */}
-            <Animated.View style={styles.realContainer}>
-              <View style={styles.newTask}>
-                <Text style={styles.headLineTxt}>New Task</Text>
-                <View style={[styles.newTaskTitleInputContainer]}>
-                  <TextInput
-                    maxLength={19}
-                    // onChange
-                    onChangeText={val => setTaskName(val)}
-                    // onFocus={event =>
-                    //   scrollToInput(findNodeHandle(event.target))
-                    // }
-                    placeholder="Name"
-                    placeholderTextColor={constants.colors.GREY}
-                    selectionColor={constants.colors.GREEN}
-                    cursorColor={constants.colors.GREEN}
-                    style={styles.newTaskTitleInput}
-                    autoFocus
-                  />
-                </View>
-              </View>
+    <Animated.View style={styles.container}>
+      <Animated.View style={styles.realContainer}>
+        <View style={styles.newTask}>
+          <Text style={styles.headLineTxt}>New Task</Text>
+          <View style={[styles.newTaskTitleInputContainer]}>
+            <TextInput
+              maxLength={19}
+              // onChange
+              onChangeText={val => setTaskName(val)}
+              placeholder="Name"
+              placeholderTextColor={constants.colors.GREY}
+              selectionColor={constants.colors.GREEN}
+              cursorColor={constants.colors.GREEN}
+              style={styles.newTaskTitleInput}
+              autoFocus
+            />
+          </View>
+        </View>
 
+        <Animated.View style={[styles.allDayLong, AnimateStyle('ALL_DAY')]}>
+          <Line
+            strength={1}
+            lengthPercentage={100}
+            rotate180
+            lineColor={constants.colors.UNDER_LINE}
+          />
+          <Animated.View style={styles.textAndToggleContainer}>
+            <View style={styles.textAndToggle}>
+              <SwitchToggle
+                switchOn={!allDayOn}
+                onPress={() => {
+                  open('ALL_DAY');
+                }}
+                RTL
+                backgroundColorOff={constants.colors.BGC}
+                backgroundColorOn={constants.colors.OFF_WHITE}
+                circleColorOff={constants.colors.GREEN}
+                circleColorOn={constants.colors.GREEN}
+                containerStyle={containerStyle}
+                circleStyle={circleStyle}
+              />
+              <TouchableOpacity onPress={() => handleNamePress('ALL_DAY')}>
+                <Text style={[styles.sectionTxt]}>All day long</Text>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+
+          <Animated.View
+            style={[styles.EveryContainer, EveryContainerStyle('ALL_DAY')]}>
+            {allDayOpen && (
               <Animated.View
-                style={[styles.allDayLong, AnimateStyle('ALL_DAY')]}>
-                <Line
-                  strength={1}
-                  lengthPercentage={100}
-                  rotate180
-                  lineColor={constants.colors.UNDER_LINE}
+                style={[
+                  styles.dateContainer,
+                  // allDayOn ? {flex: 2.5} : {flex: ZERO},
+                ]}>
+                <DateSelect
+                  handleList={datesList}
+                  setHandleList={setDatesList}
                 />
-                <Animated.View style={styles.textAndToggleContainer}>
-                  <View style={styles.textAndToggle}>
-                    <SwitchToggle
-                      switchOn={!allDayOn}
-                      onPress={() => {
-                        open('ALL_DAY');
-                      }}
-                      RTL
-                      backgroundColorOff={constants.colors.BGC}
-                      backgroundColorOn={constants.colors.OFF_WHITE}
-                      circleColorOff={constants.colors.GREEN}
-                      circleColorOn={constants.colors.GREEN}
-                      containerStyle={containerStyle}
-                      circleStyle={circleStyle}
-                    />
-                    <TouchableOpacity
-                      onPress={() => handleNamePress('ALL_DAY')}>
-                      <Text style={[styles.sectionTxt]}>All day long</Text>
-                    </TouchableOpacity>
-                  </View>
-                </Animated.View>
-
-                <Animated.View
-                  style={[
-                    styles.EveryContainer,
-                    EveryContainerStyle('ALL_DAY'),
-                  ]}>
-                  {allDayOpen && (
-                    <Animated.View
-                      style={[
-                        styles.dateContainer,
-                        // allDayOn ? {flex: 2.5} : {flex: ZERO},
-                      ]}>
-                      <DateSelect
-                        handleList={datesList}
-                        setHandleList={setDatesList}
-                      />
-                    </Animated.View>
-                  )}
-                  {/* <Text style={[styles.sectionTxt, {fontSize: 12}]}>
+              </Animated.View>
+            )}
+            {/* <Text style={[styles.sectionTxt, {fontSize: 12}]}>
                     times date ...
                   </Text> */}
-                </Animated.View>
-              </Animated.View>
-              {/* @@@@ REPEAT @@@@ */}
-              <Animated.View
-                style={[styles.allDayLong, AnimateStyle('REPEAT')]}>
-                <Line
-                  strength={1}
-                  lengthPercentage={100}
-                  lineColor={constants.colors.UNDER_LINE}
-                />
-                <Animated.View style={styles.textAndToggleContainer}>
-                  <View style={styles.textAndToggle}>
-                    <SwitchToggle
-                      switchOn={!repeatOn}
-                      onPress={() => {
-                        open('REPEAT');
-                      }}
-                      RTL
-                      backgroundColorOff={constants.colors.BLACK}
-                      backgroundColorOn={constants.colors.OFF_WHITE}
-                      circleColorOff={constants.colors.GREEN}
-                      circleColorOn={constants.colors.GREEN}
-                      containerStyle={containerStyle}
-                      circleStyle={circleStyle}
-                    />
-                    <TouchableOpacity onPress={() => handleNamePress('REPEAT')}>
-                      <Text style={[styles.sectionTxt]}>Repeat every ...</Text>
-                    </TouchableOpacity>
-                  </View>
-                </Animated.View>
-
-                <Animated.View
-                  style={[
-                    styles.EveryContainer,
-                    EveryContainerStyle('REPEAT'),
-                  ]}>
-                  {repeatOpen && (
-                    <Animated.View
-                      style={[
-                        styles.dateContainer,
-                        // allDayOn ? {flex: 2.5} : {flex: ZERO},
-                      ]}>
-                      <DateSelect
-                        handleList={datesList}
-                        setHandleList={setDatesList}
-                      />
-                    </Animated.View>
-                  )}
-                </Animated.View>
-              </Animated.View>
-              <Animated.View
-                style={[styles.description, AnimateStyle('DESCRIPTION')]}>
-                <Line
-                  strength={1}
-                  lengthPercentage={100}
-                  lineColor={constants.colors.UNDER_LINE}
-                  rotate180
-                />
-                <View style={[styles.description]}>
-                  <Animated.View style={styles.descriptionContainer}>
-                    <TouchableOpacity
-                      onPress={() => handleNamePress('DESCRIPTION')}>
-                      <Text style={[styles.sectionTxt]}>Description</Text>
-                    </TouchableOpacity>
-                  </Animated.View>
-                </View>
-
-                <Animated.View
-                  style={[
-                    styles.EveryContainer,
-                    EveryContainerStyle('DESCRIPTION'),
-                  ]}>
-                  {descriptionOpen && (
-                    <Animated.View style={[styles.descriptionInputContainer]}>
-                      <TextInput
-                        numberOfLines={4}
-                        multiline
-                        onChangeText={val => setDescription(val)}
-                        selectionColor={constants.colors.GREEN}
-                        cursorColor={constants.colors.GREEN}
-                        style={[styles.descriptionInput]}
-                        autoFocus
-                        defaultValue={description}
-                      />
-                    </Animated.View>
-                  )}
-                </Animated.View>
-              </Animated.View>
-              <Animated.View style={[styles.push, AnimateStyle('PUSH')]}>
-                <Line
-                  strength={1}
-                  lengthPercentage={100}
-                  lineColor={constants.colors.UNDER_LINE}
-                />
-                <Animated.View style={styles.textAndToggleContainer}>
-                  <View style={styles.textAndToggle}>
-                    <SwitchToggle
-                      switchOn={!pushOn}
-                      onPress={() => {
-                        open('PUSH');
-                      }}
-                      RTL
-                      backgroundColorOff={constants.colors.BLACK}
-                      backgroundColorOn={constants.colors.OFF_WHITE}
-                      circleColorOff={constants.colors.GREEN}
-                      circleColorOn={constants.colors.GREEN}
-                      containerStyle={containerStyle}
-                      circleStyle={circleStyle}
-                    />
-
-                    <TouchableOpacity onPress={() => handleNamePress('PUSH')}>
-                      <Text style={[styles.sectionTxt, {fontSize: 22}]}>
-                        Push it for me
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </Animated.View>
-
-                <Animated.View
-                  style={[styles.EveryContainer, EveryContainerStyle('PUSH')]}>
-                  <Text style={[styles.sectionTxt, {fontSize: 12}]}>
-                    times date ...
-                  </Text>
-                </Animated.View>
-              </Animated.View>
-              <View style={styles.share}>
-                <Line
-                  strength={1}
-                  lengthPercentage={100}
-                  lineColor={constants.colors.UNDER_LINE}
-                  rotate180
-                />
-                <View style={styles.textAndToggleContainer}>
-                  <View style={styles.textAndToggle}>
-                    <TouchableOpacity onPress={() => {}}>
-                      <SVG.plusIconOutlined
-                        fill={constants.colors.BGC}
-                        height="100%"
-                      />
-                    </TouchableOpacity>
-                    <Text style={[styles.sectionTxt, {fontSize: 22}]}>
-                      Share this task
-                    </Text>
-                  </View>
-                </View>
-              </View>
-              <View style={styles.note}>
-                <Line
-                  strength={1}
-                  lengthPercentage={100}
-                  lineColor={constants.colors.UNDER_LINE}
-                />
-                <View style={styles.noteTxtContainer}>
-                  <Text style={[styles.sectionTxt, {fontSize: 22}]}>Note</Text>
-                </View>
-              </View>
-            </Animated.View>
-
-            <TouchableOpacity onPress={submit} style={styles.buttonContainer}>
-              <SVG.DoneButton
-                fill={constants.colors.BLACK}
-                width="100%"
-                height="100%"
-              />
-            </TouchableOpacity>
           </Animated.View>
-          {/* </KeyboardAwareScrollView> */}
+        </Animated.View>
+        {/* @@@@ REPEAT @@@@ */}
+        <Animated.View style={[styles.allDayLong, AnimateStyle('REPEAT')]}>
+          <Line
+            strength={1}
+            lengthPercentage={100}
+            lineColor={constants.colors.UNDER_LINE}
+          />
+          <Animated.View style={styles.textAndToggleContainer}>
+            <View style={styles.textAndToggle}>
+              <SwitchToggle
+                switchOn={!repeatOn}
+                onPress={() => {
+                  open('REPEAT');
+                }}
+                RTL
+                backgroundColorOff={constants.colors.BLACK}
+                backgroundColorOn={constants.colors.OFF_WHITE}
+                circleColorOff={constants.colors.GREEN}
+                circleColorOn={constants.colors.GREEN}
+                containerStyle={containerStyle}
+                circleStyle={circleStyle}
+              />
+              <TouchableOpacity onPress={() => handleNamePress('REPEAT')}>
+                <Text style={[styles.sectionTxt]}>Repeat every ...</Text>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+
+          <Animated.View
+            style={[styles.EveryContainer, EveryContainerStyle('REPEAT')]}>
+            {repeatOpen && (
+              <Animated.View
+                style={[
+                  styles.dateContainer,
+                  // allDayOn ? {flex: 2.5} : {flex: ZERO},
+                ]}>
+                <DateSelect
+                  handleList={datesList}
+                  setHandleList={setDatesList}
+                />
+              </Animated.View>
+            )}
+          </Animated.View>
+        </Animated.View>
+        <Animated.View
+          style={[styles.description, AnimateStyle('DESCRIPTION')]}>
+          <Line
+            strength={1}
+            lengthPercentage={100}
+            lineColor={constants.colors.UNDER_LINE}
+            rotate180
+          />
+          <View style={[styles.description]}>
+            <Animated.View style={styles.descriptionContainer}>
+              <TouchableOpacity onPress={() => handleNamePress('DESCRIPTION')}>
+                <Text style={[styles.sectionTxt]}>Description</Text>
+              </TouchableOpacity>
+            </Animated.View>
+          </View>
+
+          <Animated.View
+            style={[styles.EveryContainer, EveryContainerStyle('DESCRIPTION')]}>
+            {descriptionOpen && (
+              <Animated.View style={[styles.descriptionInputContainer]}>
+                <TextInput
+                  numberOfLines={4}
+                  multiline
+                  onChangeText={val => setDescription(val)}
+                  selectionColor={constants.colors.GREEN}
+                  cursorColor={constants.colors.GREEN}
+                  style={[styles.descriptionInput]}
+                  autoFocus
+                  defaultValue={description}
+                />
+              </Animated.View>
+            )}
+          </Animated.View>
+        </Animated.View>
+        <Animated.View style={[styles.push, AnimateStyle('PUSH')]}>
+          <Line
+            strength={1}
+            lengthPercentage={100}
+            lineColor={constants.colors.UNDER_LINE}
+          />
+          <Animated.View style={styles.textAndToggleContainer}>
+            <View style={styles.textAndToggle}>
+              <SwitchToggle
+                switchOn={!pushOn}
+                onPress={() => {
+                  open('PUSH');
+                }}
+                RTL
+                backgroundColorOff={constants.colors.BLACK}
+                backgroundColorOn={constants.colors.OFF_WHITE}
+                circleColorOff={constants.colors.GREEN}
+                circleColorOn={constants.colors.GREEN}
+                containerStyle={containerStyle}
+                circleStyle={circleStyle}
+              />
+
+              <TouchableOpacity onPress={() => handleNamePress('PUSH')}>
+                <Text style={[styles.sectionTxt, {fontSize: 22}]}>
+                  Push it for me
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+
+          <Animated.View
+            style={[styles.EveryContainer, EveryContainerStyle('PUSH')]}>
+            <Text style={[styles.sectionTxt, {fontSize: 12}]}>
+              times date ...
+            </Text>
+          </Animated.View>
+        </Animated.View>
+        <View style={styles.share}>
+          <Line
+            strength={1}
+            lengthPercentage={100}
+            lineColor={constants.colors.UNDER_LINE}
+            rotate180
+          />
+          <View style={styles.textAndToggleContainer}>
+            <View style={styles.textAndToggle}>
+              <TouchableOpacity onPress={() => {}}>
+                <SVG.plusIconOutlined
+                  fill={constants.colors.BGC}
+                  height="100%"
+                />
+              </TouchableOpacity>
+              <Text style={[styles.sectionTxt, {fontSize: 22}]}>
+                Share this task
+              </Text>
+            </View>
+          </View>
         </View>
-      </View>
-      {/* </ScrollView> */}
-    </Modal>
+        <View style={styles.note}>
+          <Line
+            strength={1}
+            lengthPercentage={100}
+            lineColor={constants.colors.UNDER_LINE}
+          />
+          <View style={styles.noteTxtContainer}>
+            <Text style={[styles.sectionTxt, {fontSize: 22}]}>Note</Text>
+          </View>
+        </View>
+      </Animated.View>
+
+      <TouchableOpacity onPress={submit} style={styles.buttonContainer}>
+        <SVG.DoneButton
+          fill={constants.colors.BLACK}
+          width="100%"
+          height="100%"
+        />
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 

@@ -9,6 +9,19 @@ export const tasksApi = userApi.injectEndpoints({
         return response.data;
       },
     }),
+    getTasksByDate: builder.query({
+      query: (date: string) => {
+        return {
+          url: 'tasks/date',
+          method: 'POST',
+          body: {date},
+        };
+      },
+      providesTags: ['TasksByDate'],
+      transformResponse: (response: any, meta, arg) => {
+        return response.data;
+      },
+    }),
     addTask: builder.mutation({
       query: task => ({
         url: 'task',
@@ -16,7 +29,7 @@ export const tasksApi = userApi.injectEndpoints({
         body: task,
         credentials: 'include',
       }),
-      invalidatesTags: ['Tasks'],
+      invalidatesTags: ['TasksByDate'],
       transformResponse: (response: any, meta, arg) => {
         return response.data;
       },
@@ -27,7 +40,7 @@ export const tasksApi = userApi.injectEndpoints({
         method: 'DELETE',
         credentials: 'include',
       }),
-      invalidatesTags: ['Tasks'],
+      invalidatesTags: ['TasksByDate'],
       transformResponse: (response: any, meta, arg) => {
         return response.data;
       },
@@ -35,5 +48,9 @@ export const tasksApi = userApi.injectEndpoints({
   }),
 });
 
-export const {useGetTasksQuery, useAddTaskMutation, useDeleteTaskMutation} =
-  tasksApi;
+export const {
+  useGetTasksQuery,
+  useAddTaskMutation,
+  useDeleteTaskMutation,
+  useGetTasksByDateQuery,
+} = tasksApi;

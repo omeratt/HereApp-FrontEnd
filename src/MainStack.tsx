@@ -23,18 +23,14 @@ export default function MainStack() {
   const isSignIn = useAppSelector(selectIsSignIn);
   const {isError, isSuccess, isLoading, data, error, isFetching} =
     useMyProfileQuery(null);
+
   useEffect(() => {
-    // if (isLoading) {
     if (isSuccess) {
       console.log('get profile success', data, isSignIn);
-      // data.signIn && setSignIn(true);
     }
     if (isError) {
       console.log('get profile error', error, isSignIn);
-      // setSignIn(false);
     }
-    // }
-    // console.log('error', data);
   }, [error, data]);
   return (
     <NavigationContainer>
@@ -58,11 +54,6 @@ export default function MainStack() {
         )}>
         {isSignIn ? (
           <>
-            {/* <Stack.Screen
-              name="DateList"
-              component={DateList}
-              options={{headerShown: false}}
-            /> */}
             <Stack.Screen
               name="Welcome"
               component={Welcome}

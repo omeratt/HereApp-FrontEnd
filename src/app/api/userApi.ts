@@ -94,6 +94,11 @@ export const userApi = createApi({
         CookieManager.clearAll();
         return response.data;
       },
+      transformErrorResponse: (response: any, meta, arg) => {
+        store?.dispatch(logout());
+        CookieManager.clearAll();
+        return response;
+      },
       invalidatesTags: ['Users'],
     }),
   }),

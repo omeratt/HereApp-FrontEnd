@@ -3,7 +3,7 @@ import DoneButton from './Done.svg';
 import StartButton from './StartButton.svg';
 import Hi from './Hi.svg';
 import Search from './Search.svg';
-import Timer from './Timer.svg';
+import MenuIcon from './MenuIcon.svg';
 import plusIconOutlined from './plusIconOutlined.svg';
 import BoxIcon from './BoxIcon.svg';
 
@@ -13,7 +13,7 @@ const SVG = {
   StartButton,
   Hi,
   Search,
-  Timer,
+  MenuIcon,
   plusIconOutlined,
   BoxIcon,
 };

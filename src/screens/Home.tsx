@@ -2,7 +2,6 @@ import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import constants from '../assets/constants';
 import SVG from '../assets/svg';
-import {useLogoutMutation} from '../app/api/userApi';
 import NewTask from '../components/NewTask';
 import Animated, {
   FadeIn,
@@ -20,6 +19,7 @@ import {
 import DisplayTask from '../components/DisplayTask';
 import {useAppDispatch} from '../app/hooks';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import {DrawerActions, useNavigation} from '@react-navigation/native';
 // import {TouchableOpacity} from 'react-native-gesture-handler';
 
 const dates = [
@@ -61,16 +61,13 @@ const dates = [
 ];
 
 const Home = () => {
-  const [Logout, {isLoading, data, isSuccess, isError, error}] =
-    useLogoutMutation();
-
   const [isModalVisible, setModalVisible] = useState(false);
-
   const [tasks, setTasks] = useState<any[]>([]);
   const [dates, setDates] = useState<Date[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [offset, setOffset] = useState(0);
   const [isNext, setIsNext] = useState<boolean>(false);
+  const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const {
     isLoading: taskLoading,
@@ -90,7 +87,7 @@ const Home = () => {
         setTasks(res.data);
       })
       .catch(err => {
-        console.log('error getting tasks', error);
+        console.log('error getting tasks', err);
       });
   };
   useEffect(() => {
@@ -121,34 +118,20 @@ const Home = () => {
     setIsNext(true);
     setOffset(offset + 7);
   };
-  useEffect(() => {
-    if (data) {
-      console.log('logout', data);
-    }
-    if (error) {
-      console.log('logoutError', error);
-    }
-  }, [data, error]);
+
   useEffect(() => {
     if (tasks1) {
       console.log('getting tasks', tasks);
       setTasks(tasks1);
     }
-    if (error) {
-      console.log('error getting tasks', error);
+    if (tasksError) {
+      console.log('error getting tasks', tasksError);
     }
   }, [tasks1, tasksError]);
-  const SignOut = () => (
-    <TouchableOpacity
-      style={{
-        position: 'absolute',
-        top: 0,
-        right: '50%',
-      }}
-      onPress={async () => await Logout(null)}>
-      <Text style={{color: 'black'}}>logout</Text>
-    </TouchableOpacity>
-  );
+
+  const openDrawer = () => {
+    navigation.dispatch(DrawerActions.openDrawer());
+  };
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
   // variables
@@ -167,7 +150,6 @@ const Home = () => {
       entering={FadeIn}
       exiting={FadeOutUp}
       style={styles.container}>
-      <SignOut />
       <View style={styles.topView}>
         <View style={styles.task}>
           <View style={styles.today}>
@@ -292,9 +274,13 @@ const Home = () => {
         <View style={styles.box}></View>
       </View>
       <View style={styles.bottomView}>
-        <View style={{width: '35.33%'}}>
-          <SVG.Timer fill={constants.colors.BLACK} height="100%" width="100%" />
-        </View>
+        <TouchableOpacity onPress={openDrawer} style={{width: '35.33%'}}>
+          <SVG.MenuIcon
+            fill={constants.colors.BLACK}
+            height="100%"
+            width="100%"
+          />
+        </TouchableOpacity>
         <View style={{width: '35.33%'}}>
           <SVG.BoxIcon
             fill={constants.colors.BLACK}

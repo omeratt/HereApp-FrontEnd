@@ -20,7 +20,7 @@ const CustomDrawer: React.FC<ICustomerDrawer> = props => {
 
   const handleLogout = async () => {
     try {
-      await Logout(null);
+      await Logout(null).unwrap();
     } catch (err) {
       console.log('an error at logout', err);
     }

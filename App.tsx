@@ -26,6 +26,7 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {Provider} from 'react-redux';
 import {persistor, store} from './src/app/store';
 import {PersistGate} from 'redux-persist/integration/react';
+import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 I18nManager.forceRTL(true);
 // I18nManager.swapLeftAndRightInRTL(true);
 const App = () => {
@@ -34,7 +35,9 @@ const App = () => {
       <GestureHandlerRootView style={{flex: 1}}>
         <PersistGate persistor={persistor} loading={<Text>Loading...</Text>}>
           <Provider store={store}>
-            <MainStack />
+            <BottomSheetModalProvider>
+              <MainStack />
+            </BottomSheetModalProvider>
           </Provider>
         </PersistGate>
       </GestureHandlerRootView>

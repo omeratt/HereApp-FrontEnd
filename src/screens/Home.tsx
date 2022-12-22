@@ -66,6 +66,7 @@ const Home = () => {
   const [dates, setDates] = useState<Date[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [offset, setOffset] = useState(0);
+  const [isTaskLoading, setIsTaskLoading] = useState<boolean>(false);
   const [isNext, setIsNext] = useState<boolean>(false);
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
@@ -75,8 +76,10 @@ const Home = () => {
     isSuccess: taskSuccess,
     isError: taskIsError,
     error: tasksError,
+    isFetching: taskFetch,
   } = useGetTasksByDateQuery(selectedDate);
   const datePress = (date: Date) => {
+    setIsTaskLoading(true);
     setSelectedDate(date.toLocaleDateString().split('.').join('/'));
     const result = dispatch(
       tasksApi.endpoints.getTasksByDate.initiate(
@@ -85,10 +88,12 @@ const Home = () => {
     )
       .then(res => {
         setTasks(res.data);
+        console.log(tasks.length);
       })
       .catch(err => {
         console.log('error getting tasks', err);
-      });
+      })
+      .finally(() => setIsTaskLoading(false));
   };
   useEffect(() => {
     // Generate the dates for the current week
@@ -120,6 +125,11 @@ const Home = () => {
   };
 
   useEffect(() => {
+    if (taskFetch) {
+      setIsTaskLoading(true);
+    } else {
+      setIsTaskLoading(false);
+    }
     if (tasks1) {
       console.log('getting tasks', tasks);
       setTasks(tasks1);
@@ -218,7 +228,7 @@ const Home = () => {
             })}
           </Animated.View>
           <View style={styles.taskListColumnContainer}>
-            <DisplayTask data={tasks} />
+            <DisplayTask data={tasks} isTaskLoading={isTaskLoading} />
             {/* <View style={styles.taskListContainer}>
               <View style={styles.taskListContent}>
                 <Text style={styles.taskContentTitle}>Home work</Text>

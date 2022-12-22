@@ -9,7 +9,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import React, {useCallback, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import Animated, {
   FadeInUp,
   SlideInDown,
@@ -31,8 +31,9 @@ interface RenderItemProps {
 }
 interface props {
   data: any[];
+  isTaskLoading: boolean;
 }
-export default function DisplayTask({data}: props) {
+export default function DisplayTask({data, isTaskLoading}: props) {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [
     DeleteTask,
@@ -46,14 +47,21 @@ export default function DisplayTask({data}: props) {
       console.log('err in delete', err);
     }
   };
+  let timer: any;
+  useEffect(() => {
+    return () => {
+      clearTimeout(timer);
+    };
+  }, []);
+  const [deleteProps, setDeleteProps] = useState({id: '', name: ''});
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
   // variables
   const snapPoints = useMemo(() => ['15%', '15%'], []);
 
   // callbacks
-  const handlePresentModalPress = useCallback(() => {
-    bottomSheetModalRef.current?.present();
+  const handlePresentModalPress = useCallback((name: string, id: string) => {
+    bottomSheetModalRef.current?.present({name, id});
   }, []);
   const closeDeleteModal = useCallback(() => {
     bottomSheetModalRef.current?.dismiss();
@@ -61,7 +69,14 @@ export default function DisplayTask({data}: props) {
   const handleSheetChanges = useCallback((index: number) => {
     console.log('handleSheetChanges', index);
   }, []);
-  const DeleteModal = ({_id}: {_id: string}) => {
+  const openDeleteModal = (props: {name: string; id: string}) => {
+    setDeleteProps(props);
+    //todo without timer - with send props on present()
+    timer = setTimeout(() => {
+      bottomSheetModalRef.current?.present();
+    }, 150);
+  };
+  const DeleteModal = ({_id, name}: {_id: string; name: string}) => {
     return (
       <BottomSheetModal
         ref={bottomSheetModalRef}
@@ -69,8 +84,9 @@ export default function DisplayTask({data}: props) {
         snapPoints={snapPoints}
         // contentHeight={constants.HEIGHT}
         // detached
+
         backgroundStyle={{backgroundColor: constants.colors.GREEN}}
-        stackBehavior="replace"
+        // stackBehavior="replace"
         // onChange={handleSheetChanges}
       >
         <View
@@ -79,8 +95,11 @@ export default function DisplayTask({data}: props) {
             width: '100%',
             alignItems: 'center',
           }}>
-          <Text style={[styles.deleteTxt, {marginBottom: '5%'}]}>
+          <Text style={[styles.deleteTxt]}>
             Are you sure you want to delete
+          </Text>
+          <Text style={[styles.deleteTxt, {marginBottom: '2%'}]}>
+            {deleteProps.name}
           </Text>
           <View
             style={{
@@ -99,7 +118,7 @@ export default function DisplayTask({data}: props) {
                 borderRadius: 100,
                 borderWidth: 1,
               }}
-              onPress={() => onPressDelete(_id)}>
+              onPress={() => onPressDelete(deleteProps.id)}>
               <Text style={styles.deleteTxt}>Yes</Text>
             </TouchableOpacity>
             <TouchableOpacity style={{width: '35%'}} onPress={closeDeleteModal}>
@@ -116,49 +135,55 @@ export default function DisplayTask({data}: props) {
       return <ActivityIndicator size={30} color={constants.colors.GREEN} />;
     else return null;
   };
-  const renderItem: ListRenderItem<RenderItemProps> = ({item, index}) => (
-    <Animated.View
-      style={styles.taskListContainer}
-      exiting={SlideOutRight.duration(1500)}
-      entering={SlideInDown.delay(index * 50).duration(500)}>
-      <View style={styles.taskListContent}>
-        <TouchableOpacity onLongPress={() => handlePresentModalPress()}>
-          <Text style={styles.taskContentTitle}>{item.name}</Text>
-          <Text style={styles.taskContentBody}>{item.details}</Text>
-        </TouchableOpacity>
-      </View>
-      <View>
-        <CheckBox
-          checked={item.done}
-          // onPress={async () =>
-          //   await addToList(days[3], isWednesday, setIsWednesday)
-          // }
-          iconRight
-          fontFamily={constants.Fonts.text}
-          containerStyle={styles.checkBox}
-          checkedIcon={
-            <CircleCheckBox
-              size={25}
-              fill={constants.colors.GREEN}
-              borderColor={constants.colors.UNDER_LINE}
-            />
-          }
-          uncheckedIcon={
-            <CircleCheckBox
-              size={25}
-              borderColor={constants.colors.UNDER_LINE}
-            />
-          }
-          textStyle={styles.taskTxt}
-          // title="Wednesday"
-          titleProps={{}}
-          uncheckedColor="#F00"
-        />
-      </View>
-
-      <DeleteModal _id={item._id as string} />
-    </Animated.View>
-  );
+  const renderItem: ListRenderItem<RenderItemProps> = ({item, index}) => {
+    return (
+      <Animated.View
+        style={styles.taskListContainer}
+        exiting={SlideOutRight.duration(600)}
+        entering={SlideInDown.delay(index * 50).duration(500)}>
+        <View style={styles.taskListContent}>
+          <TouchableOpacity
+            // onPress={() => {
+            //   handlePresentModalPress(item.name as string, item._id as string);
+            // }}
+            onPress={() =>
+              openDeleteModal({
+                name: item.name as string,
+                id: item._id as string,
+              })
+            }>
+            <Text style={styles.taskContentTitle}>{item.name}</Text>
+            <Text style={styles.taskContentBody}>{item.details}</Text>
+          </TouchableOpacity>
+        </View>
+        <View>
+          <CheckBox
+            checked={item.done}
+            iconRight
+            fontFamily={constants.Fonts.text}
+            containerStyle={styles.checkBox}
+            checkedIcon={
+              <CircleCheckBox
+                size={25}
+                fill={constants.colors.GREEN}
+                borderColor={constants.colors.UNDER_LINE}
+              />
+            }
+            uncheckedIcon={
+              <CircleCheckBox
+                size={25}
+                borderColor={constants.colors.UNDER_LINE}
+              />
+            }
+            textStyle={styles.taskTxt}
+            // title="Wednesday"
+            titleProps={{}}
+            uncheckedColor="#F00"
+          />
+        </View>
+      </Animated.View>
+    );
+  };
 
   return (
     <View
@@ -181,12 +206,23 @@ export default function DisplayTask({data}: props) {
         // alignItems: 'center',
         // alignItems: 'center',
       }}>
-      <FlatList
-        data={data}
-        ListEmptyComponent={emptyList}
-        contentContainerStyle={{height: '135%'}}
-        renderItem={renderItem}
-      />
+      {isTaskLoading ? (
+        <ActivityIndicator size={30} color={constants.colors.GREEN} />
+      ) : (
+        <>
+          <FlatList
+            data={data}
+            ListEmptyComponent={emptyList}
+            renderItem={renderItem}
+            keyExtractor={item => item._id as string}
+            // viewabilityConfig={}
+          />
+          <DeleteModal
+            _id={deleteProps.id as string}
+            name={deleteProps.name as string}
+          />
+        </>
+      )}
     </View>
   );
 }

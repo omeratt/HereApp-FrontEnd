@@ -3,6 +3,7 @@ import constants from '../../assets/constants';
 import {login, logout} from '../Reducers/User/userSlice';
 import {store} from '../store';
 import CookieManager from '@react-native-cookies/cookies';
+import {tasksApi} from './taskApi';
 
 export const userApi = createApi({
   reducerPath: 'userApi',
@@ -89,14 +90,15 @@ export const userApi = createApi({
         method: 'post',
       }),
       transformResponse: (response: any, meta, arg) => {
-        // store?.dispatch(login(response.data));
         store?.dispatch(logout());
         CookieManager.clearAll();
+        store?.dispatch(tasksApi.util.resetApiState());
         return response.data;
       },
       transformErrorResponse: (response: any, meta, arg) => {
         store?.dispatch(logout());
         CookieManager.clearAll();
+        store?.dispatch(tasksApi.util.resetApiState());
         return response;
       },
       invalidatesTags: ['Users'],

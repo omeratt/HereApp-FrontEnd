@@ -1,4 +1,12 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  FlatList,
+  FlatListProps,
+  ListRenderItem,
+} from 'react-native';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import constants from '../assets/constants';
 import SVG from '../assets/svg';
@@ -17,9 +25,14 @@ import {
   useGetTasksQuery,
 } from '../app/api/taskApi';
 import DisplayTask from '../components/DisplayTask';
-import {useAppDispatch} from '../app/hooks';
+import {useAppDispatch, useAppSelector} from '../app/hooks';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {DrawerActions, useNavigation} from '@react-navigation/native';
+import WeeklyCalendar, {
+  Week,
+  WeeksBySundayDate,
+} from '../components/WeeklyCalender';
+import {selectDateSelector} from '../app/Reducers/User/userSlice';
 // import {TouchableOpacity} from 'react-native-gesture-handler';
 
 const dates = [
@@ -70,6 +83,7 @@ const Home = () => {
   const [isNext, setIsNext] = useState<boolean>(false);
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
+  const datesDict = useAppSelector(selectDateSelector);
   const {
     isLoading: taskLoading,
     data: tasks1,
@@ -78,14 +92,10 @@ const Home = () => {
     error: tasksError,
     isFetching: taskFetch,
   } = useGetTasksByDateQuery(selectedDate);
-  const datePress = (date: Date) => {
+  const datePress = (date: string) => {
     setIsTaskLoading(true);
-    setSelectedDate(date.toLocaleDateString().split('.').join('/'));
-    const result = dispatch(
-      tasksApi.endpoints.getTasksByDate.initiate(
-        date.toLocaleDateString().split('.').join('/'),
-      ),
-    )
+    setSelectedDate(date);
+    const result = dispatch(tasksApi.endpoints.getTasksByDate.initiate(date))
       .then(res => {
         setTasks(res.data);
         console.log(tasks.length);
@@ -111,7 +121,7 @@ const Home = () => {
     }
     setDates(weekDates.reverse());
     // Set the initial selected date to today
-    setSelectedDate(currentDate.toLocaleDateString().split('.').join('/'));
+    setSelectedDate(formatDate(currentDate));
   }, [offset]);
 
   const handleBackPress = () => {
@@ -122,6 +132,17 @@ const Home = () => {
   const handleNextPress = () => {
     setIsNext(true);
     setOffset(offset + 7);
+  };
+
+  const formatDate = (date: Date): string => {
+    const formattedDate = new Intl.DateTimeFormat('heb-IL', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }).format(date);
+
+    const fixedDate = formattedDate.split('.').join('/');
+    return fixedDate;
   };
 
   useEffect(() => {
@@ -154,6 +175,45 @@ const Home = () => {
   const handleSheetChanges = useCallback((index: number) => {
     console.log('handleSheetChanges', index);
   }, []);
+
+  const renderItem: ListRenderItem<Week> | null | undefined = item => {
+    // const dateString = date.toDateString();
+    // const formattedDate = formatDate(date);
+    return (
+      <>
+        {item.item.map(day => {
+          return (
+            <View key={day.date} style={styles.dateContent}>
+              <TouchableOpacity
+                style={{width: '100%'}}
+                onPress={() => {
+                  datePress(day.date);
+                }}>
+                <Text style={[styles.dateText, {marginBottom: '25%'}]}>
+                  {day.name}
+                </Text>
+                <View
+                  style={[
+                    styles.datePicker,
+                    {
+                      backgroundColor:
+                        selectedDate === day.date
+                          ? constants.colors.GREEN
+                          : 'transparent',
+                      elevation: selectedDate === day.date ? 5 : 0,
+                    },
+                  ]}>
+                  <Text style={styles.dateText}>
+                    {day.date.substring(8, 10)}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          );
+        })}
+      </>
+    );
+  };
 
   return (
     <Animated.View
@@ -188,45 +248,31 @@ const Home = () => {
             </TouchableOpacity>
             <Text style={styles.taskTitle}>Today</Text>
           </View>
-          <Animated.View style={styles.date}>
-            {dates.map(date => {
-              const dateString = date.toDateString();
-              return (
-                <View key={dateString} style={styles.dateContent}>
-                  <TouchableOpacity
-                    style={{width: '100%'}}
-                    onPress={() => {
-                      datePress(date);
-                    }}>
-                    {/*TODO: horizontal flatlist*/}
-                    <Text style={[styles.dateText, {marginBottom: '25%'}]}>
-                      {dateString.substring(0, 3)}
-                    </Text>
-                    <View
-                      style={[
-                        styles.datePicker,
-                        {
-                          backgroundColor:
-                            selectedDate ===
-                            date.toLocaleDateString().split('.').join('/')
-                              ? constants.colors.GREEN
-                              : 'transparent',
-                          elevation:
-                            selectedDate ===
-                            date.toLocaleDateString().split('.').join('/')
-                              ? 5
-                              : 0,
-                        },
-                      ]}>
-                      <Text style={styles.dateText}>
-                        {dateString.substring(8, 10)}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-              );
-            })}
-          </Animated.View>
+
+          <View style={styles.date}>
+            {datesDict && (
+              <FlatList
+                data={Object.values(datesDict)}
+                renderItem={renderItem}
+                keyExtractor={(item, index) => index.toString()}
+                horizontal
+                contentContainerStyle={{
+                  height: '100%',
+                  maxHeight: '100%',
+                  width: '100%',
+                  flexGrow: 1,
+                }}
+                style={{flex: 1}}
+                onScroll={() => {
+                  console.log('asdasdasdd');
+                }}
+                initialNumToRender={2}
+                // pagingEnabled
+                // style={styles.date}
+              />
+            )}
+            {/* <WeeklyCalendar /> */}
+          </View>
           <View style={styles.taskListColumnContainer}>
             <DisplayTask data={tasks} isTaskLoading={isTaskLoading} />
             {/* <View style={styles.taskListContainer}>
@@ -408,16 +454,19 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   date: {
+    flex: 1,
     flexDirection: 'row',
     height: '23.5%',
     // width: constants.WIDTH,
     width: '100%',
     alignItems: 'center',
     justifyContent: 'space-between',
+    // backgroundColor:''
 
     // backgroundColor: constants.colors.BLACK,
   },
   dateContent: {
+    flex: 1,
     width: '11.2%',
     // height: '70%',
     alignItems: 'center',
@@ -425,7 +474,7 @@ const styles = StyleSheet.create({
     margin: 5,
     alignContent: 'center',
     borderRadius: 9999,
-    // backgroundColor: constants.colors.OFF_WHITE,
+    backgroundColor: constants.colors.OFF_WHITE,
     // elevation: 2,
   },
   dateText: {

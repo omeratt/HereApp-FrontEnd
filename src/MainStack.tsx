@@ -54,7 +54,7 @@ export default function MainStack() {
         )}>
         {isSignIn ? (
           <>
-            <Stack.Screen
+            {/* <Stack.Screen
               name="Welcome"
               component={Welcome}
               options={{
@@ -67,7 +67,7 @@ export default function MainStack() {
                   />
                 ),
               }}
-            />
+            /> */}
             <Stack.Screen
               name="HomePage"
               component={Home}

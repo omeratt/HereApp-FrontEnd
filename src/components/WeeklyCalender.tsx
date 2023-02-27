@@ -10,30 +10,25 @@ export type WeeksBySundayDate = {
 };
 
 const DAYS_IN_WEEK = 7;
-// const YEARS_DIFFERENCE = 1;
 const MONTH_DIFFERENCE = 1;
 
 const getWeeklyCalendar = () => {
   const getWeeksBySundayDate = (): WeeksBySundayDate => {
     const weeksBySundayDate: WeeksBySundayDate = {};
 
-    // Get the date 7 years ago
+    // Get the date month ago
     const startDate = new Date();
     startDate.setMonth(startDate.getMonth() - MONTH_DIFFERENCE);
     startDate.setDate(startDate.getDate() - startDate.getDay());
-    // startDate.setFullYear(startDate.getFullYear() - YEARS_DIFFERENCE);
-    // startDate.setDate(startDate.getDate() - startDate.getDay());
-    // Get the date 7 years from now
+    // Get the date month from now
     const endDate = new Date();
-    endDate.setMonth(endDate.getMonth() - MONTH_DIFFERENCE);
-    endDate.setDate(endDate.getDate() - endDate.getDay());
+    endDate.setMonth(endDate.getMonth() + MONTH_DIFFERENCE);
+    endDate.setDate(endDate.getDate() + (6 - endDate.getDay()));
 
     // Loop through each week between the start and end dates
     let currentDate = startDate;
     while (currentDate <= endDate) {
       const week: Week = [];
-
-      //   console.log({currentDate});
       // Loop through each day in the week
       for (let i = 0; i < DAYS_IN_WEEK; i++) {
         const day: Day = {
@@ -48,7 +43,6 @@ const getWeeklyCalendar = () => {
 
       // Store the week in the dictionary with the Sunday date as the key
       const sundayDate = getSundayDate(currentDate);
-      //   console.log({sundayDate});
       weeksBySundayDate[sundayDate] = week;
     }
 
@@ -70,9 +64,7 @@ const getWeeklyCalendar = () => {
     return formattedDate;
   };
 
-  // Example usage
   const weeksBySundayDate = getWeeksBySundayDate();
-  //   console.log(weeksBySundayDate);
 
   return weeksBySundayDate;
 };

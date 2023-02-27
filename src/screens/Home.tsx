@@ -4,83 +4,31 @@ import {
   TouchableOpacity,
   View,
   FlatList,
-  FlatListProps,
   ListRenderItem,
 } from 'react-native';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import constants from '../assets/constants';
 import SVG from '../assets/svg';
 import NewTask from '../components/NewTask';
-import Animated, {
-  FadeIn,
-  FadeInUp,
-  FadeOutUp,
-  FadingTransition,
-  FlipInYRight,
-  ZoomInEasyDown,
-} from 'react-native-reanimated';
-import {
-  tasksApi,
-  useGetTasksByDateQuery,
-  useGetTasksQuery,
-} from '../app/api/taskApi';
+import Animated, {FadeIn, FadeOutUp} from 'react-native-reanimated';
+import {tasksApi, useGetTasksByDateQuery} from '../app/api/taskApi';
 import DisplayTask from '../components/DisplayTask';
 import {useAppDispatch, useAppSelector} from '../app/hooks';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {DrawerActions, useNavigation} from '@react-navigation/native';
-import WeeklyCalendar, {
-  Week,
-  WeeksBySundayDate,
-} from '../components/WeeklyCalender';
+import {Week} from '../components/WeeklyCalender';
 import {selectDateSelector} from '../app/Reducers/User/userSlice';
-// import {TouchableOpacity} from 'react-native-gesture-handler';
 
-const dates = [
-  {
-    dayName: 'Mon',
-    dayNum: '20',
-    key: 'asd123',
-  },
-  {
-    dayName: 'Tue',
-    key: '123312asd',
-    dayNum: '21',
-  },
-  {
-    dayName: 'Wed',
-    key: 'asd1gsd',
-    dayNum: '22',
-  },
-  {
-    dayName: 'Thu',
-    key: 'adgasd3',
-    dayNum: '23',
-  },
-  {
-    dayName: 'Fri',
-    key: 'hderh341',
-    dayNum: '24',
-  },
-  {
-    dayName: 'Sat',
-    key: 'as32tasgz',
-    dayNum: '25',
-  },
-  {
-    key: 'asf32tgzg',
-    dayName: 'Sun',
-    dayNum: '26',
-  },
-];
+const CURRENT_DATE = new Date();
 
 const Home = () => {
-  const [isModalVisible, setModalVisible] = useState(false);
+  // const [isModalVisible, setModalVisible] = useState(false);
+  // const [dates, setDates] = useState<Date[]>([]);
+  // const [offset, setOffset] = useState(0);
+  // const [isNext, setIsNext] = useState<boolean>(false);
   const [tasks, setTasks] = useState<any[]>([]);
-  const [dates, setDates] = useState<Date[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>('');
-  const [offset, setOffset] = useState(0);
   const [isTaskLoading, setIsTaskLoading] = useState<boolean>(false);
-  const [isNext, setIsNext] = useState<boolean>(false);
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const datesDict = useAppSelector(selectDateSelector);
@@ -106,33 +54,19 @@ const Home = () => {
       .finally(() => setIsTaskLoading(false));
   };
   useEffect(() => {
-    // Generate the dates for the current week
-    const currentDate = new Date();
-    const currentDayOfWeek = currentDate.getDay();
-    const weekDates = [];
-    for (let i = 0; i < 7; i++) {
-      weekDates.push(
-        new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate() - currentDayOfWeek + i + offset,
-        ),
-      );
-    }
-    setDates(weekDates.reverse());
     // Set the initial selected date to today
-    setSelectedDate(formatDate(currentDate));
-  }, [offset]);
+    setSelectedDate(formatDate(CURRENT_DATE));
+  }, []);
 
-  const handleBackPress = () => {
-    setIsNext(false);
-    setOffset(offset - 7);
-  };
+  // const handleBackPress = () => {
+  //   setIsNext(false);
+  //   setOffset(offset - 7);
+  // };
 
-  const handleNextPress = () => {
-    setIsNext(true);
-    setOffset(offset + 7);
-  };
+  // const handleNextPress = () => {
+  //   setIsNext(true);
+  //   setOffset(offset + 7);
+  // };
 
   const formatDate = (date: Date): string => {
     const formattedDate = new Intl.DateTimeFormat('heb-IL', {
@@ -144,6 +78,22 @@ const Home = () => {
     const fixedDate = formattedDate.split('.').join('/');
     return fixedDate;
   };
+
+  const findDateIndex = (DateToCheck: string) => {
+    if (!datesDict) return 0;
+    const index = Object.values(datesDict).findIndex((val, index) => {
+      const gaga = val.filter(vals => vals.date === DateToCheck);
+      if (gaga.length) return index;
+    });
+    return index;
+  };
+  const currentDateIndexInFlatList = useMemo(() => {
+    if (!selectedDate) return findDateIndex(formatDate(CURRENT_DATE));
+    const [day, month, year] = selectedDate.split('/').map(Number);
+    const date = new Date(year, month - 1, day);
+    const formattedDateToCheck = formatDate(date);
+    return findDateIndex(formattedDateToCheck);
+  }, [selectedDate]);
 
   useEffect(() => {
     if (taskFetch) {
@@ -177,19 +127,18 @@ const Home = () => {
   }, []);
 
   const renderItem: ListRenderItem<Week> | null | undefined = item => {
-    // const dateString = date.toDateString();
-    // const formattedDate = formatDate(date);
     return (
       <>
         {item.item.map(day => {
+          const date = day.date;
           return (
-            <View key={day.date} style={styles.dateContent}>
+            <View key={date} style={styles.dateContent}>
               <TouchableOpacity
                 style={{width: '100%'}}
                 onPress={() => {
-                  datePress(day.date);
+                  datePress(date);
                 }}>
-                <Text style={[styles.dateText, {marginBottom: '25%'}]}>
+                <Text style={[styles.dateText, {marginBottom: 5}]}>
                   {day.name}
                 </Text>
                 <View
@@ -197,15 +146,14 @@ const Home = () => {
                     styles.datePicker,
                     {
                       backgroundColor:
-                        selectedDate === day.date
+                        selectedDate === date
                           ? constants.colors.GREEN
                           : 'transparent',
-                      elevation: selectedDate === day.date ? 5 : 0,
+                      elevation: selectedDate === date ? 5 : 0,
                     },
                   ]}>
-                  <Text style={styles.dateText}>
-                    {day.date.substring(8, 10)}
-                  </Text>
+                  {/* <Text style={styles.dateText}>{date.substring(0, 2)}</Text> */}
+                  <Text style={styles.dateText}>{date.substring(0, 5)}</Text>
                 </View>
               </TouchableOpacity>
             </View>
@@ -214,7 +162,6 @@ const Home = () => {
       </>
     );
   };
-
   return (
     <Animated.View
       entering={FadeIn}
@@ -248,7 +195,6 @@ const Home = () => {
             </TouchableOpacity>
             <Text style={styles.taskTitle}>Today</Text>
           </View>
-
           <View style={styles.date}>
             {datesDict && (
               <FlatList
@@ -256,22 +202,15 @@ const Home = () => {
                 renderItem={renderItem}
                 keyExtractor={(item, index) => index.toString()}
                 horizontal
-                contentContainerStyle={{
-                  height: '100%',
-                  maxHeight: '100%',
-                  width: '100%',
-                  flexGrow: 1,
+                style={{
+                  flex: 1,
                 }}
-                style={{flex: 1}}
-                onScroll={() => {
-                  console.log('asdasdasdd');
-                }}
-                initialNumToRender={2}
-                // pagingEnabled
-                // style={styles.date}
+                showsHorizontalScrollIndicator={false}
+                initialNumToRender={1}
+                initialScrollIndex={currentDateIndexInFlatList || 0}
+                inverted
               />
             )}
-            {/* <WeeklyCalendar /> */}
           </View>
           <View style={styles.taskListColumnContainer}>
             <DisplayTask data={tasks} isTaskLoading={isTaskLoading} />

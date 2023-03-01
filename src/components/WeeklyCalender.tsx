@@ -18,7 +18,7 @@ const getWeeklyCalendar = () => {
 
     // Get the date month ago
     const startDate = new Date();
-    startDate.setMonth(startDate.getMonth() - 0);
+    startDate.setMonth(startDate.getMonth() - MONTH_DIFFERENCE);
     startDate.setDate(startDate.getDate() - startDate.getDay());
     // Get the date month from now
     const endDate = new Date();

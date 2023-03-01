@@ -20,7 +20,7 @@ import {Week} from '../components/WeeklyCalender';
 import {selectDateSelector} from '../app/Reducers/User/userSlice';
 
 const CURRENT_DATE = new Date();
-const DATE_ITEM_WIDTH = constants.WIDTH * 0.095;
+const DATE_ITEM_WIDTH = constants.WIDTH * 0.108;
 const Home = () => {
   // const [isModalVisible, setModalVisible] = useState(false);
   // const [dates, setDates] = useState<Date[]>([]);
@@ -81,15 +81,13 @@ const Home = () => {
 
   const findDateIndex = (DateToCheck: string) => {
     if (!datesDict) return 0;
-    // console.log(DateToCheck);
     const index = Object.values(datesDict).findIndex((val, index) => {
-      // console.log(val);
       const gaga = val.filter(vals => vals.date === DateToCheck);
-      console.log('gagaaaaaa', gaga);
       if (gaga.length) return index;
     });
     return ~index ? index : 0;
   };
+
   const currentDateIndexInFlatList = useMemo(() => {
     if (!selectedDate) return findDateIndex(formatDate(CURRENT_DATE));
     const [day, month, year] = selectedDate.split('/').map(Number);
@@ -97,7 +95,6 @@ const Home = () => {
     const formattedDateToCheck = formatDate(date); //13/2/2023
     return findDateIndex(formattedDateToCheck);
   }, [selectedDate]);
-  console.log(currentDateIndexInFlatList);
 
   useEffect(() => {
     if (taskFetch) {
@@ -143,7 +140,10 @@ const Home = () => {
           return (
             <View key={date} style={styles.dateContent}>
               <TouchableOpacity
-                style={{width: '100%'}}
+                style={{
+                  width: '100%',
+                  alignItems: 'center',
+                }}
                 onPress={() => {
                   datePress(date);
                 }}>
@@ -161,7 +161,6 @@ const Home = () => {
                       elevation: selectedDate === date ? 5 : 0,
                     },
                   ]}>
-                  {/* <Text style={styles.dateText}>{date.substring(0, 2)}</Text> */}
                   <Text style={styles.dateText}>{date.substring(0, 2)}</Text>
                 </View>
               </TouchableOpacity>
@@ -180,25 +179,14 @@ const Home = () => {
         <View style={styles.task}>
           <View style={styles.today}>
             <TouchableOpacity
-              // onPress={() => setModalVisible(!isModalVisible)}
               onPress={handlePresentModalPress}
               style={[
-                // styles.plusIcon,
                 {
-                  // backgroundColor: 'green',
-                  // width: 25,
-                  // height: 25,
                   zIndex: 1,
-                  // position: 'absolute',
                 },
               ]}>
               <SVG.plusIconOutlined
-                // onPress={() => setModalVisible(!isModalVisible)}
-                // onPress={() => setModalVisible(!isModalVisible)}
-                // onPressIn={() => setModalVisible(!isModalVisible)}
                 style={[styles.plusIcon]}
-                // height={50}
-                // width={50}
                 fill={constants.colors.BGC}
               />
             </TouchableOpacity>
@@ -211,15 +199,10 @@ const Home = () => {
                 renderItem={renderItem}
                 keyExtractor={(item, index) => index.toString()}
                 horizontal
-                // style={{
-                //   flex: 1,
-                // }}
-                // initialNumToRender={7}
                 showsHorizontalScrollIndicator={false}
                 initialScrollIndex={currentDateIndexInFlatList || 0}
                 inverted
                 pagingEnabled
-                getItemLayout={getItemLayout}
               />
             )}
           </View>
@@ -404,28 +387,19 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   date: {
-    flex: 1,
     flexDirection: 'row',
     height: '23.5%',
-    // width: constants.WIDTH,
-    width: '100%',
+
     alignItems: 'center',
     justifyContent: 'space-between',
-    // backgroundColor:''
-
-    // backgroundColor: constants.colors.BLACK,
   },
   dateContent: {
     // flex: 1,
     width: DATE_ITEM_WIDTH,
-    // height: '70%',
+    height: '80%',
     alignItems: 'center',
     flexDirection: 'column',
-    margin: 5,
-    alignContent: 'center',
-    borderRadius: 9999,
-    // backgroundColor: constants.colors.GREEN,
-    // elevation: 2,
+    marginLeft: DATE_ITEM_WIDTH * 0.1255,
   },
   dateText: {
     fontFamily: constants.Fonts.text,
@@ -434,10 +408,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   datePicker: {
-    height: '55%',
-    width: '100%',
-
-    borderRadius: 800,
+    height: DATE_ITEM_WIDTH * 0.8,
+    width: DATE_ITEM_WIDTH * 0.8,
+    marginBottom: '12%',
+    borderRadius: 500,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -455,9 +429,6 @@ const styles = StyleSheet.create({
     // padding: '10%',
     justifyContent: 'center',
     alignItems: 'center',
-    // backgroundColor: 'blue',
-    // alignContent: 'center',
-    // backgroundColor: 'red',
   },
   taskListContent: {
     height: '100%',

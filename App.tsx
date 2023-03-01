@@ -35,6 +35,7 @@ const App = () => {
   useEffect(() => {
     const dates = getWeeklyCalendar();
     store.dispatch(setDates(dates));
+    console.log(dates);
   }, []);
 
   return (

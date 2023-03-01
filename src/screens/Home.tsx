@@ -20,7 +20,7 @@ import {Week} from '../components/WeeklyCalender';
 import {selectDateSelector} from '../app/Reducers/User/userSlice';
 
 const CURRENT_DATE = new Date();
-
+const DATE_ITEM_WIDTH = constants.WIDTH * 0.095;
 const Home = () => {
   // const [isModalVisible, setModalVisible] = useState(false);
   // const [dates, setDates] = useState<Date[]>([]);
@@ -81,19 +81,23 @@ const Home = () => {
 
   const findDateIndex = (DateToCheck: string) => {
     if (!datesDict) return 0;
+    // console.log(DateToCheck);
     const index = Object.values(datesDict).findIndex((val, index) => {
+      // console.log(val);
       const gaga = val.filter(vals => vals.date === DateToCheck);
+      console.log('gagaaaaaa', gaga);
       if (gaga.length) return index;
     });
-    return index;
+    return ~index ? index : 0;
   };
   const currentDateIndexInFlatList = useMemo(() => {
     if (!selectedDate) return findDateIndex(formatDate(CURRENT_DATE));
     const [day, month, year] = selectedDate.split('/').map(Number);
     const date = new Date(year, month - 1, day);
-    const formattedDateToCheck = formatDate(date);
+    const formattedDateToCheck = formatDate(date); //13/2/2023
     return findDateIndex(formattedDateToCheck);
   }, [selectedDate]);
+  console.log(currentDateIndexInFlatList);
 
   useEffect(() => {
     if (taskFetch) {
@@ -125,6 +129,11 @@ const Home = () => {
   const handleSheetChanges = useCallback((index: number) => {
     console.log('handleSheetChanges', index);
   }, []);
+  const getItemLayout = (data: any, index: any) => ({
+    length: DATE_ITEM_WIDTH,
+    offset: DATE_ITEM_WIDTH * index,
+    index,
+  });
 
   const renderItem: ListRenderItem<Week> | null | undefined = item => {
     return (
@@ -153,7 +162,7 @@ const Home = () => {
                     },
                   ]}>
                   {/* <Text style={styles.dateText}>{date.substring(0, 2)}</Text> */}
-                  <Text style={styles.dateText}>{date.substring(0, 5)}</Text>
+                  <Text style={styles.dateText}>{date.substring(0, 2)}</Text>
                 </View>
               </TouchableOpacity>
             </View>
@@ -202,13 +211,15 @@ const Home = () => {
                 renderItem={renderItem}
                 keyExtractor={(item, index) => index.toString()}
                 horizontal
-                style={{
-                  flex: 1,
-                }}
+                // style={{
+                //   flex: 1,
+                // }}
+                // initialNumToRender={7}
                 showsHorizontalScrollIndicator={false}
-                initialNumToRender={1}
                 initialScrollIndex={currentDateIndexInFlatList || 0}
                 inverted
+                pagingEnabled
+                getItemLayout={getItemLayout}
               />
             )}
           </View>
@@ -405,15 +416,15 @@ const styles = StyleSheet.create({
     // backgroundColor: constants.colors.BLACK,
   },
   dateContent: {
-    flex: 1,
-    width: '11.2%',
+    // flex: 1,
+    width: DATE_ITEM_WIDTH,
     // height: '70%',
     alignItems: 'center',
     flexDirection: 'column',
     margin: 5,
     alignContent: 'center',
     borderRadius: 9999,
-    backgroundColor: constants.colors.OFF_WHITE,
+    // backgroundColor: constants.colors.GREEN,
     // elevation: 2,
   },
   dateText: {

@@ -29,6 +29,7 @@ const Home = () => {
   const [tasks, setTasks] = useState<any[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [isTaskLoading, setIsTaskLoading] = useState<boolean>(false);
+  const [currentMonth, setCurrentMonth] = useState<string>('');
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const datesDict = useAppSelector(selectDateSelector);
@@ -132,6 +133,25 @@ const Home = () => {
     index,
   });
 
+  const getMonthFromStringDate = (date: string) => {
+    const [day, month, year] = date.split('/');
+    const monthName = new Date(+year, +month - 1, +day).toLocaleString(
+      'default',
+      {
+        month: 'long',
+      },
+    );
+    return monthName;
+  };
+
+  const handleViewableChange = useRef((item: any) => {
+    const firstElementDate =
+      item.viewableItems[1]?.item[0].date ||
+      item.viewableItems[0]?.item[0].date;
+    const month = getMonthFromStringDate(firstElementDate);
+    setCurrentMonth(month);
+  });
+
   const renderItem: ListRenderItem<Week> | null | undefined = item => {
     return (
       <>
@@ -191,7 +211,7 @@ const Home = () => {
                 fill={constants.colors.BGC}
               />
             </TouchableOpacity>
-            <Text style={styles.taskTitle}>Today</Text>
+            <Text style={styles.taskTitle}>{currentMonth || 'Today'}</Text>
           </View>
           <View style={styles.date}>
             {datesDict && (
@@ -204,6 +224,10 @@ const Home = () => {
                 initialScrollIndex={currentDateIndexInFlatList || 0}
                 inverted
                 pagingEnabled
+                onViewableItemsChanged={handleViewableChange.current}
+                // viewabilityConfigCallbackPairs={
+                //   viewabilityConfigCallbackPairs.current
+                // }
               />
             )}
           </View>

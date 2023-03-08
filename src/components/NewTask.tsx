@@ -64,8 +64,9 @@ const circleStyle = {
 type tabType = 'PUSH' | 'ALL_DAY' | 'REPEAT' | 'DESCRIPTION' | 'NOTE';
 interface props {
   closeModal: any;
+  targetDate: string;
 }
-const NewTask = ({closeModal}: props) => {
+const NewTask: React.FC<props> = ({closeModal, targetDate}) => {
   const ref = useRef<any>();
 
   const AnimateStyle = (tab: tabType) => {
@@ -114,6 +115,7 @@ const NewTask = ({closeModal}: props) => {
       const data = await AddTask({
         name: taskName,
         details: description,
+        targetDate,
       }).unwrap();
       console.log(data);
       setDescription('');

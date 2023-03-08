@@ -145,6 +145,7 @@ const Home = () => {
                   alignItems: 'center',
                 }}
                 onPress={() => {
+                  console.log({date});
                   datePress(date);
                 }}>
                 <Text style={[styles.dateText, {marginBottom: 5}]}>
@@ -297,7 +298,10 @@ const Home = () => {
           }}
           // enableDismissOnClose
           onChange={handleSheetChanges}>
-          <NewTask closeModal={bottomSheetModalRef.current?.dismiss} />
+          <NewTask
+            closeModal={bottomSheetModalRef.current?.dismiss}
+            targetDate={selectedDate}
+          />
         </BottomSheetModal>
       </BottomSheetModalProvider>
     </Animated.View>

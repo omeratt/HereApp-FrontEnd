@@ -70,6 +70,7 @@ export default function DisplayTask({data, isTaskLoading}: props) {
     console.log('handleSheetChanges', index);
   }, []);
   const openDeleteModal = (props: {name: string; id: string}) => {
+    if (timer) clearTimeout(timer);
     setDeleteProps(props);
     //todo without timer - with send props on present()
     timer = setTimeout(() => {
@@ -86,7 +87,7 @@ export default function DisplayTask({data, isTaskLoading}: props) {
         // detached
 
         backgroundStyle={{backgroundColor: constants.colors.GREEN}}
-        // stackBehavior="replace"
+        stackBehavior="replace"
         // onChange={handleSheetChanges}
       >
         <View

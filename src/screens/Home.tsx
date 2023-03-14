@@ -135,12 +135,9 @@ const Home = () => {
 
   const getMonthFromStringDate = (date: string) => {
     const [day, month, year] = date.split('/');
-    const monthName = new Date(+year, +month - 1, +day).toLocaleString(
-      'default',
-      {
-        month: 'long',
-      },
-    );
+    const monthName = new Date(+year, +month - 1, +day).toLocaleString('eng', {
+      month: 'long',
+    });
     return monthName;
   };
 

@@ -34,14 +34,20 @@ import {useAddTaskMutation} from '../app/api/taskApi';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 const DEFAULT_FLEX = {
   PUSH: 1.2,
-  ALL_DAY: 1,
+  SET_TIME_CONTENT: 1,
+  SET_TIME: 1,
+  DAY_AND_TIME: 1,
+  TODAY: 1,
   REPEAT: 1,
   DESCRIPTION: 1,
   NOTE: 1.3,
 };
 const OPENED_FLEX = {
   PUSH: 2.5,
-  ALL_DAY: 2.5,
+  SET_TIME_CONTENT: 2.5,
+  SET_TIME: 2.5,
+  TODAY: 2.5,
+  DAY_AND_TIME: 2.5,
   REPEAT: 2.5,
   DESCRIPTION: 2.5,
   NOTE: 1.3,
@@ -61,7 +67,15 @@ const circleStyle = {
   borderWidth: 1,
   borderColor: constants.colors.UNDER_LINE,
 };
-type tabType = 'PUSH' | 'ALL_DAY' | 'REPEAT' | 'DESCRIPTION' | 'NOTE';
+type tabType =
+  | 'PUSH'
+  | 'SET_TIME'
+  | 'SET_TIME_CONTENT'
+  | 'TODAY'
+  | 'DAY_AND_TIME'
+  | 'REPEAT'
+  | 'DESCRIPTION'
+  | 'NOTE';
 interface props {
   closeModal: any;
   targetDate: string;
@@ -91,12 +105,14 @@ const NewTask: React.FC<props> = ({closeModal, targetDate}) => {
     };
   });
   // const [isModalVisible, setModalVisible] = useState(true);
-  const [allDayOn, setAllDayOn] = useState(false);
+  const [timeOn, setTimeOn] = useState(false);
+  const [todayOn, setTodayOn] = useState(false);
   const [repeatOn, setRepeatOn] = useState(false);
   const [descriptionOn, setDescriptionOn] = useState(false);
   const [pushOn, setPushOn] = useState(false);
   const [noteOn, setNoteOn] = useState(false);
-  const [allDayOpen, setAllDayOpen] = useState(false);
+  const [timeOpen, setTimeOpen] = useState(false);
+  const [todayOpen, setTodayOpen] = useState(false);
   const [repeatOpen, setRepeatOpen] = useState(false);
   const [descriptionOpen, setDescriptionOpen] = useState(false);
   const [pushOpen, setPushOpen] = useState(false);
@@ -129,8 +145,20 @@ const NewTask: React.FC<props> = ({closeModal, targetDate}) => {
       line: useSharedValue(DEFAULT_FLEX.PUSH),
       space: useSharedValue(ZERO),
     },
-    ALL_DAY: {
-      line: useSharedValue(DEFAULT_FLEX.ALL_DAY),
+    SET_TIME_CONTENT: {
+      line: useSharedValue(DEFAULT_FLEX.SET_TIME_CONTENT),
+      space: useSharedValue(ZERO),
+    },
+    SET_TIME: {
+      line: useSharedValue(DEFAULT_FLEX.SET_TIME),
+      space: useSharedValue(ZERO),
+    },
+    TODAY: {
+      line: useSharedValue(DEFAULT_FLEX.TODAY),
+      space: useSharedValue(ZERO),
+    },
+    DAY_AND_TIME: {
+      line: useSharedValue(DEFAULT_FLEX.DAY_AND_TIME),
       space: useSharedValue(ZERO),
     },
     REPEAT: {
@@ -167,7 +195,10 @@ const NewTask: React.FC<props> = ({closeModal, targetDate}) => {
   };
   const handleNamePress = (tabName: tabType) => {
     // flexPush.value = withSpring(toValue, {...SPRING_CONFIG, mass: duration});
+    console.log(tabName, TABS[tabName].stateIsOpen);
+
     TABS[tabName].setStateOpen(!TABS[tabName].stateIsOpen);
+    console.log(tabName, TABS[tabName].stateIsOpen);
     if (!TABS[tabName].stateIsOpen) {
       closeAllExcept(tabName);
       flex[tabName].line.value = withTiming(OPENED_FLEX[tabName], {
@@ -190,13 +221,37 @@ const NewTask: React.FC<props> = ({closeModal, targetDate}) => {
     });
   };
   const TABS = {
-    ALL_DAY: {
+    SET_TIME_CONTENT: {
       open,
       close,
-      stateIsOn: allDayOn,
-      setStateOn: setAllDayOn,
-      stateIsOpen: allDayOpen,
-      setStateOpen: setAllDayOpen,
+      stateIsOn: repeatOn,
+      setStateOn: setRepeatOn,
+      stateIsOpen: repeatOpen,
+      setStateOpen: setRepeatOpen,
+    },
+    SET_TIME: {
+      open,
+      close,
+      stateIsOn: timeOn,
+      setStateOn: setTimeOn,
+      stateIsOpen: timeOpen,
+      setStateOpen: setTimeOpen,
+    },
+    TODAY: {
+      open,
+      close,
+      stateIsOn: repeatOn,
+      setStateOn: setRepeatOn,
+      stateIsOpen: repeatOpen,
+      setStateOpen: setRepeatOpen,
+    },
+    DAY_AND_TIME: {
+      open,
+      close,
+      stateIsOn: repeatOn,
+      setStateOn: setRepeatOn,
+      stateIsOpen: repeatOpen,
+      setStateOpen: setRepeatOpen,
     },
     REPEAT: {
       open,
@@ -259,6 +314,84 @@ const NewTask: React.FC<props> = ({closeModal, targetDate}) => {
   Keyboard.addListener('keyboardDidHide', () => {
     taskDescriptionInputRef?.current?.blur();
   });
+
+  const TodayTab = () => {
+    return (
+      <>
+        <Animated.View
+          style={[styles.SetTimeSubTabsContainer, AnimateStyle('SET_TIME')]}>
+          <Line
+            strength={1}
+            lengthPercentage={100}
+            rotate180
+            lineColor={constants.colors.UNDER_LINE}
+          />
+          <Animated.View style={styles.textAndToggleContainer}>
+            <View style={styles.textAndToggle}>
+              <SwitchToggle
+                switchOn={!timeOn}
+                onPress={() => {
+                  // open('SET_TIME');
+                }}
+                RTL
+                backgroundColorOff={constants.colors.BGC}
+                backgroundColorOn={constants.colors.OFF_WHITE}
+                circleColorOff={constants.colors.GREEN}
+                circleColorOn={constants.colors.GREEN}
+                containerStyle={containerStyle}
+                circleStyle={circleStyle}
+              />
+              <TouchableOpacity onPress={() => handleNamePress('SET_TIME')}>
+                <Text style={[styles.sectionTxt]}>Today</Text>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+
+          <Animated.View
+            style={[styles.EveryContainer, EveryContainerStyle('SET_TIME')]}>
+            {/* {timeOpen && (
+            <Animated.View style={[styles.dateContainer]}></Animated.View>
+          )} */}
+          </Animated.View>
+        </Animated.View>
+      </>
+    );
+  };
+
+  const DayAndTimeTab = () => {
+    return (
+      <Animated.View
+        style={[styles.flexOneAndJustifyCenter, AnimateStyle('SET_TIME')]}>
+        <Animated.View style={styles.textAndToggleContainer}>
+          <View style={styles.textAndToggle}>
+            <SwitchToggle
+              switchOn={!timeOn}
+              onPress={() => {
+                // open('SET_TIME');
+              }}
+              RTL
+              backgroundColorOff={constants.colors.BGC}
+              backgroundColorOn={constants.colors.OFF_WHITE}
+              circleColorOff={constants.colors.GREEN}
+              circleColorOn={constants.colors.GREEN}
+              containerStyle={containerStyle}
+              circleStyle={circleStyle}
+            />
+            <TouchableOpacity onPress={() => handleNamePress('SET_TIME')}>
+              <Text style={[styles.sectionTxt]}>Today</Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+
+        <Animated.View
+          style={[styles.EveryContainer, EveryContainerStyle('SET_TIME')]}>
+          {/* {timeOpen && (
+        <Animated.View style={[styles.dateContainer]}></Animated.View>
+      )} */}
+        </Animated.View>
+      </Animated.View>
+    );
+  };
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <Animated.View style={styles.container}>
@@ -275,103 +408,10 @@ const NewTask: React.FC<props> = ({closeModal, targetDate}) => {
                 selectionColor={constants.colors.GREEN}
                 cursorColor={constants.colors.GREEN}
                 style={styles.newTaskTitleInput}
-                autoFocus
                 onSubmitEditing={Keyboard.dismiss}
               />
             </View>
           </View>
-
-          <Animated.View style={[styles.allDayLong, AnimateStyle('ALL_DAY')]}>
-            <Line
-              strength={1}
-              lengthPercentage={100}
-              rotate180
-              lineColor={constants.colors.UNDER_LINE}
-            />
-            <Animated.View style={styles.textAndToggleContainer}>
-              <View style={styles.textAndToggle}>
-                <SwitchToggle
-                  switchOn={!allDayOn}
-                  onPress={() => {
-                    open('ALL_DAY');
-                  }}
-                  RTL
-                  backgroundColorOff={constants.colors.BGC}
-                  backgroundColorOn={constants.colors.OFF_WHITE}
-                  circleColorOff={constants.colors.GREEN}
-                  circleColorOn={constants.colors.GREEN}
-                  containerStyle={containerStyle}
-                  circleStyle={circleStyle}
-                />
-                <TouchableOpacity onPress={() => handleNamePress('ALL_DAY')}>
-                  <Text style={[styles.sectionTxt]}>All day long</Text>
-                </TouchableOpacity>
-              </View>
-            </Animated.View>
-
-            <Animated.View
-              style={[styles.EveryContainer, EveryContainerStyle('ALL_DAY')]}>
-              {allDayOpen && (
-                <Animated.View
-                  style={[
-                    styles.dateContainer,
-                    // allDayOn ? {flex: 2.5} : {flex: ZERO},
-                  ]}>
-                  <DateSelect
-                    handleList={datesList}
-                    setHandleList={setDatesList}
-                  />
-                </Animated.View>
-              )}
-              {/* <Text style={[styles.sectionTxt, {fontSize: 12}]}>
-                    times date ...
-                  </Text> */}
-            </Animated.View>
-          </Animated.View>
-          {/* @@@@ REPEAT @@@@ */}
-          <Animated.View style={[styles.allDayLong, AnimateStyle('REPEAT')]}>
-            <Line
-              strength={1}
-              lengthPercentage={100}
-              lineColor={constants.colors.UNDER_LINE}
-            />
-            <Animated.View style={styles.textAndToggleContainer}>
-              <View style={styles.textAndToggle}>
-                <SwitchToggle
-                  switchOn={!repeatOn}
-                  onPress={() => {
-                    open('REPEAT');
-                  }}
-                  RTL
-                  backgroundColorOff={constants.colors.BLACK}
-                  backgroundColorOn={constants.colors.OFF_WHITE}
-                  circleColorOff={constants.colors.GREEN}
-                  circleColorOn={constants.colors.GREEN}
-                  containerStyle={containerStyle}
-                  circleStyle={circleStyle}
-                />
-                <TouchableOpacity onPress={() => handleNamePress('REPEAT')}>
-                  <Text style={[styles.sectionTxt]}>Repeat every ...</Text>
-                </TouchableOpacity>
-              </View>
-            </Animated.View>
-
-            <Animated.View
-              style={[styles.EveryContainer, EveryContainerStyle('REPEAT')]}>
-              {repeatOpen && (
-                <Animated.View
-                  style={[
-                    styles.dateContainer,
-                    // allDayOn ? {flex: 2.5} : {flex: ZERO},
-                  ]}>
-                  <DateSelect
-                    handleList={datesList}
-                    setHandleList={setDatesList}
-                  />
-                </Animated.View>
-              )}
-            </Animated.View>
-          </Animated.View>
           <Animated.View
             style={[styles.description, AnimateStyle('DESCRIPTION')]}>
             <Line
@@ -411,6 +451,95 @@ const NewTask: React.FC<props> = ({closeModal, targetDate}) => {
               )}
             </Animated.View>
           </Animated.View>
+          <Animated.View
+            style={[styles.flexOneAndJustifyCenter, AnimateStyle('SET_TIME')]}>
+            <Line
+              strength={1}
+              lengthPercentage={100}
+              rotate180
+              lineColor={constants.colors.UNDER_LINE}
+            />
+            <Animated.View style={styles.textAndToggleContainer}>
+              <View style={styles.textAndToggle}>
+                <SwitchToggle
+                  switchOn={!timeOn}
+                  onPress={() => {
+                    open('SET_TIME');
+                  }}
+                  RTL
+                  backgroundColorOff={constants.colors.BGC}
+                  backgroundColorOn={constants.colors.OFF_WHITE}
+                  circleColorOff={constants.colors.GREEN}
+                  circleColorOn={constants.colors.GREEN}
+                  containerStyle={containerStyle}
+                  circleStyle={circleStyle}
+                />
+                <TouchableOpacity onPress={() => handleNamePress('SET_TIME')}>
+                  <Text style={[styles.sectionTxt]}>Set Time</Text>
+                </TouchableOpacity>
+              </View>
+            </Animated.View>
+
+            <Animated.View
+              style={[styles.EveryContainer, EveryContainerStyle('SET_TIME')]}>
+              {timeOpen && (
+                <Animated.View style={[styles.dateContainer]}>
+                  <TodayTab />
+                  <DayAndTimeTab />
+                  {/* <DateSelect
+                    handleList={datesList}
+                    setHandleList={setDatesList}
+                  /> */}
+                </Animated.View>
+              )}
+            </Animated.View>
+          </Animated.View>
+          {/* @@@@ REPEAT @@@@ */}
+          <Animated.View
+            style={[styles.flexOneAndJustifyCenter, AnimateStyle('REPEAT')]}>
+            <Line
+              strength={1}
+              lengthPercentage={100}
+              lineColor={constants.colors.UNDER_LINE}
+            />
+            <Animated.View style={styles.textAndToggleContainer}>
+              <View style={styles.textAndToggle}>
+                <SwitchToggle
+                  switchOn={!repeatOn}
+                  onPress={() => {
+                    open('REPEAT');
+                  }}
+                  RTL
+                  backgroundColorOff={constants.colors.BLACK}
+                  backgroundColorOn={constants.colors.OFF_WHITE}
+                  circleColorOff={constants.colors.GREEN}
+                  circleColorOn={constants.colors.GREEN}
+                  containerStyle={containerStyle}
+                  circleStyle={circleStyle}
+                />
+                <TouchableOpacity onPress={() => handleNamePress('REPEAT')}>
+                  <Text style={[styles.sectionTxt]}>Repeat every ...</Text>
+                </TouchableOpacity>
+              </View>
+            </Animated.View>
+
+            <Animated.View
+              style={[styles.EveryContainer, EveryContainerStyle('REPEAT')]}>
+              {repeatOpen && (
+                <Animated.View
+                  style={[
+                    styles.dateContainer,
+                    // timeOn ? {flex: 2.5} : {flex: ZERO},
+                  ]}>
+                  <DateSelect
+                    handleList={datesList}
+                    setHandleList={setDatesList}
+                  />
+                </Animated.View>
+              )}
+            </Animated.View>
+          </Animated.View>
+
           <Animated.View style={[styles.push, AnimateStyle('PUSH')]}>
             <Line
               strength={1}
@@ -555,7 +684,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     // backgroundColor: 'yellow',
   },
-  allDayLong: {
+  flexOneAndJustifyCenter: {
     flex: 1,
     justifyContent: 'center',
     // alignItems: 'center',
@@ -594,6 +723,8 @@ const styles = StyleSheet.create({
   dateContainer: {
     alignSelf: 'flex-end',
     justifyContent: 'center',
+    width: '100%',
+    height: '100%',
   },
   push: {
     flex: 1.2,
@@ -613,4 +744,10 @@ const styles = StyleSheet.create({
   },
   doneButton: {},
   EveryContainer: {paddingRight: '5.5%', paddingLeft: '5.2%'},
+  SetTimeSubTabsContainer: {
+    alignSelf: 'flex-end',
+    justifyContent: 'center',
+    width: '100%',
+    height: '100%',
+  },
 });

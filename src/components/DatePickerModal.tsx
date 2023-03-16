@@ -19,19 +19,20 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
 }) => {
   const [currentDate, setCurrentDate] = React.useState<Date>(new Date());
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-  console.log({currentDate});
   const handleConfirm = () => {
-    // if(dateFormat === 'time'){
-    //     currentDate.setHours(1)
-    //     currentDate.setMinutes(1)
-    // }
     const formattedDate = formatDate(currentDate);
     setDate(formattedDate);
     close();
   };
   const handleChange = (date: Date) => {
-    console.log({datepicker: date.toLocaleDateString()});
-    setCurrentDate(date);
+    dateFormat === 'time' ? handleHoursChange(date) : setCurrentDate(date);
+  };
+
+  const handleHoursChange = (date: Date) => {
+    const time = date.toLocaleTimeString();
+    const [hours, minutes] = time.split(':');
+    const fixedDate = new Date(date.setUTCHours(+hours, +minutes));
+    setCurrentDate(fixedDate);
   };
   const cancelConfirm = () => {
     setCurrentDate(new Date());
@@ -91,7 +92,6 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
             fadeToColor={constants.colors.BGC}
             style={styles.datePicker}
             textColor={constants.colors.GREEN}
-            // locale={'heb-il'}
           />
         </View>
       </BottomSheetModal>

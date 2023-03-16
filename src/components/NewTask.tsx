@@ -1,8 +1,5 @@
 import {
-  findNodeHandle,
   Keyboard,
-  KeyboardAvoidingView,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -10,29 +7,18 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import React, {useCallback, useMemo, useRef, useState} from 'react';
-// import Modal from 'react-native-modal';
+import React, {useRef, useState} from 'react';
 import constants from '../assets/constants';
 import SVG from '../assets/svg';
 import Line from './Line';
 import SwitchToggle from 'react-native-switch-toggle';
 import Animated, {
-  interpolate,
   useAnimatedStyle,
-  useDerivedValue,
   useSharedValue,
-  withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import {SPRING_CONFIG, ZERO} from '../screens/AuthModal';
-import {
-  KeyboardAwareScrollView,
-  KeyboardAwareScrollViewProps,
-} from 'react-native-keyboard-aware-scroll-view';
-import DateSelect from './DateSelect';
+import {ZERO} from '../screens/AuthModal';
 import {useAddTaskMutation} from '../app/api/taskApi';
-import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
-import DatePicker from 'react-native-date-picker';
 import DatePickerModal from './DatePickerModal';
 import {formatStringToDate} from './WeeklyCalender';
 const DEFAULT_FLEX = {
@@ -138,11 +124,8 @@ const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
   const [descriptionOpen, setDescriptionOpen] = useState(false);
   const [pushOpen, setPushOpen] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
-  const [datesList, setDatesList] = useState<string[]>([]);
   const [taskName, setTaskName] = useState<string>();
   const [description, setDescription] = useState<string>();
-  const [dateModalOpen, setDateModalOpen] = useState<boolean>(false);
-  const [todayHours, setTodayHours] = useState<string>('');
 
   const [AddTask, {isLoading, data, isSuccess, isError, error}] =
     useAddTaskMutation();
@@ -458,7 +441,8 @@ const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
                 containerStyle={subToggleContainerStyle}
                 circleStyle={subToggleCircleStyle}
               />
-              <TouchableOpacity onPress={() => handleNamePress('TODAY')}>
+              <TouchableOpacity onPress={() => open('TODAY')}>
+                {/* <TouchableOpacity onPress={() => handleNamePress('TODAY')}> */}
                 <Text style={[styles.subSectionTxt]}>Today</Text>
               </TouchableOpacity>
             </View>
@@ -466,12 +450,10 @@ const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
 
           {todayOpen && (
             <Animated.View
-              style={[
-                styles.EveryContainer,
-                EveryContainerStyle('TODAY'),
-                {backgroundColor: 'blue'},
-              ]}>
-              <Animated.View style={[styles.dateContainer]}></Animated.View>
+              style={[styles.EveryContainer, EveryContainerStyle('TODAY')]}>
+              <Animated.View style={[styles.dateContainer]}>
+                <Text style={{color: 'black'}}>{targetDate}</Text>
+              </Animated.View>
             </Animated.View>
           )}
         </Animated.View>
@@ -489,7 +471,6 @@ const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
               switchOn={!dayAndTimeOn}
               onPress={() => {
                 open('DAY_AND_TIME');
-                setDateModalOpen(prev => !prev);
               }}
               RTL
               backgroundColorOff={constants.colors.BGC}
@@ -503,7 +484,6 @@ const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
             <TouchableOpacity
               onPress={() => {
                 open('DAY_AND_TIME');
-                setDateModalOpen(prev => !prev);
               }}>
               {/* <TouchableOpacity onPress={() => handleNamePress('DAY_AND_TIME')}> */}
               <Text style={[styles.subSectionTxt]}>Day and time</Text>
@@ -697,17 +677,11 @@ const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
           />
         </TouchableOpacity>
         <DatePickerModal
-          isOpen={TABS['TODAY'].stateIsOpen}
-          date={formatStringToDate(targetDate)}
-          dateFormat={'time'}
-          setDate={setTodayHours}
-        />
-        {/* <DatePickerModal
           isOpen={TABS['DAY_AND_TIME'].stateIsOpen || TABS['TODAY'].stateIsOpen}
           date={formatStringToDate(targetDate)}
           dateFormat={TABS['DAY_AND_TIME'].stateIsOpen ? 'datetime' : 'time'}
           setDate={setTargetDate}
-        /> */}
+        />
       </Animated.View>
     </TouchableWithoutFeedback>
   );
@@ -726,13 +700,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: '3.2%',
   },
   realContainer: {
-    // backgroundColor: 'red',
     height: '73.09375%',
     width: '100%',
     borderRadius: 40,
     borderWidth: 1,
     borderColor: constants.colors.UNDER_LINE,
-    // padding: '5.2%',
   },
   newTask: {flex: 1.6, padding: '5.2%'},
   headLineTxt: {

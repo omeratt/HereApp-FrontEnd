@@ -33,14 +33,14 @@ import DateSelect from './DateSelect';
 import {useAddTaskMutation} from '../app/api/taskApi';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 const DEFAULT_FLEX = {
-  PUSH: 1.2,
+  PUSH: 1,
   SET_TIME_CONTENT: 1,
   SET_TIME: 1,
   DAY_AND_TIME: 1,
   TODAY: 1,
   REPEAT: 1,
   DESCRIPTION: 1,
-  NOTE: 1.3,
+  NOTE: 3,
 };
 const OPENED_FLEX = {
   PUSH: 2.5,
@@ -50,7 +50,7 @@ const OPENED_FLEX = {
   DAY_AND_TIME: 2.5,
   REPEAT: 2.5,
   DESCRIPTION: 2.5,
-  NOTE: 1.3,
+  NOTE: 3,
 };
 const containerStyle = {
   width: 65,
@@ -63,6 +63,21 @@ const containerStyle = {
 const circleStyle = {
   width: 25,
   height: 25,
+  borderRadius: 12.5,
+  borderWidth: 1,
+  borderColor: constants.colors.UNDER_LINE,
+};
+const subToggleContainerStyle = {
+  width: 47,
+  height: 22,
+  borderRadius: 25,
+  padding: 3,
+  borderWidth: 1,
+  borderColor: constants.colors.UNDER_LINE,
+};
+const subToggleCircleStyle = {
+  width: 18,
+  height: 18,
   borderRadius: 12.5,
   borderWidth: 1,
   borderColor: constants.colors.UNDER_LINE,
@@ -107,12 +122,14 @@ const NewTask: React.FC<props> = ({closeModal, targetDate}) => {
   // const [isModalVisible, setModalVisible] = useState(true);
   const [timeOn, setTimeOn] = useState(false);
   const [todayOn, setTodayOn] = useState(false);
+  const [dayAndTimeOn, setDayAndTimeOn] = useState(false);
   const [repeatOn, setRepeatOn] = useState(false);
   const [descriptionOn, setDescriptionOn] = useState(false);
   const [pushOn, setPushOn] = useState(false);
   const [noteOn, setNoteOn] = useState(false);
   const [timeOpen, setTimeOpen] = useState(false);
   const [todayOpen, setTodayOpen] = useState(false);
+  const [dayAndTimeOpen, setDayAndTimeOpen] = useState(false);
   const [repeatOpen, setRepeatOpen] = useState(false);
   const [descriptionOpen, setDescriptionOpen] = useState(false);
   const [pushOpen, setPushOpen] = useState(false);
@@ -176,38 +193,104 @@ const NewTask: React.FC<props> = ({closeModal, targetDate}) => {
   };
 
   const open = (tabName: tabType) => {
-    // flexPush.value = withSpring(toValue, {...SPRING_CONFIG, mass: duration});
     TABS[tabName].setStateOn(!TABS[tabName].stateIsOn);
     TABS[tabName].setStateOpen(!TABS[tabName].stateIsOn);
+
+    //OPEN TAB
     if (!TABS[tabName].stateIsOn) {
       closeAllExcept(tabName);
-      flex[tabName].line.value = withTiming(OPENED_FLEX[tabName], {
-        duration: 300,
-      });
-      flex[tabName].space.value = withTiming(3, {
+      if (tabName === 'TODAY') {
+        flex['SET_TIME'].line.value = withTiming(4.5, {
+          duration: 300,
+        });
+        flex['SET_TIME'].space.value = withTiming(4.5, {
+          duration: 300,
+        });
+        flex['NOTE'].line.value = withTiming(1.2, {
+          duration: 300,
+        });
+      } else if (tabName === 'DAY_AND_TIME') {
+        flex['TODAY'].line.value = withTiming(1, {
+          duration: 300,
+        });
+        flex['TODAY'].space.value = withTiming(1, {
+          duration: 300,
+        });
+        flex['SET_TIME'].line.value = withTiming(4.5, {
+          duration: 300,
+        });
+        flex['SET_TIME'].space.value = withTiming(4.5, {
+          duration: 300,
+        });
+        flex['NOTE'].line.value = withTiming(1.2, {
+          duration: 300,
+        });
+        flex[tabName].line.value = withTiming(10, {
+          duration: 300,
+        });
+      } else {
+        flex[tabName].line.value = withTiming(OPENED_FLEX[tabName], {
+          duration: 300,
+        });
+      }
+      flex[tabName].space.value = withTiming(1.7, {
         duration: 300,
       });
       if (tabName == 'DESCRIPTION')
         descInputAnimation.value = withTiming(100, {duration: 300});
-    } else {
+    }
+    //CLOSE TAB
+    else {
+      if (tabName === 'TODAY' || tabName === 'DAY_AND_TIME') {
+        flex['SET_TIME'].line.value = withTiming(2.5, {
+          duration: 300,
+        });
+        flex['SET_TIME'].space.value = withTiming(1.7, {
+          duration: 300,
+        });
+        flex['NOTE'].line.value = withTiming(3, {
+          duration: 300,
+        });
+      }
       TABS[tabName].close(tabName);
     }
   };
   const handleNamePress = (tabName: tabType) => {
-    // flexPush.value = withSpring(toValue, {...SPRING_CONFIG, mass: duration});
-    console.log(tabName, TABS[tabName].stateIsOpen);
-
     TABS[tabName].setStateOpen(!TABS[tabName].stateIsOpen);
-    console.log(tabName, TABS[tabName].stateIsOpen);
+    //OPEN TAB
     if (!TABS[tabName].stateIsOpen) {
       closeAllExcept(tabName);
+      if (tabName === 'TODAY' || tabName === 'DAY_AND_TIME') {
+        flex['SET_TIME'].line.value = withTiming(4.5, {
+          duration: 300,
+        });
+        flex['SET_TIME'].space.value = withTiming(4.5, {
+          duration: 300,
+        });
+        flex['NOTE'].line.value = withTiming(1.2, {
+          duration: 300,
+        });
+      }
       flex[tabName].line.value = withTiming(OPENED_FLEX[tabName], {
         duration: 300,
       });
-      flex[tabName].space.value = withTiming(3, {
+      flex[tabName].space.value = withTiming(1.7, {
         duration: 300,
       });
-    } else {
+    }
+    //CLOSE TAB
+    else {
+      if (tabName === 'TODAY' || tabName === 'DAY_AND_TIME') {
+        flex['SET_TIME'].line.value = withTiming(2.5, {
+          duration: 300,
+        });
+        flex['SET_TIME'].space.value = withTiming(1.7, {
+          duration: 300,
+        });
+        flex['NOTE'].line.value = withTiming(3, {
+          duration: 300,
+        });
+      }
       TABS[tabName].close(tabName);
     }
   };
@@ -240,18 +323,18 @@ const NewTask: React.FC<props> = ({closeModal, targetDate}) => {
     TODAY: {
       open,
       close,
-      stateIsOn: repeatOn,
-      setStateOn: setRepeatOn,
-      stateIsOpen: repeatOpen,
-      setStateOpen: setRepeatOpen,
+      stateIsOn: todayOn,
+      setStateOn: setTodayOn,
+      stateIsOpen: todayOpen,
+      setStateOpen: setTodayOpen,
     },
     DAY_AND_TIME: {
       open,
       close,
-      stateIsOn: repeatOn,
-      setStateOn: setRepeatOn,
-      stateIsOpen: repeatOpen,
-      setStateOpen: setRepeatOpen,
+      stateIsOn: dayAndTimeOn,
+      setStateOn: setDayAndTimeOn,
+      stateIsOpen: dayAndTimeOpen,
+      setStateOpen: setDayAndTimeOpen,
     },
     REPEAT: {
       open,
@@ -294,8 +377,15 @@ const NewTask: React.FC<props> = ({closeModal, targetDate}) => {
   const closeAllExcept = (tabName: string) => {
     for (const [key, tab] of Object.entries(TABS)) {
       if (key != tabName) {
-        tab.close(key as tabType);
-        tab.setStateOpen(false);
+        if (
+          !(
+            (tabName === 'TODAY' || tabName === 'DAY_AND_TIME') &&
+            (key as tabType) === 'SET_TIME'
+          )
+        ) {
+          tab.close(key as tabType);
+          tab.setStateOpen(false);
+        }
       }
     }
   };
@@ -319,40 +409,38 @@ const NewTask: React.FC<props> = ({closeModal, targetDate}) => {
     return (
       <>
         <Animated.View
-          style={[styles.SetTimeSubTabsContainer, AnimateStyle('SET_TIME')]}>
-          <Line
-            strength={1}
-            lengthPercentage={100}
-            rotate180
-            lineColor={constants.colors.UNDER_LINE}
-          />
-          <Animated.View style={styles.textAndToggleContainer}>
-            <View style={styles.textAndToggle}>
+          style={[
+            styles.flexOneAndJustifyCenter,
+            // {backgroundColor: 'blue'},
+            AnimateStyle('SET_TIME'),
+          ]}>
+          <Animated.View style={[styles.textAndToggleContainer]}>
+            <View style={styles.TxtAndToggleInSetTime}>
               <SwitchToggle
-                switchOn={!timeOn}
+                switchOn={!todayOn}
                 onPress={() => {
-                  // open('SET_TIME');
+                  open('TODAY');
                 }}
                 RTL
                 backgroundColorOff={constants.colors.BGC}
                 backgroundColorOn={constants.colors.OFF_WHITE}
                 circleColorOff={constants.colors.GREEN}
                 circleColorOn={constants.colors.GREEN}
-                containerStyle={containerStyle}
-                circleStyle={circleStyle}
+                containerStyle={subToggleContainerStyle}
+                circleStyle={subToggleCircleStyle}
               />
-              <TouchableOpacity onPress={() => handleNamePress('SET_TIME')}>
-                <Text style={[styles.sectionTxt]}>Today</Text>
+              <TouchableOpacity onPress={() => handleNamePress('TODAY')}>
+                <Text style={[styles.subSectionTxt]}>Today</Text>
               </TouchableOpacity>
             </View>
           </Animated.View>
 
-          <Animated.View
-            style={[styles.EveryContainer, EveryContainerStyle('SET_TIME')]}>
-            {/* {timeOpen && (
-            <Animated.View style={[styles.dateContainer]}></Animated.View>
-          )} */}
-          </Animated.View>
+          {todayOpen && (
+            <Animated.View
+              style={[styles.EveryContainer, EveryContainerStyle('TODAY')]}>
+              <Animated.View style={[styles.dateContainer]}></Animated.View>
+            </Animated.View>
+          )}
         </Animated.View>
       </>
     );
@@ -361,34 +449,35 @@ const NewTask: React.FC<props> = ({closeModal, targetDate}) => {
   const DayAndTimeTab = () => {
     return (
       <Animated.View
-        style={[styles.flexOneAndJustifyCenter, AnimateStyle('SET_TIME')]}>
+        style={[styles.flexOneAndJustifyCenter, AnimateStyle('DAY_AND_TIME')]}>
         <Animated.View style={styles.textAndToggleContainer}>
-          <View style={styles.textAndToggle}>
+          <View style={styles.TxtAndToggleInSetTime}>
             <SwitchToggle
-              switchOn={!timeOn}
+              switchOn={!dayAndTimeOn}
               onPress={() => {
-                // open('SET_TIME');
+                open('DAY_AND_TIME');
               }}
               RTL
               backgroundColorOff={constants.colors.BGC}
               backgroundColorOn={constants.colors.OFF_WHITE}
               circleColorOff={constants.colors.GREEN}
               circleColorOn={constants.colors.GREEN}
-              containerStyle={containerStyle}
-              circleStyle={circleStyle}
+              containerStyle={subToggleContainerStyle}
+              circleStyle={subToggleCircleStyle}
             />
-            <TouchableOpacity onPress={() => handleNamePress('SET_TIME')}>
-              <Text style={[styles.sectionTxt]}>Today</Text>
+
+            <TouchableOpacity onPress={() => handleNamePress('DAY_AND_TIME')}>
+              <Text style={[styles.subSectionTxt]}>Day and time</Text>
             </TouchableOpacity>
           </View>
         </Animated.View>
 
-        <Animated.View
-          style={[styles.EveryContainer, EveryContainerStyle('SET_TIME')]}>
-          {/* {timeOpen && (
-        <Animated.View style={[styles.dateContainer]}></Animated.View>
-      )} */}
-        </Animated.View>
+        {dayAndTimeOpen && (
+          <Animated.View
+            style={[styles.EveryContainer, EveryContainerStyle('SET_TIME')]}>
+            <Animated.View style={[styles.dateContainer]}></Animated.View>
+          </Animated.View>
+        )}
       </Animated.View>
     );
   };
@@ -412,201 +501,150 @@ const NewTask: React.FC<props> = ({closeModal, targetDate}) => {
               />
             </View>
           </View>
-          <Animated.View
-            style={[styles.description, AnimateStyle('DESCRIPTION')]}>
-            <Line
-              strength={1}
-              lengthPercentage={100}
-              lineColor={constants.colors.UNDER_LINE}
-              rotate180
-            />
-            <View style={[styles.description]}>
-              <Animated.View style={styles.descriptionContainer}>
-                <TouchableOpacity
-                  onPress={() => handleNamePress('DESCRIPTION')}>
-                  <Text style={[styles.sectionTxt]}>Description</Text>
-                </TouchableOpacity>
-              </Animated.View>
-            </View>
+          <View style={{flex: 6.3}}>
+            <Animated.View
+              style={[styles.description, AnimateStyle('DESCRIPTION')]}>
+              <Line
+                strength={1}
+                lengthPercentage={100}
+                lineColor={constants.colors.UNDER_LINE}
+                rotate180
+              />
+              <View style={[styles.description]}>
+                <Animated.View style={styles.descriptionContainer}>
+                  <TouchableOpacity
+                    onPress={() => handleNamePress('DESCRIPTION')}>
+                    <Text style={[styles.sectionTxt]}>Description</Text>
+                  </TouchableOpacity>
+                </Animated.View>
+              </View>
 
+              <Animated.View
+                style={[
+                  styles.EveryContainer,
+                  EveryContainerStyle('DESCRIPTION'),
+                ]}>
+                {descriptionOpen && (
+                  <Animated.View style={[styles.descriptionInputContainer]}>
+                    <TextInput
+                      numberOfLines={4}
+                      multiline
+                      onChangeText={val => setDescription(val)}
+                      selectionColor={constants.colors.GREEN}
+                      cursorColor={constants.colors.GREEN}
+                      style={[styles.descriptionInput]}
+                      autoFocus
+                      defaultValue={description}
+                      ref={taskDescriptionInputRef}
+                    />
+                  </Animated.View>
+                )}
+              </Animated.View>
+            </Animated.View>
             <Animated.View
               style={[
-                styles.EveryContainer,
-                EveryContainerStyle('DESCRIPTION'),
+                styles.flexOneAndJustifyCenter,
+                AnimateStyle('SET_TIME'),
               ]}>
-              {descriptionOpen && (
-                <Animated.View style={[styles.descriptionInputContainer]}>
-                  <TextInput
-                    numberOfLines={4}
-                    multiline
-                    onChangeText={val => setDescription(val)}
-                    selectionColor={constants.colors.GREEN}
-                    cursorColor={constants.colors.GREEN}
-                    style={[styles.descriptionInput]}
-                    autoFocus
-                    defaultValue={description}
-                    ref={taskDescriptionInputRef}
+              <Line
+                strength={1}
+                lengthPercentage={100}
+                rotate180
+                lineColor={constants.colors.UNDER_LINE}
+              />
+              <Animated.View style={styles.textAndToggleContainer}>
+                <View style={styles.textAndToggle}>
+                  <SwitchToggle
+                    switchOn={!timeOn}
+                    onPress={() => {
+                      open('SET_TIME');
+                    }}
+                    RTL
+                    backgroundColorOff={constants.colors.BGC}
+                    backgroundColorOn={constants.colors.OFF_WHITE}
+                    circleColorOff={constants.colors.GREEN}
+                    circleColorOn={constants.colors.GREEN}
+                    containerStyle={containerStyle}
+                    circleStyle={circleStyle}
                   />
-                </Animated.View>
-              )}
-            </Animated.View>
-          </Animated.View>
-          <Animated.View
-            style={[styles.flexOneAndJustifyCenter, AnimateStyle('SET_TIME')]}>
-            <Line
-              strength={1}
-              lengthPercentage={100}
-              rotate180
-              lineColor={constants.colors.UNDER_LINE}
-            />
-            <Animated.View style={styles.textAndToggleContainer}>
-              <View style={styles.textAndToggle}>
-                <SwitchToggle
-                  switchOn={!timeOn}
-                  onPress={() => {
-                    open('SET_TIME');
-                  }}
-                  RTL
-                  backgroundColorOff={constants.colors.BGC}
-                  backgroundColorOn={constants.colors.OFF_WHITE}
-                  circleColorOff={constants.colors.GREEN}
-                  circleColorOn={constants.colors.GREEN}
-                  containerStyle={containerStyle}
-                  circleStyle={circleStyle}
-                />
-                <TouchableOpacity onPress={() => handleNamePress('SET_TIME')}>
-                  <Text style={[styles.sectionTxt]}>Set Time</Text>
-                </TouchableOpacity>
-              </View>
-            </Animated.View>
+                  <TouchableOpacity onPress={() => handleNamePress('SET_TIME')}>
+                    <Text style={[styles.sectionTxt]}>Set Time</Text>
+                  </TouchableOpacity>
+                </View>
+              </Animated.View>
 
-            <Animated.View
-              style={[styles.EveryContainer, EveryContainerStyle('SET_TIME')]}>
-              {timeOpen && (
-                <Animated.View style={[styles.dateContainer]}>
-                  <TodayTab />
-                  <DayAndTimeTab />
-                  {/* <DateSelect
+              <Animated.View
+                style={[
+                  styles.EveryContainer,
+                  EveryContainerStyle('SET_TIME'),
+                ]}>
+                {timeOpen && (
+                  <>
+                    <Line
+                      strength={1}
+                      lengthPercentage={100}
+                      rotate180
+                      lineColor={constants.colors.UNDER_LINE}
+                    />
+                    <Animated.View style={[styles.setTimeSubContainer]}>
+                      <TodayTab />
+                      <DayAndTimeTab />
+                      {/* <DateSelect
                     handleList={datesList}
                     setHandleList={setDatesList}
                   /> */}
-                </Animated.View>
-              )}
+                    </Animated.View>
+                  </>
+                )}
+              </Animated.View>
             </Animated.View>
-          </Animated.View>
-          {/* @@@@ REPEAT @@@@ */}
-          <Animated.View
-            style={[styles.flexOneAndJustifyCenter, AnimateStyle('REPEAT')]}>
-            <Line
-              strength={1}
-              lengthPercentage={100}
-              lineColor={constants.colors.UNDER_LINE}
-            />
-            <Animated.View style={styles.textAndToggleContainer}>
-              <View style={styles.textAndToggle}>
-                <SwitchToggle
-                  switchOn={!repeatOn}
-                  onPress={() => {
-                    open('REPEAT');
-                  }}
-                  RTL
-                  backgroundColorOff={constants.colors.BLACK}
-                  backgroundColorOn={constants.colors.OFF_WHITE}
-                  circleColorOff={constants.colors.GREEN}
-                  circleColorOn={constants.colors.GREEN}
-                  containerStyle={containerStyle}
-                  circleStyle={circleStyle}
-                />
-                <TouchableOpacity onPress={() => handleNamePress('REPEAT')}>
-                  <Text style={[styles.sectionTxt]}>Repeat every ...</Text>
-                </TouchableOpacity>
-              </View>
-            </Animated.View>
+            {/* @@@@ REPEAT @@@@ */}
 
-            <Animated.View
-              style={[styles.EveryContainer, EveryContainerStyle('REPEAT')]}>
-              {repeatOpen && (
-                <Animated.View
-                  style={[
-                    styles.dateContainer,
-                    // timeOn ? {flex: 2.5} : {flex: ZERO},
-                  ]}>
-                  <DateSelect
-                    handleList={datesList}
-                    setHandleList={setDatesList}
+            <Animated.View style={[styles.push, AnimateStyle('PUSH')]}>
+              <Line
+                strength={1}
+                lengthPercentage={100}
+                lineColor={constants.colors.UNDER_LINE}
+              />
+              <Animated.View style={styles.textAndToggleContainer}>
+                <View style={styles.textAndToggle}>
+                  <SwitchToggle
+                    switchOn={!pushOn}
+                    onPress={() => {
+                      open('PUSH');
+                    }}
+                    RTL
+                    backgroundColorOff={constants.colors.BLACK}
+                    backgroundColorOn={constants.colors.OFF_WHITE}
+                    circleColorOff={constants.colors.GREEN}
+                    circleColorOn={constants.colors.GREEN}
+                    containerStyle={containerStyle}
+                    circleStyle={circleStyle}
                   />
-                </Animated.View>
-              )}
-            </Animated.View>
-          </Animated.View>
 
-          <Animated.View style={[styles.push, AnimateStyle('PUSH')]}>
-            <Line
-              strength={1}
-              lengthPercentage={100}
-              lineColor={constants.colors.UNDER_LINE}
-            />
-            <Animated.View style={styles.textAndToggleContainer}>
-              <View style={styles.textAndToggle}>
-                <SwitchToggle
-                  switchOn={!pushOn}
-                  onPress={() => {
-                    open('PUSH');
-                  }}
-                  RTL
-                  backgroundColorOff={constants.colors.BLACK}
-                  backgroundColorOn={constants.colors.OFF_WHITE}
-                  circleColorOff={constants.colors.GREEN}
-                  circleColorOn={constants.colors.GREEN}
-                  containerStyle={containerStyle}
-                  circleStyle={circleStyle}
-                />
+                  <TouchableOpacity onPress={() => handleNamePress('PUSH')}>
+                    <Text style={[styles.sectionTxt]}>Push it for me</Text>
+                  </TouchableOpacity>
+                </View>
+              </Animated.View>
 
-                <TouchableOpacity onPress={() => handleNamePress('PUSH')}>
-                  <Text style={[styles.sectionTxt, {fontSize: 22}]}>
-                    Push it for me
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </Animated.View>
-
-            <Animated.View
-              style={[styles.EveryContainer, EveryContainerStyle('PUSH')]}>
-              <Text style={[styles.sectionTxt, {fontSize: 12}]}>
-                times date ...
-              </Text>
-            </Animated.View>
-          </Animated.View>
-          <View style={styles.share}>
-            <Line
-              strength={1}
-              lengthPercentage={100}
-              lineColor={constants.colors.UNDER_LINE}
-              rotate180
-            />
-            <View style={styles.textAndToggleContainer}>
-              <View style={styles.textAndToggle}>
-                <TouchableOpacity onPress={() => {}}>
-                  <SVG.plusIconOutlined
-                    fill={constants.colors.BGC}
-                    height="100%"
-                  />
-                </TouchableOpacity>
-                <Text style={[styles.sectionTxt, {fontSize: 22}]}>
-                  Share this task
+              <Animated.View
+                style={[styles.EveryContainer, EveryContainerStyle('PUSH')]}>
+                <Text style={[styles.sectionTxt, {fontSize: 12}]}>
+                  times date ...
                 </Text>
+              </Animated.View>
+            </Animated.View>
+            <Animated.View style={[styles.note, AnimateStyle('NOTE')]}>
+              <Line
+                strength={1}
+                lengthPercentage={100}
+                lineColor={constants.colors.UNDER_LINE}
+              />
+              <View style={styles.noteTxtContainer}>
+                <Text style={[styles.sectionTxt]}>Notes</Text>
               </View>
-            </View>
-          </View>
-          <View style={styles.note}>
-            <Line
-              strength={1}
-              lengthPercentage={100}
-              lineColor={constants.colors.UNDER_LINE}
-            />
-            <View style={styles.noteTxtContainer}>
-              <Text style={[styles.sectionTxt, {fontSize: 22}]}>Note</Text>
-            </View>
+            </Animated.View>
           </View>
         </Animated.View>
 
@@ -631,12 +669,12 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: constants.colors.OFF_WHITE,
     alignItems: 'center',
-    justifyContent: 'space-evenly',
-    padding: '3.2%',
+    justifyContent: 'space-between',
+    paddingHorizontal: '3.2%',
   },
   realContainer: {
     // backgroundColor: 'red',
-    height: '90%',
+    height: '73.09375%',
     width: '100%',
     borderRadius: 40,
     borderWidth: 1,
@@ -647,11 +685,12 @@ const styles = StyleSheet.create({
   headLineTxt: {
     color: constants.colors.BLACK,
     fontFamily: constants.Fonts.paragraph,
+    // fontWeight: '700',
     fontSize: 30,
   },
   newTaskTitleInputContainer: {
     // backgroundColor: constants.colors.BLACK,
-    height: '70%',
+    height: '80%',
     width: '62%',
     alignSelf: 'flex-end',
     justifyContent: 'center',
@@ -692,7 +731,12 @@ const styles = StyleSheet.create({
   sectionTxt: {
     color: constants.colors.BLACK,
     fontFamily: constants.Fonts.text,
-    fontSize: 20,
+    fontSize: 16,
+  },
+  subSectionTxt: {
+    color: constants.colors.BLACK,
+    fontFamily: constants.Fonts.text,
+    fontSize: 12,
   },
   repeat: {flex: 2.5},
   description: {flex: 1, justifyContent: 'center'},
@@ -733,7 +777,7 @@ const styles = StyleSheet.create({
     // backgroundColor: 'red',
   },
   share: {flex: 1},
-  note: {flex: 1.3},
+  note: {flex: 2.5},
   noteTxtContainer: {
     padding: '5.2%',
   },
@@ -743,11 +787,27 @@ const styles = StyleSheet.create({
     height: '10%',
   },
   doneButton: {},
-  EveryContainer: {paddingRight: '5.5%', paddingLeft: '5.2%'},
-  SetTimeSubTabsContainer: {
-    alignSelf: 'flex-end',
+  EveryContainer: {
+    paddingRight: '5.5%',
+    paddingLeft: '5.2%',
+  },
+  TxtAndToggleInSetTime: {
+    // padding: '5.2%',
+    paddingRight: '5.2%',
+    // paddingLeft: '5.2%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    // backgroundColor: 'yellow',
+    // height: '100%',
+  },
+  setTimeSubContainer: {
+    // alignSelf: 'flex-end',
+
     justifyContent: 'center',
     width: '100%',
     height: '100%',
+    paddingVertical: '5%',
+    // backgroundColor: 'red',
   },
 });

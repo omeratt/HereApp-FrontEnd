@@ -11,6 +11,13 @@ export type WeeksBySundayDate = {
 
 const DAYS_IN_WEEK = 7;
 const MONTH_DIFFERENCE = 1;
+export const formatDate = (date: Date): string =>
+  date.toLocaleDateString('en-GB').split('.').join('/');
+
+export const formatStringToDate = (date: string) => {
+  const [day, month, year] = date.split('/').map(Number);
+  return new Date(year, month - 1, day);
+};
 
 const getWeeklyCalendar = () => {
   const getWeeksBySundayDate = (): WeeksBySundayDate => {
@@ -49,8 +56,8 @@ const getWeeklyCalendar = () => {
     return weeksBySundayDate;
   };
 
-  const formatDate = (date: Date): string =>
-    date.toLocaleDateString('en-GB').split('.').join('/');
+  // const formatDate = (date: Date): string =>
+  //   date.toLocaleDateString('en-GB').split('.').join('/');
 
   const getShortName = (dayOfWeek: number): string => {
     const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];

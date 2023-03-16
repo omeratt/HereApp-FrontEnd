@@ -27,7 +27,9 @@ const Home = () => {
   // const [offset, setOffset] = useState(0);
   // const [isNext, setIsNext] = useState<boolean>(false);
   const [tasks, setTasks] = useState<any[]>([]);
-  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [selectedDate, setSelectedDate] = useState<string>(
+    formatDate(new Date()),
+  );
   const [isTaskLoading, setIsTaskLoading] = useState<boolean>(false);
   const [currentMonth, setCurrentMonth] = useState<string>('');
   const navigation = useNavigation();
@@ -69,7 +71,7 @@ const Home = () => {
   //   setOffset(offset + 7);
   // };
 
-  const formatDate = (date: Date): string => {
+  function formatDate(date: Date): string {
     const formattedDate = new Intl.DateTimeFormat('heb-IL', {
       day: '2-digit',
       month: '2-digit',
@@ -78,7 +80,7 @@ const Home = () => {
 
     const fixedDate = formattedDate.split('.').join('/');
     return fixedDate;
-  };
+  }
 
   const findDateIndex = (DateToCheck: string) => {
     if (!datesDict) return 0;
@@ -322,6 +324,7 @@ const Home = () => {
           <NewTask
             closeModal={bottomSheetModalRef.current?.dismiss}
             targetDate={selectedDate}
+            setTargetDate={setSelectedDate}
           />
         </BottomSheetModal>
       </BottomSheetModalProvider>

@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 import React, {useCallback, useMemo, useRef, useState} from 'react';
-import Modal from 'react-native-modal';
+// import Modal from 'react-native-modal';
 import constants from '../assets/constants';
 import SVG from '../assets/svg';
 import Line from './Line';
@@ -32,6 +32,9 @@ import {
 import DateSelect from './DateSelect';
 import {useAddTaskMutation} from '../app/api/taskApi';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import DatePicker from 'react-native-date-picker';
+import DatePickerModal from './DatePickerModal';
+import {formatStringToDate} from './WeeklyCalender';
 const DEFAULT_FLEX = {
   PUSH: 1,
   SET_TIME_CONTENT: 1,
@@ -94,8 +97,9 @@ type tabType =
 interface props {
   closeModal: any;
   targetDate: string;
+  setTargetDate: React.Dispatch<React.SetStateAction<string>>;
 }
-const NewTask: React.FC<props> = ({closeModal, targetDate}) => {
+const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
   const ref = useRef<any>();
 
   const AnimateStyle = (tab: tabType) => {
@@ -137,8 +141,12 @@ const NewTask: React.FC<props> = ({closeModal, targetDate}) => {
   const [datesList, setDatesList] = useState<string[]>([]);
   const [taskName, setTaskName] = useState<string>();
   const [description, setDescription] = useState<string>();
+  const [dateModalOpen, setDateModalOpen] = useState<boolean>(false);
+  const [todayHours, setTodayHours] = useState<string>('');
+
   const [AddTask, {isLoading, data, isSuccess, isError, error}] =
     useAddTaskMutation();
+
   const taskNameInputRef = React.useRef<TextInput>(null);
   const taskDescriptionInputRef = React.useRef<TextInput>(null);
   const submit = async () => {
@@ -241,7 +249,28 @@ const NewTask: React.FC<props> = ({closeModal, targetDate}) => {
     }
     //CLOSE TAB
     else {
-      if (tabName === 'TODAY' || tabName === 'DAY_AND_TIME') {
+      if (tabName === 'TODAY' && TABS['DAY_AND_TIME'].stateIsOpen) {
+        flex['TODAY'].line.value = withTiming(1, {
+          duration: 300,
+        });
+        flex['TODAY'].space.value = withTiming(1, {
+          duration: 300,
+        });
+        flex['SET_TIME'].line.value = withTiming(4.5, {
+          duration: 300,
+        });
+        flex['SET_TIME'].space.value = withTiming(4.5, {
+          duration: 300,
+        });
+        flex['NOTE'].line.value = withTiming(1.2, {
+          duration: 300,
+        });
+        flex[tabName].line.value = withTiming(10, {
+          duration: 300,
+        });
+      } else if (tabName === 'TODAY' || tabName === 'DAY_AND_TIME') {
+        console.log('asdasdas', tabName);
+
         flex['SET_TIME'].line.value = withTiming(2.5, {
           duration: 300,
         });
@@ -437,7 +466,11 @@ const NewTask: React.FC<props> = ({closeModal, targetDate}) => {
 
           {todayOpen && (
             <Animated.View
-              style={[styles.EveryContainer, EveryContainerStyle('TODAY')]}>
+              style={[
+                styles.EveryContainer,
+                EveryContainerStyle('TODAY'),
+                {backgroundColor: 'blue'},
+              ]}>
               <Animated.View style={[styles.dateContainer]}></Animated.View>
             </Animated.View>
           )}
@@ -456,6 +489,7 @@ const NewTask: React.FC<props> = ({closeModal, targetDate}) => {
               switchOn={!dayAndTimeOn}
               onPress={() => {
                 open('DAY_AND_TIME');
+                setDateModalOpen(prev => !prev);
               }}
               RTL
               backgroundColorOff={constants.colors.BGC}
@@ -466,7 +500,12 @@ const NewTask: React.FC<props> = ({closeModal, targetDate}) => {
               circleStyle={subToggleCircleStyle}
             />
 
-            <TouchableOpacity onPress={() => handleNamePress('DAY_AND_TIME')}>
+            <TouchableOpacity
+              onPress={() => {
+                open('DAY_AND_TIME');
+                setDateModalOpen(prev => !prev);
+              }}>
+              {/* <TouchableOpacity onPress={() => handleNamePress('DAY_AND_TIME')}> */}
               <Text style={[styles.subSectionTxt]}>Day and time</Text>
             </TouchableOpacity>
           </View>
@@ -475,7 +514,9 @@ const NewTask: React.FC<props> = ({closeModal, targetDate}) => {
         {dayAndTimeOpen && (
           <Animated.View
             style={[styles.EveryContainer, EveryContainerStyle('SET_TIME')]}>
-            <Animated.View style={[styles.dateContainer]}></Animated.View>
+            <Animated.View style={[styles.dateContainer]}>
+              <Text style={{color: 'black'}}>{targetDate}</Text>
+            </Animated.View>
           </Animated.View>
         )}
       </Animated.View>
@@ -655,6 +696,18 @@ const NewTask: React.FC<props> = ({closeModal, targetDate}) => {
             height="100%"
           />
         </TouchableOpacity>
+        <DatePickerModal
+          isOpen={TABS['TODAY'].stateIsOpen}
+          date={formatStringToDate(targetDate)}
+          dateFormat={'time'}
+          setDate={setTodayHours}
+        />
+        {/* <DatePickerModal
+          isOpen={TABS['DAY_AND_TIME'].stateIsOpen || TABS['TODAY'].stateIsOpen}
+          date={formatStringToDate(targetDate)}
+          dateFormat={TABS['DAY_AND_TIME'].stateIsOpen ? 'datetime' : 'time'}
+          setDate={setTargetDate}
+        /> */}
       </Animated.View>
     </TouchableWithoutFeedback>
   );

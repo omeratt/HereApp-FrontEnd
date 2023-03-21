@@ -198,8 +198,15 @@ const Home = () => {
     //   console.log(item.item, item.index);
     // });
     // flatListRef.current
-    const date = item.viewableItems[0]?.item;
-    console.log(date);
+    // console.log()
+    // const dada = item.viewableItems[7]?.index <
+    const len = item.viewableItems?.length;
+    const blah = len <= 7 ? len - 1 : 7;
+    console.log({blah, len});
+    // const index = (item.viewableItems[index]?.item + 7) || 7;
+    const date = item.viewableItems[blah]?.item;
+    // const date = item.viewableItems[index]?.item;
+    console.log(item.viewableItems);
     if (!date) return;
     const currentDateToDisplay = tempGetMonthFromStringDate(date);
     setCurrentMonth(currentDateToDisplay);
@@ -374,9 +381,9 @@ const Home = () => {
                 // contentContainerStyle={{flex: 1}}
                 // style={{flex: 1}}
                 onViewableItemsChanged={handleViewableChange.current}
-                // viewabilityConfig={{
-                //   itemVisiblePercentThreshold: 24,
-                // }}
+                viewabilityConfig={{
+                  itemVisiblePercentThreshold: 24,
+                }}
                 // viewabilityConfigCallbackPairs={
                 //   viewabilityConfigCallbackPairs.current
                 // }

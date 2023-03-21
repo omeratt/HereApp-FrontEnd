@@ -32,11 +32,11 @@ import {setDates} from './src/app/Reducers/User/userSlice';
 I18nManager.forceRTL(true);
 // I18nManager.swapLeftAndRightInRTL(true);
 const App = () => {
-  useEffect(() => {
-    const dates = getWeeklyCalendar();
-    store.dispatch(setDates(dates));
-    console.log(dates);
-  }, []);
+  // useEffect(() => {
+  //   const dates = getWeeklyCalendar();
+  //   store.dispatch(setDates(dates));
+  //   console.log(dates);
+  // }, []);
 
   return (
     <>

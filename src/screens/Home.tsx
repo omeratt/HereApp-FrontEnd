@@ -102,9 +102,9 @@ const Home = () => {
       // const gaga = val.filter(vals => vals.date === DateToCheck);
       // compareDates(val.fullDate, DateToCheck);
       if (compareDates(val.fullDate, DateToCheck)) {
-        // flatListRef.current?.scrollToIndex({index});
-        // flatListRef.current?.sc;
         console.log('---------------------------index hsa found!!', index);
+        flatListRef.current?.scrollToIndex({index: index + 3});
+        // flatListRef.current?.sc;
         return index;
       }
     });
@@ -121,6 +121,13 @@ const Home = () => {
     // const formattedDateToCheck = formatDate(date); //13/2/2023
     // return findDateIndex(formattedDateToCheck);
   }, [selectedDate]);
+
+  // if (flatListRef.current) {
+  //   flatListRef.current?.scrollToIndex({index: 1});
+  //   console.log(
+  //     'aklsdklasjdklasjdlkasjdklasjdlkj89217318237189237918238912389127389',
+  //   );
+  // }
 
   useEffect(() => {
     if (taskFetch) {
@@ -182,11 +189,11 @@ const Home = () => {
   };
 
   const handleViewableChange = useRef((item: any) => {
-    console.log({items: item.viewableItems});
-    item.viewableItems?.forEach((item: any) => {
-      console.log(item.item, item.index);
-    });
-    const date = item.viewableItems[4]?.item;
+    // console.log({items: item.viewableItems});
+    // item.viewableItems?.forEach((item: any) => {
+    //   console.log(item.item, item.index);
+    // });
+    const date = item.viewableItems[3]?.item;
     if (!date) return;
     const currentDateToDisplay = tempGetMonthFromStringDate(date);
     setCurrentMonth(currentDateToDisplay);
@@ -324,35 +331,53 @@ const Home = () => {
           <View style={[styles.date]}>
             {datesDict && (
               <FlatList
+                ref={flatListRef}
                 data={flatListData}
+                onContentSizeChange={() => {
+                  if (
+                    flatListRef &&
+                    flatListRef.current &&
+                    flatListData &&
+                    flatListData.length &&
+                    currentDateIndexInFlatList
+                  ) {
+                    flatListRef.current.scrollToIndex({
+                      index: currentDateIndexInFlatList + 3,
+                    });
+                  }
+                }}
                 // data={Object.values(datesDict)}
 
                 renderItem={renderItem}
                 keyExtractor={(item, index) => index.toString()}
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                initialScrollIndex={16}
-                // initialScrollIndex={currentDateIndexInFlatList || 0}
+                // initialScrollIndex={16}
+                initialScrollIndex={currentDateIndexInFlatList || 0}
                 inverted
                 pagingEnabled
                 // ItemSeparatorComponent={() => <React.Fragment />}
                 // contentContainerStyle={{flex: 1}}
+                // style={{flex: 1}}
                 onViewableItemsChanged={handleViewableChange.current}
+                viewabilityConfig={{
+                  itemVisiblePercentThreshold: 24,
+                }}
                 // viewabilityConfigCallbackPairs={
                 //   viewabilityConfigCallbackPairs.current
                 // }
                 snapToAlignment={'center'}
-                getItemLayout={(data, index) => {
-                  // console.log({topViewWidth});
-                  const width = topViewWidth || 360;
-                  // if (!topViewWidth) console.log({widthasdasd: width});
-                  // else console.log({widrh: width});
-                  return {
-                    index,
-                    length: constants.WIDTH / 8,
-                    offset: (constants.WIDTH / 8) * index,
-                  };
-                }}
+                // getItemLayout={(data, index) => {
+                //   // console.log({topViewWidth});
+                //   const width = topViewWidth || 360;
+                //   // if (!topViewWidth) console.log({widthasdasd: width});
+                //   // else console.log({widrh: width});
+                //   return {
+                //     index,
+                //     length: constants.WIDTH / 8,
+                //     offset: (constants.WIDTH / 8) * index,
+                //   };
+                // }}
               />
             )}
           </View>

@@ -18,6 +18,8 @@ import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {DrawerActions, useNavigation} from '@react-navigation/native';
 import {getDatesForYear, Week} from '../components/WeeklyCalender';
 import {selectDateSelector} from '../app/Reducers/User/userSlice';
+import Entypo from 'react-native-vector-icons/Entypo';
+import Line from '../components/Line';
 
 const CURRENT_DATE = new Date();
 const thisYear = CURRENT_DATE.getFullYear();
@@ -162,7 +164,8 @@ const Home = () => {
 
   const handleViewableChange = useRef((item: any) => {
     // console.log({items: item.viewableItems});
-    const date = item.viewableItems[4].item;
+    const date = item.viewableItems[4]?.item;
+    if (!date) return;
     const currentDateToDisplay = tempGetMonthFromStringDate(date);
     setCurrentMonth(currentDateToDisplay);
 
@@ -184,7 +187,6 @@ const Home = () => {
           onPress={() => {
             console.log({item});
           }}>
-          <Text style={[styles.dateText, {marginBottom: 5}]}>{item.day}</Text>
           <View
             style={[
               styles.datePicker,
@@ -198,6 +200,7 @@ const Home = () => {
             ]}>
             <Text style={styles.dateText}>{item.dayName}</Text>
           </View>
+          <Text style={[styles.dateText, {marginBottom: 5}]}>{item.day}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -263,6 +266,22 @@ const Home = () => {
             </TouchableOpacity>
             <Text style={styles.taskTitle}>{currentMonth || 'Today'}</Text>
           </View>
+          <View
+            style={{
+              // height: 0,
+              margin: 0,
+              padding: 0,
+              backgroundColor: 'cyan',
+              justifyContent: 'flex-start',
+            }}>
+            <Line
+              strength={1}
+              lengthPercentage={100}
+              lineColor={constants.colors.UNDER_LINE}
+              rotate180
+            />
+          </View>
+          <View style={styles.triangle} />
           <View style={styles.date}>
             {datesDict && (
               <FlatList
@@ -274,11 +293,19 @@ const Home = () => {
                 showsHorizontalScrollIndicator={false}
                 initialScrollIndex={currentDateIndexInFlatList || 0}
                 inverted
-                // pagingEnabled
+                pagingEnabled
                 onViewableItemsChanged={handleViewableChange.current}
                 // viewabilityConfigCallbackPairs={
                 //   viewabilityConfigCallbackPairs.current
                 // }
+                snapToAlignment={'center'}
+                // getItemLayout={(data, index) => {
+                //   return {
+                //     index,
+                //     length: 15,
+                //     offset: 15 * index,
+                //   };
+                // }}
               />
             )}
           </View>
@@ -434,12 +461,13 @@ const styles = StyleSheet.create({
     height: '75.5%',
     borderColor: constants.colors.UNDER_LINE,
     borderBottomWidth: 1,
-    padding: '5%',
+    // padding: '5%',
     position: 'relative',
   },
   today: {
     // backgroundColor: 'blue',
     // marginBottom: 5,
+    padding: '5%',
     height: '20%',
   },
   taskTitle: {
@@ -467,19 +495,21 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   date: {
-    flexDirection: 'row',
+    // flexDirection: 'row',
     height: '23.5%',
+    padding: '5%',
 
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   dateContent: {
     // flex: 1,
-    width: DATE_ITEM_WIDTH,
+    // width: constants.WIDTH,
+    width: DATE_ITEM_WIDTH * 1.11,
     height: '80%',
     alignItems: 'center',
     flexDirection: 'column',
-    marginLeft: DATE_ITEM_WIDTH * 0.1255,
+    // marginLeft: DATE_ITEM_WIDTH * 0.1255,
   },
   dateText: {
     fontFamily: constants.Fonts.text,
@@ -497,6 +527,7 @@ const styles = StyleSheet.create({
   },
   taskListColumnContainer: {
     height: `${100 - 23.5 - 15}%`,
+    padding: '5%',
     // backgroundColor: 'green',
     // justifyContent: 'flex-end',
     // paddingBottom: '6%',
@@ -592,5 +623,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
 
     // backgroundColor: 'blue',
+  },
+  triangle: {
+    width: 0,
+    height: 0,
+    backgroundColor: 'transparent',
+    borderStyle: 'solid',
+    borderLeftWidth: 6,
+    borderRightWidth: 6,
+    borderTopWidth: 8.7,
+    // borderBottomWidth: 0,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderBottomColor: 'black',
+    // transform: [{rotate: '180deg'}],
+    alignSelf: 'center',
   },
 });

@@ -56,6 +56,7 @@ const Home = () => {
     isFetching: taskFetch,
   } = useGetTasksByDateQuery(selectedDate);
   const datePress = (date: Date) => {
+    console.log(date);
     setIsTaskLoading(true);
     // setSelectedDate(date);
     setSelectedDate2(date);
@@ -105,7 +106,7 @@ const Home = () => {
       // compareDates(val.fullDate, DateToCheck);
       if (compareDates(val.fullDate, DateToCheck)) {
         console.log('---------------------------index hsa found!!', index);
-        flatListRef.current?.scrollToIndex({index: index + 3});
+        flatListRef.current?.scrollToIndex({index: index});
         // flatListRef.current?.sc;
         return index;
       }
@@ -196,7 +197,9 @@ const Home = () => {
     // item.viewableItems?.forEach((item: any) => {
     //   console.log(item.item, item.index);
     // });
-    const date = item.viewableItems[4]?.item;
+    // flatListRef.current
+    const date = item.viewableItems[0]?.item;
+    console.log(date);
     if (!date) return;
     const currentDateToDisplay = tempGetMonthFromStringDate(date);
     setCurrentMonth(currentDateToDisplay);
@@ -217,10 +220,7 @@ const Home = () => {
     const areDatesEqual = compareDates(selectedDate2, date2);
     return (
       <View
-        style={[
-          styles.dateContent,
-          {width: topViewWidth && topViewWidth / 7.8},
-        ]}>
+        style={[styles.dateContent, {width: topViewWidth && topViewWidth / 7}]}>
         <TouchableOpacity
           style={{
             width: '100%',
@@ -293,11 +293,7 @@ const Home = () => {
       exiting={FadeOutUp}
       style={styles.container}>
       <View style={styles.topView}>
-        <View
-          style={styles.task}
-          onLayout={e => {
-            setTopViewWidth(e.nativeEvent.layout.width);
-          }}>
+        <View style={styles.task}>
           <View style={styles.today}>
             <TouchableOpacity
               onPress={handlePresentModalPress}
@@ -329,9 +325,19 @@ const Home = () => {
             />
           </View>
           <View style={styles.triangle} />
-          <View style={[styles.date]}>
+          <View
+            style={[
+              styles.date,
+              {
+                // transform: [{translateX: constants.WIDTH / 2 - 50}],
+                // overflow: 'scroll',
+              },
+            ]}>
             {datesDict && (
               <FlatList
+                onLayout={e => {
+                  setTopViewWidth(e.nativeEvent.layout.width);
+                }}
                 ref={flatListRef}
                 data={flatListData}
                 onContentSizeChange={() => {
@@ -343,18 +349,25 @@ const Home = () => {
                     currentDateIndexInFlatList
                   ) {
                     flatListRef.current.scrollToIndex({
-                      index: currentDateIndexInFlatList + 3,
+                      index: currentDateIndexInFlatList,
+                      animated: false,
                     });
                   }
                 }}
                 // data={Object.values(datesDict)}
-
                 renderItem={renderItem}
                 keyExtractor={(item, index) => index.toString()}
                 horizontal
                 showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{
+                  paddingHorizontal: topViewWidth && topViewWidth / 2,
+                }}
+                // onMomentumScrollEnd={e => {
+                //   console.log({e: e.nativeEvent});
+                // }}
                 // initialScrollIndex={16}
-                initialScrollIndex={currentDateIndexInFlatList || 0}
+                // initialScrollIndex={currentDateIndexInFlatList || 0}
+                // maxToRenderPerBatch={7}
                 inverted
                 pagingEnabled
                 // ItemSeparatorComponent={() => <React.Fragment />}
@@ -367,18 +380,21 @@ const Home = () => {
                 // viewabilityConfigCallbackPairs={
                 //   viewabilityConfigCallbackPairs.current
                 // }
+                onScrollToIndexFailed={() => {}}
                 snapToAlignment={'center'}
-                // getItemLayout={(data, index) => {
-                //   // console.log({topViewWidth});
-                //   const width = topViewWidth || 360;
-                //   // if (!topViewWidth) console.log({widthasdasd: width});
-                //   // else console.log({widrh: width});
-                //   return {
-                //     index,
-                //     length: constants.WIDTH / 8,
-                //     offset: (constants.WIDTH / 8) * index,
-                //   };
-                // }}
+                getItemLayout={(data, index) => {
+                  // console.log({topViewWidth});
+                  const width = topViewWidth || 360;
+                  // if (!topViewWidth) console.log({widthasdasd: width});
+                  // else console.log({widrh: width});
+                  return {
+                    index: index,
+                    length: width / 7,
+                    offset:
+                      (width / 7) * (flatListData.length - 1 - index) +
+                      width / 7 / 2,
+                  };
+                }}
               />
             )}
           </View>
@@ -569,6 +585,7 @@ const styles = StyleSheet.create({
   },
   date: {
     // flexDirection: 'row',
+
     height: '23.5%',
     paddingHorizontal: '5%',
     paddingTop: '2.5%',

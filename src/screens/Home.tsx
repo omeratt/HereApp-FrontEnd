@@ -16,10 +16,12 @@ import DisplayTask from '../components/DisplayTask';
 import {useAppDispatch, useAppSelector} from '../app/hooks';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {DrawerActions, useNavigation} from '@react-navigation/native';
-import {Week} from '../components/WeeklyCalender';
+import {getDatesForYear, Week} from '../components/WeeklyCalender';
 import {selectDateSelector} from '../app/Reducers/User/userSlice';
 
 const CURRENT_DATE = new Date();
+const thisYear = CURRENT_DATE.getFullYear();
+const allDates = getDatesForYear(thisYear);
 const DATE_ITEM_WIDTH = constants.WIDTH * 0.108;
 const Home = () => {
   // const [isModalVisible, setModalVisible] = useState(false);
@@ -28,7 +30,7 @@ const Home = () => {
   // const [isNext, setIsNext] = useState<boolean>(false);
   const [tasks, setTasks] = useState<any[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>(
-    formatDate(new Date()),
+    formatDate(CURRENT_DATE),
   );
   const [isTaskLoading, setIsTaskLoading] = useState<boolean>(false);
   const [currentMonth, setCurrentMonth] = useState<string>('');
@@ -137,59 +139,108 @@ const Home = () => {
 
   const getMonthFromStringDate = (date: string) => {
     const [day, month, year] = date.split('/');
+
     const monthName = new Date(+year, +month - 1, +day).toLocaleString('eng', {
       month: 'long',
+      year: '2-digit',
     });
+    console.log({monthName});
     return monthName;
+  };
+  const tempGetMonthFromStringDate = (item: any) => {
+    const monthName = item?.fullDate.toLocaleString('eng', {
+      month: 'long',
+    });
+
+    const isToday =
+      item?.fullDate.toDateString() === CURRENT_DATE.toDateString();
+    const formattedDate = `${isToday ? 'Today' : item.dayName},${
+      item.day
+    } ${monthName}`;
+    return formattedDate;
   };
 
   const handleViewableChange = useRef((item: any) => {
-    const firstElementDate =
-      item.viewableItems[1]?.item[0].date ||
-      item.viewableItems[0]?.item[0].date;
-    const month = getMonthFromStringDate(firstElementDate);
-    setCurrentMonth(month);
+    // console.log({items: item.viewableItems});
+    const date = item.viewableItems[4].item;
+    const currentDateToDisplay = tempGetMonthFromStringDate(date);
+    setCurrentMonth(currentDateToDisplay);
+
+    // const firstElementDate =
+    //   item.viewableItems[1]?.item[0].date ||
+    //   item.viewableItems[0]?.item[0].date;
+    // const month = getMonthFromStringDate(firstElementDate);
   });
 
-  const renderItem: ListRenderItem<Week> | null | undefined = item => {
+  const renderItem: ListRenderItem<any> | null | undefined = ({item}) => {
+    // const date = day.date;
     return (
-      <>
-        {item.item.map(day => {
-          const date = day.date;
-          return (
-            <View key={date} style={styles.dateContent}>
-              <TouchableOpacity
-                style={{
-                  width: '100%',
-                  alignItems: 'center',
-                }}
-                onPress={() => {
-                  console.log({date});
-                  datePress(date);
-                }}>
-                <Text style={[styles.dateText, {marginBottom: 5}]}>
-                  {day.name}
-                </Text>
-                <View
-                  style={[
-                    styles.datePicker,
-                    {
-                      backgroundColor:
-                        selectedDate === date
-                          ? constants.colors.GREEN
-                          : 'transparent',
-                      elevation: selectedDate === date ? 5 : 0,
-                    },
-                  ]}>
-                  <Text style={styles.dateText}>{date.substring(0, 2)}</Text>
-                </View>
-              </TouchableOpacity>
-            </View>
-          );
-        })}
-      </>
+      <View style={styles.dateContent}>
+        <TouchableOpacity
+          style={{
+            width: '100%',
+            alignItems: 'center',
+          }}
+          onPress={() => {
+            console.log({item});
+          }}>
+          <Text style={[styles.dateText, {marginBottom: 5}]}>{item.day}</Text>
+          <View
+            style={[
+              styles.datePicker,
+              // {
+              //   backgroundColor:
+              //     selectedDate === date
+              //       ? constants.colors.GREEN
+              //       : 'transparent',
+              //   elevation: selectedDate === date ? 5 : 0,
+              // },
+            ]}>
+            <Text style={styles.dateText}>{item.dayName}</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
     );
   };
+  // const renderItem: ListRenderItem<Week> | null | undefined = item => {
+  //   return (
+  //     <>
+  //       {item.item.map(day => {
+  //         const date = day.date;
+  //         return (
+  //           <View key={date} style={styles.dateContent}>
+  //             <TouchableOpacity
+  //               style={{
+  //                 width: '100%',
+  //                 alignItems: 'center',
+  //               }}
+  //               onPress={() => {
+  //                 console.log({date});
+  //                 datePress(date);
+  //               }}>
+  //               <Text style={[styles.dateText, {marginBottom: 5}]}>
+  //                 {day.name}
+  //               </Text>
+  //               <View
+  //                 style={[
+  //                   styles.datePicker,
+  //                   {
+  //                     backgroundColor:
+  //                       selectedDate === date
+  //                         ? constants.colors.GREEN
+  //                         : 'transparent',
+  //                     elevation: selectedDate === date ? 5 : 0,
+  //                   },
+  //                 ]}>
+  //                 <Text style={styles.dateText}>{date.substring(0, 2)}</Text>
+  //               </View>
+  //             </TouchableOpacity>
+  //           </View>
+  //         );
+  //       })}
+  //     </>
+  //   );
+  // };
   return (
     <Animated.View
       entering={FadeIn}
@@ -215,14 +266,15 @@ const Home = () => {
           <View style={styles.date}>
             {datesDict && (
               <FlatList
-                data={Object.values(datesDict)}
+                data={allDates.slice(0, 14)}
+                // data={Object.values(datesDict)}
                 renderItem={renderItem}
                 keyExtractor={(item, index) => index.toString()}
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 initialScrollIndex={currentDateIndexInFlatList || 0}
                 inverted
-                pagingEnabled
+                // pagingEnabled
                 onViewableItemsChanged={handleViewableChange.current}
                 // viewabilityConfigCallbackPairs={
                 //   viewabilityConfigCallbackPairs.current

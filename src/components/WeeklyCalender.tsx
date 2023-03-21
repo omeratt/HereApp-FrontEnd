@@ -19,6 +19,11 @@ export const formatStringToDate = (date: string) => {
   return new Date(year, month - 1, day);
 };
 
+const getShortName = (dayOfWeek: number): string => {
+  const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  return names[dayOfWeek];
+};
+
 const getWeeklyCalendar = () => {
   const getWeeksBySundayDate = (): WeeksBySundayDate => {
     const weeksBySundayDate: WeeksBySundayDate = {};
@@ -59,11 +64,6 @@ const getWeeklyCalendar = () => {
   // const formatDate = (date: Date): string =>
   //   date.toLocaleDateString('en-GB').split('.').join('/');
 
-  const getShortName = (dayOfWeek: number): string => {
-    const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    return names[dayOfWeek];
-  };
-
   const getSundayDate = (date: Date): string => {
     const sunday = new Date(date);
     sunday.setDate(sunday.getDate() - sunday.getDay() - DAYS_IN_WEEK);
@@ -75,5 +75,36 @@ const getWeeklyCalendar = () => {
 
   return weeksBySundayDate;
 };
+
+interface DateObject {
+  day: number;
+  dayName: string;
+  month: string;
+  fullDate: Date;
+}
+
+export function getDatesForYear(year: number): DateObject[] {
+  const dates = [];
+
+  // Loop over all days of the year
+  for (let month = 0; month < 12; month++) {
+    const numDaysInMonth = new Date(year, month + 1, 0).getDate();
+
+    for (let day = 1; day <= numDaysInMonth; day++) {
+      const date = new Date(year, month, day);
+      const dayName = getShortName(date.getDay());
+      const formattedMonth = date.toLocaleString('default', {month: 'short'});
+
+      dates.push({
+        day,
+        dayName,
+        month: formattedMonth,
+        fullDate: date,
+      });
+    }
+  }
+
+  return dates;
+}
 
 export default getWeeklyCalendar;

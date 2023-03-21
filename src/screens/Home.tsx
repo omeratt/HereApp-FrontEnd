@@ -23,23 +23,22 @@ import {
 import {selectDateSelector} from '../app/Reducers/User/userSlice';
 import Line from '../components/Line';
 
+const DATE_ITEM_WIDTH = constants.WIDTH * 0.108;
 const CURRENT_DATE = new Date();
 const thisYear = CURRENT_DATE.getFullYear();
 const allDates = getDatesForYear(thisYear);
-const DATE_ITEM_WIDTH = constants.WIDTH * 0.108;
 const flatListData = allDates.slice(60, 100);
 const Home = () => {
   // const [isModalVisible, setModalVisible] = useState(false);
   // const [dates, setDates] = useState<Date[]>([]);
   // const [offset, setOffset] = useState(0);
-  // const [isNext, setIsNext] = useState<boolean>(false);
   const [topViewWidth, setTopViewWidth] = useState<number | undefined>(
     undefined,
   );
   const [tasks, setTasks] = useState<any[]>([]);
-  const [selectedDate, setSelectedDate] = useState<string>(
-    formatDate(CURRENT_DATE),
-  );
+  // const [selectedDate, setSelectedDate] = useState<string>(
+  //   formatDate(CURRENT_DATE),
+  // );
   const [selectedDate2, setSelectedDate2] = useState<Date>(CURRENT_DATE);
   const [isTaskLoading, setIsTaskLoading] = useState<boolean>(false);
   const [currentMonth, setCurrentMonth] = useState<string>('');
@@ -54,11 +53,9 @@ const Home = () => {
     isError: taskIsError,
     error: tasksError,
     isFetching: taskFetch,
-  } = useGetTasksByDateQuery(selectedDate);
+  } = useGetTasksByDateQuery('');
   const datePress = (date: Date) => {
-    console.log(date);
     setIsTaskLoading(true);
-    // setSelectedDate(date);
     setSelectedDate2(date);
     // const result = dispatch(tasksApi.endpoints.getTasksByDate.initiate(date))
     //   .then(res => {
@@ -70,10 +67,6 @@ const Home = () => {
     //   })
     //   .finally(() => setIsTaskLoading(false));
   };
-  // useEffect(() => {
-  //   // Set the initial selected date to today
-  //   setSelectedDate(formatDate(CURRENT_DATE));
-  // }, []);
 
   const compareDates = (date1: Date, date2: Date): boolean => {
     return date1?.toDateString() === date2?.toDateString();
@@ -102,12 +95,8 @@ const Home = () => {
   const findDateIndex = (DateToCheck: Date) => {
     if (!datesDict) return 0;
     const index = Object.values(flatListData).findIndex((val, index) => {
-      // const gaga = val.filter(vals => vals.date === DateToCheck);
-      // compareDates(val.fullDate, DateToCheck);
       if (compareDates(val.fullDate, DateToCheck)) {
-        console.log('---------------------------index hsa found!!', index);
         flatListRef.current?.scrollToIndex({index: index});
-        // flatListRef.current?.sc;
         return index;
       }
     });
@@ -116,23 +105,8 @@ const Home = () => {
 
   const currentDateIndexInFlatList = useMemo(() => {
     if (!selectedDate2) return findDateIndex(CURRENT_DATE);
-    // const dateToCheck = formatStringToDate(selectedDate); //13/2/2023
     return findDateIndex(selectedDate2);
-    // return findDateIndex(dateToCheck);
-    // if (!selectedDate) return findDateIndex(formatDate(CURRENT_DATE));
-    // const [day, month, year] = selectedDate.split('/').map(Number);
-    // const date = new Date(year, month - 1, day);
-    // const formattedDateToCheck = formatDate(date); //13/2/2023
-    // return findDateIndex(formattedDateToCheck);
   }, [selectedDate2]);
-
-  // if (flatListRef.current) {
-  //   flatListRef.current?.scrollToIndex({index: 1});
-  //   console.log(
-  //     'aklsdklasjdklasjdlkasjdklasjdlkj89217318237189237918238912389127389',
-  //   );
-  // }
-
   useEffect(() => {
     if (taskFetch) {
       setIsTaskLoading(true);
@@ -163,11 +137,6 @@ const Home = () => {
   const handleSheetChanges = useCallback((index: number) => {
     console.log('handleSheetChanges', index);
   }, []);
-  const getItemLayout = (data: any, index: any) => ({
-    length: DATE_ITEM_WIDTH,
-    offset: DATE_ITEM_WIDTH * index,
-    index,
-  });
 
   const getMonthFromStringDate = (date: string) => {
     const [day, month, year] = date.split('/');
@@ -176,7 +145,6 @@ const Home = () => {
       month: 'long',
       year: '2-digit',
     });
-    console.log({monthName});
     return monthName;
   };
   const tempGetMonthFromStringDate = (item: any) => {
@@ -193,37 +161,16 @@ const Home = () => {
   };
 
   const handleViewableChange = useRef((item: any) => {
-    // console.log({items: item.viewableItems});
-    // item.viewableItems?.forEach((item: any) => {
-    //   console.log(item.item, item.index);
-    // });
-    // flatListRef.current
-    // console.log()
-    // const dada = item.viewableItems[7]?.index <
-    const len = item.viewableItems?.length;
-    const blah = len <= 7 ? len - 1 : 7;
-    console.log({blah, len});
-    // const index = (item.viewableItems[index]?.item + 7) || 7;
-    const date = item.viewableItems[blah]?.item;
-    // const date = item.viewableItems[index]?.item;
-    console.log(item.viewableItems);
+    const itemsLength = item.viewableItems?.length;
+    const currentViewableItemIndex = itemsLength <= 7 ? itemsLength - 1 : 7;
+    const date = item.viewableItems[currentViewableItemIndex]?.item;
     if (!date) return;
     const currentDateToDisplay = tempGetMonthFromStringDate(date);
     setCurrentMonth(currentDateToDisplay);
-
-    // const firstElementDate =
-    //   item.viewableItems[1]?.item[0].date ||
-    //   item.viewableItems[0]?.item[0].date;
-    // const month = getMonthFromStringDate(firstElementDate);
   });
-  // console.log({selectedDate});
 
   const renderItem: ListRenderItem<any> | null | undefined = ({item}) => {
     const date2 = item.fullDate;
-    //TODO: change selectedDate from string to something else
-
-    // const selec
-    // const date1 = formatStringToDate(selectedDate);
     const areDatesEqual = compareDates(selectedDate2, date2);
     return (
       <View
@@ -232,7 +179,6 @@ const Home = () => {
           style={{
             width: '100%',
             alignItems: 'center',
-            // backgroundColor: 'white',
           }}
           onPress={() => datePress(date2)}>
           <Text style={[styles.dateText, {marginBottom: 1}]}>
@@ -293,7 +239,6 @@ const Home = () => {
   //     </>
   //   );
   // };
-  // console.log({currentDateIndexInFlatList});
   return (
     <Animated.View
       entering={FadeIn}
@@ -318,7 +263,6 @@ const Home = () => {
           </View>
           <View
             style={{
-              // height: 0,
               margin: 0,
               padding: 0,
               backgroundColor: 'cyan',
@@ -348,20 +292,20 @@ const Home = () => {
                 ref={flatListRef}
                 data={flatListData}
                 onContentSizeChange={() => {
+                  console.log('vhange1', flatListRef.current);
                   if (
                     flatListRef &&
                     flatListRef.current &&
                     flatListData &&
-                    flatListData.length &&
-                    currentDateIndexInFlatList
+                    flatListData.length
                   ) {
+                    // console.log('change', flatListRef.current?.props);
                     flatListRef.current.scrollToIndex({
                       index: currentDateIndexInFlatList,
                       animated: false,
                     });
                   }
                 }}
-                // data={Object.values(datesDict)}
                 renderItem={renderItem}
                 keyExtractor={(item, index) => index.toString()}
                 horizontal
@@ -369,31 +313,15 @@ const Home = () => {
                 contentContainerStyle={{
                   paddingHorizontal: topViewWidth && topViewWidth / 2,
                 }}
-                // onMomentumScrollEnd={e => {
-                //   console.log({e: e.nativeEvent});
-                // }}
-                // initialScrollIndex={16}
-                // initialScrollIndex={currentDateIndexInFlatList || 0}
-                // maxToRenderPerBatch={7}
                 inverted
                 pagingEnabled
-                // ItemSeparatorComponent={() => <React.Fragment />}
-                // contentContainerStyle={{flex: 1}}
-                // style={{flex: 1}}
                 onViewableItemsChanged={handleViewableChange.current}
                 viewabilityConfig={{
                   itemVisiblePercentThreshold: 24,
                 }}
-                // viewabilityConfigCallbackPairs={
-                //   viewabilityConfigCallbackPairs.current
-                // }
-                onScrollToIndexFailed={() => {}}
                 snapToAlignment={'center'}
                 getItemLayout={(data, index) => {
-                  // console.log({topViewWidth});
                   const width = topViewWidth || 360;
-                  // if (!topViewWidth) console.log({widthasdasd: width});
-                  // else console.log({widrh: width});
                   return {
                     index: index,
                     length: width / 7,
@@ -496,11 +424,11 @@ const Home = () => {
           }}
           // enableDismissOnClose
           onChange={handleSheetChanges}>
-          <NewTask
+          {/* <NewTask
             closeModal={bottomSheetModalRef.current?.dismiss}
             targetDate={selectedDate}
             setTargetDate={setSelectedDate}
-          />
+          /> */}
         </BottomSheetModal>
       </BottomSheetModalProvider>
     </Animated.View>

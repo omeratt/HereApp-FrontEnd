@@ -30,6 +30,9 @@ const Home = () => {
   // const [dates, setDates] = useState<Date[]>([]);
   // const [offset, setOffset] = useState(0);
   // const [isNext, setIsNext] = useState<boolean>(false);
+  const [topViewWidth, setTopViewWidth] = useState<number | undefined>(
+    undefined,
+  );
   const [tasks, setTasks] = useState<any[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>(
     formatDate(CURRENT_DATE),
@@ -178,15 +181,20 @@ const Home = () => {
   const renderItem: ListRenderItem<any> | null | undefined = ({item}) => {
     // const date = day.date;
     return (
-      <View style={styles.dateContent}>
+      <View
+        style={[styles.dateContent, {width: topViewWidth && topViewWidth / 8}]}>
         <TouchableOpacity
           style={{
             width: '100%',
             alignItems: 'center',
+            // backgroundColor: 'white',
           }}
           onPress={() => {
             console.log({item});
           }}>
+          <Text style={[styles.dateText, {marginBottom: 1}]}>
+            {item.dayName}
+          </Text>
           <View
             style={[
               styles.datePicker,
@@ -198,9 +206,8 @@ const Home = () => {
               //   elevation: selectedDate === date ? 5 : 0,
               // },
             ]}>
-            <Text style={styles.dateText}>{item.dayName}</Text>
+            <Text style={[styles.dateText]}>{item.day}</Text>
           </View>
-          <Text style={[styles.dateText, {marginBottom: 5}]}>{item.day}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -250,7 +257,11 @@ const Home = () => {
       exiting={FadeOutUp}
       style={styles.container}>
       <View style={styles.topView}>
-        <View style={styles.task}>
+        <View
+          style={styles.task}
+          onLayout={e => {
+            setTopViewWidth(e.nativeEvent.layout.width);
+          }}>
           <View style={styles.today}>
             <TouchableOpacity
               onPress={handlePresentModalPress}
@@ -287,6 +298,7 @@ const Home = () => {
               <FlatList
                 data={allDates.slice(0, 14)}
                 // data={Object.values(datesDict)}
+
                 renderItem={renderItem}
                 keyExtractor={(item, index) => index.toString()}
                 horizontal
@@ -294,6 +306,8 @@ const Home = () => {
                 initialScrollIndex={currentDateIndexInFlatList || 0}
                 inverted
                 pagingEnabled
+                ItemSeparatorComponent={() => <React.Fragment />}
+                // contentContainerStyle={{flex: 1}}
                 onViewableItemsChanged={handleViewableChange.current}
                 // viewabilityConfigCallbackPairs={
                 //   viewabilityConfigCallbackPairs.current
@@ -497,18 +511,20 @@ const styles = StyleSheet.create({
   date: {
     // flexDirection: 'row',
     height: '23.5%',
-    padding: '5%',
-
+    paddingHorizontal: '5%',
+    paddingTop: '2.5%',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   dateContent: {
     // flex: 1,
     // width: constants.WIDTH,
-    width: DATE_ITEM_WIDTH * 1.11,
+    // width: DATE_ITEM_WIDTH * 1.129,
+    width: '30%',
     height: '80%',
     alignItems: 'center',
     flexDirection: 'column',
+    backgroundColor: 'green',
     // marginLeft: DATE_ITEM_WIDTH * 0.1255,
   },
   dateText: {
@@ -518,9 +534,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   datePicker: {
-    height: DATE_ITEM_WIDTH * 0.8,
-    width: DATE_ITEM_WIDTH * 0.8,
-    marginBottom: '12%',
+    height: DATE_ITEM_WIDTH,
+    width: DATE_ITEM_WIDTH,
+    // marginBottom: '12%',
     borderRadius: 500,
     alignItems: 'center',
     justifyContent: 'center',

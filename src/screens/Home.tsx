@@ -40,6 +40,7 @@ const Home = () => {
   const [selectedDate, setSelectedDate] = useState<string>(
     formatDate(CURRENT_DATE),
   );
+  const [selectedDate2, setSelectedDate2] = useState<Date>(CURRENT_DATE);
   const [isTaskLoading, setIsTaskLoading] = useState<boolean>(false);
   const [currentMonth, setCurrentMonth] = useState<string>('');
   const flatListRef = useRef<FlatList>();
@@ -54,23 +55,24 @@ const Home = () => {
     error: tasksError,
     isFetching: taskFetch,
   } = useGetTasksByDateQuery(selectedDate);
-  const datePress = (date: string) => {
+  const datePress = (date: Date) => {
     setIsTaskLoading(true);
-    setSelectedDate(date);
-    const result = dispatch(tasksApi.endpoints.getTasksByDate.initiate(date))
-      .then(res => {
-        setTasks(res.data);
-        console.log(tasks.length);
-      })
-      .catch(err => {
-        console.log('error getting tasks', err);
-      })
-      .finally(() => setIsTaskLoading(false));
+    // setSelectedDate(date);
+    setSelectedDate2(date);
+    // const result = dispatch(tasksApi.endpoints.getTasksByDate.initiate(date))
+    //   .then(res => {
+    //     setTasks(res.data);
+    //     console.log(tasks.length);
+    //   })
+    //   .catch(err => {
+    //     console.log('error getting tasks', err);
+    //   })
+    //   .finally(() => setIsTaskLoading(false));
   };
-  useEffect(() => {
-    // Set the initial selected date to today
-    setSelectedDate(formatDate(CURRENT_DATE));
-  }, []);
+  // useEffect(() => {
+  //   // Set the initial selected date to today
+  //   setSelectedDate(formatDate(CURRENT_DATE));
+  // }, []);
 
   const compareDates = (date1: Date, date2: Date): boolean => {
     return date1?.toDateString() === date2?.toDateString();
@@ -112,15 +114,16 @@ const Home = () => {
   };
 
   const currentDateIndexInFlatList = useMemo(() => {
-    if (!selectedDate) return findDateIndex(CURRENT_DATE);
-    const dateToCheck = formatStringToDate(selectedDate); //13/2/2023
-    return findDateIndex(dateToCheck);
+    if (!selectedDate2) return findDateIndex(CURRENT_DATE);
+    // const dateToCheck = formatStringToDate(selectedDate); //13/2/2023
+    return findDateIndex(selectedDate2);
+    // return findDateIndex(dateToCheck);
     // if (!selectedDate) return findDateIndex(formatDate(CURRENT_DATE));
     // const [day, month, year] = selectedDate.split('/').map(Number);
     // const date = new Date(year, month - 1, day);
     // const formattedDateToCheck = formatDate(date); //13/2/2023
     // return findDateIndex(formattedDateToCheck);
-  }, [selectedDate]);
+  }, [selectedDate2]);
 
   // if (flatListRef.current) {
   //   flatListRef.current?.scrollToIndex({index: 1});
@@ -193,7 +196,7 @@ const Home = () => {
     // item.viewableItems?.forEach((item: any) => {
     //   console.log(item.item, item.index);
     // });
-    const date = item.viewableItems[3]?.item;
+    const date = item.viewableItems[4]?.item;
     if (!date) return;
     const currentDateToDisplay = tempGetMonthFromStringDate(date);
     setCurrentMonth(currentDateToDisplay);
@@ -210,8 +213,8 @@ const Home = () => {
     //TODO: change selectedDate from string to something else
 
     // const selec
-    const date1 = formatStringToDate(selectedDate);
-    const areDatesEqual = compareDates(date1, date2);
+    // const date1 = formatStringToDate(selectedDate);
+    const areDatesEqual = compareDates(selectedDate2, date2);
     return (
       <View
         style={[
@@ -224,9 +227,7 @@ const Home = () => {
             alignItems: 'center',
             // backgroundColor: 'white',
           }}
-          onPress={() => {
-            console.log({item});
-          }}>
+          onPress={() => datePress(date2)}>
           <Text style={[styles.dateText, {marginBottom: 1}]}>
             {item.dayName}
           </Text>
@@ -360,9 +361,9 @@ const Home = () => {
                 // contentContainerStyle={{flex: 1}}
                 // style={{flex: 1}}
                 onViewableItemsChanged={handleViewableChange.current}
-                viewabilityConfig={{
-                  itemVisiblePercentThreshold: 24,
-                }}
+                // viewabilityConfig={{
+                //   itemVisiblePercentThreshold: 24,
+                // }}
                 // viewabilityConfigCallbackPairs={
                 //   viewabilityConfigCallbackPairs.current
                 // }

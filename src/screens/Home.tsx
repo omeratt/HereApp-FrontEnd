@@ -20,6 +20,7 @@ import {
   DateObject,
   generateMonthObjects,
   getDatesForYear,
+  getMoreDays,
 } from '../components/WeeklyCalender';
 import Line from '../components/Line';
 
@@ -28,11 +29,19 @@ const CURRENT_DATE = new Date();
 const allDates = getDatesForYear(CURRENT_DATE);
 // const allDates = generateMonthObjects(CURRENT_DATE);
 const flatListData = Object.values(allDates);
-console.log({len: flatListData.length});
+const initialNumToRender = flatListData.length;
+const reload = (date: Date) => {
+  const newDate = new Date(new Date().setMonth(date.getMonth()));
+  // console.log({newDate});
+  return getMoreDays(newDate);
+  // return getDatesForYear(newDate);
+};
+// console.log({len: flatListData.length});
 const Home = () => {
   // const [isModalVisible, setModalVisible] = useState(false);
   // const [dates, setDates] = useState<Date[]>([]);
   // const [offset, setOffset] = useState(0);
+  const [dada, setDada] = useState<Record<string, DateObject>>(allDates);
   const [topViewWidth, setTopViewWidth] = useState<number | undefined>(
     undefined,
   );
@@ -70,7 +79,6 @@ const Home = () => {
     //   })
     //   .finally(() => setIsTaskLoading(false));
   };
-
   const compareDates = (date1: Date, date2: Date): boolean => {
     return date1?.toDateString() === date2?.toDateString();
   };
@@ -103,7 +111,7 @@ const Home = () => {
   const findDateAndScroll = (DateToCheck: Date) => {
     const key = DateToCheck.toLocaleDateString();
     const index = getIndexByKey(allDates, key);
-    if (index < 0) return;
+    if (index < 0) return 0;
     flatListRef.current?.scrollToIndex({index});
     return index;
   };
@@ -147,16 +155,14 @@ const Home = () => {
   const getMonthFromStringDate = (date: string) => {
     const [day, month, year] = date.split('/');
 
-    const monthName = new Date(+year, +month - 1, +day).toLocaleString('eng', {
-      month: 'long',
-      year: '2-digit',
-    });
+    const monthName = new Date(+year, +month - 1, +day).toLocaleString();
     return monthName;
   };
   const tempGetMonthFromStringDate = () => {
     if (!dateHeader) return;
     // const date = new Date(dateHeader.)
     // console.log(Object.keys(flatListData))
+    // console.log({dateHeader});
     const monthName = dateHeader?.fullDate.toLocaleString('eng', {
       month: 'long',
     });
@@ -330,7 +336,8 @@ const Home = () => {
                 }}
                 // extraData={[selectedFinalDate, topViewWidth]}
                 ref={flatListRef}
-                data={flatListData}
+                data={Object.values(dada)}
+                // data={flatListData}
                 // onContentSizeChange={() => {
                 //   console.log('vhange1', flatListRef.current);
                 //   if (
@@ -346,11 +353,11 @@ const Home = () => {
                 //     });
                 //   }
                 // }}
-                initialNumToRender={100}
-                // initialScrollIndex={currentDateIndexInFlatList}
+                initialNumToRender={initialNumToRender}
                 onMomentumScrollEnd={onDragEnd}
                 renderItem={renderItem}
-                keyExtractor={(item, index) => index.toString()}
+                // keyExtractor={(item, index) => index.toString()}
+                keyExtractor={(item, index) => item.fullDate.toLocaleString()}
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{

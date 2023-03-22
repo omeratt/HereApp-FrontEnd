@@ -29,7 +29,8 @@ export function getDatesForYear(_date: Date): Record<string, DateObject> {
   const dates: Record<string, DateObject> = {};
 
   // Loop over all days of the year
-  for (let month = _month - 1; month < _month + 2; month++) {
+  for (let month = _month; month < _month + 2; month++) {
+    // console.log({month});
     const numDaysInMonth = new Date(year, month + 1, 0).getDate();
     for (let day = 1; day <= numDaysInMonth; day++) {
       const date = new Date(year, month, day);
@@ -44,6 +45,28 @@ export function getDatesForYear(_date: Date): Record<string, DateObject> {
       };
     }
   }
+  return dates;
+}
+export function getMoreDays(_date: Date): Record<string, DateObject> {
+  const year = _date.getFullYear();
+  const _month = _date.getMonth();
+  const _day = _date.getDay() + 1;
+  const dates: Record<string, DateObject> = {};
+  for (let i = 0; i < 15; i++) {
+    let newDate = new Date(_date);
+    newDate.setTime(_date.getTime() + i * 24 * 60 * 60 * 1000);
+    const dayName = getShortName(newDate.getDay());
+    const formattedMonth = newDate.toLocaleString('default', {month: 'short'});
+    const key = newDate.toLocaleDateString();
+    const day = newDate.getDate();
+    dates[key] = {
+      day,
+      dayName,
+      month: formattedMonth,
+      fullDate: newDate,
+    };
+  }
+  // console.log({dates});
   return dates;
 }
 
@@ -84,4 +107,68 @@ export function generateMonthObjects(date: Date): Record<string, DateObject> {
   }
 
   return monthObjects;
+}
+
+export function reloadMonthObjects(
+  originalObjects: Record<string, DateObject>,
+) {
+  // Get the keys of the original dictionary and sort them in ascending order
+  const keys = Object.keys(originalObjects).sort();
+
+  // Get the date of the last object in the dictionary
+  const lastDate = new Date(keys[keys.length - 1]);
+
+  // Calculate the start date for the new objects (one day after the last object)
+  const startDate = new Date(
+    lastDate.getFullYear(),
+    lastDate.getMonth(),
+    lastDate.getDate() + 1,
+  );
+
+  // Calculate the end date for the new objects (30 days after the start date)
+  const endDate = new Date(
+    startDate.getFullYear(),
+    startDate.getMonth(),
+    startDate.getDate() + 30,
+  );
+
+  // Create a new dictionary for the updated objects
+  const updatedObjects: Record<string, DateObject> = {};
+
+  // Loop through each day between the start and end dates
+  for (let day = startDate.getDate(); day <= endDate.getDate(); day++) {
+    const currentDate = new Date(
+      startDate.getFullYear(),
+      startDate.getMonth(),
+      day,
+    );
+    const dayName = currentDate.toLocaleString('default', {weekday: 'short'});
+    const monthName = currentDate.toLocaleString('default', {month: 'long'});
+
+    // Create a DateObject for the current date
+    const dateObject: DateObject = {
+      fullDate: currentDate,
+      day: day,
+      dayName: dayName,
+      month: monthName.charAt(0).toUpperCase() + monthName.slice(1),
+    };
+
+    // Add the DateObject to the updatedObjects dictionary with the current date as the key
+    updatedObjects[currentDate.toISOString().split('T')[0]] = dateObject;
+  }
+
+  // Get the keys of the updatedObjects dictionary and sort them in ascending order
+  const updatedKeys = Object.keys(updatedObjects).sort();
+
+  // Delete the last 30 objects from the original dictionary
+  for (let i = 0; i < 30; i++) {
+    delete originalObjects[keys[keys.length - 1 - i]];
+  }
+
+  // Add the updatedObjects to the original dictionary
+  for (const key of updatedKeys) {
+    originalObjects[key] = updatedObjects[key];
+  }
+
+  return originalObjects;
 }

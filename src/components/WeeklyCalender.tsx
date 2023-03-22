@@ -76,7 +76,7 @@ const getWeeklyCalendar = () => {
   return weeksBySundayDate;
 };
 
-interface DateObject {
+export interface DateObject {
   day: number;
   dayName: string;
   month: string;

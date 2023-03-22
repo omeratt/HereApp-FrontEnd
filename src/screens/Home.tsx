@@ -47,7 +47,7 @@ const Home = () => {
   const flatListRef = useRef<FlatList<DateObject> | null>(null);
   const selectedScrollDate = useRef<Date>(CURRENT_DATE);
   const selectedDate = useRef<Date>(CURRENT_DATE);
-  const dateHeader = useRef<DateObject>();
+  const [dateHeader, setDateHeader] = useState<DateObject>();
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const datesDict = useAppSelector(selectDateSelector);
@@ -61,7 +61,8 @@ const Home = () => {
   } = useGetTasksByDateQuery('');
   const datePress = (date: Date) => {
     setIsTaskLoading(true);
-    // setSelectedFinalDate(date);
+    setSelectedFinalDate(date);
+
     selectedDate.current = date;
     const result = dispatch(
       tasksApi.endpoints.getTasksByDate.initiate(formatDate(date)),
@@ -161,33 +162,48 @@ const Home = () => {
     });
     return monthName;
   };
-  const tempGetMonthFromStringDate = (item: any) => {
-    if (!item) return;
-    const monthName = item?.fullDate.toLocaleString('eng', {
+  const tempGetMonthFromStringDate = useMemo(() => {
+    if (!dateHeader) return;
+    const monthName = dateHeader?.fullDate.toLocaleString('eng', {
       month: 'long',
     });
 
     const isToday =
-      item?.fullDate.toDateString() === CURRENT_DATE.toDateString();
-    const formattedDate = `${isToday ? 'Today' : item.dayName},${
-      item.day
+      dateHeader?.fullDate.toDateString() === CURRENT_DATE.toDateString();
+    const formattedDate = `${isToday ? 'Today' : dateHeader.dayName},${
+      dateHeader.day
     } ${monthName}`;
     return formattedDate;
-  };
+  }, [dateHeader]);
 
+  let prevDate: Date = selectedScrollDate.current;
   const handleViewableChange = useRef((item: any) => {
     const itemsLength = item.viewableItems?.length;
     const currentViewableItemIndex = itemsLength <= 7 ? itemsLength - 1 : 7;
     const date = item.viewableItems[currentViewableItemIndex]?.item;
     if (!date) return;
     selectedScrollDate.current = date.fullDate;
-    dateHeader.current = date;
-    setTimeout(() => {
-      setSelectedFinalDate(selectedScrollDate.current);
-    }, 100);
+    prevDate = date.fullDate;
+    // setDateHeader(date);
+
+    // console.log('handleViewableChange');
+    // setTimeout(() => {
+
+    // }, 100);
     // const currentDateToDisplay = tempGetMonthFromStringDate(date);
     // setCurrentMonth(currentDateToDisplay);
   });
+  const onDragEnd = useCallback(() => {
+    if (prevDate !== selectedScrollDate.current) {
+      prevDate = selectedScrollDate.current;
+      console.log(selectedScrollDate.current);
+      // setSelectedFinalDate(selectedScrollDate.current);
+      datePress(selectedScrollDate.current);
+      // setDateHeader(prev => {
+      //   return {...prev};
+      // });
+    }
+  }, [selectedScrollDate.current]);
 
   const renderItem: ListRenderItem<any> | null | undefined = ({item}) => {
     const date2 = item.fullDate;
@@ -200,7 +216,10 @@ const Home = () => {
             width: '100%',
             alignItems: 'center',
           }}
-          onPress={() => datePress(date2)}>
+          onPress={() => {
+            datePress(date2);
+            setDateHeader(item);
+          }}>
           <Text style={[styles.dateText, {marginBottom: 1}]}>
             {item.dayName}
           </Text>
@@ -208,6 +227,8 @@ const Home = () => {
             style={[
               styles.datePicker,
               {
+                width: topViewWidth && topViewWidth / 9,
+                height: topViewWidth && topViewWidth / 9,
                 backgroundColor: areDatesEqual
                   ? constants.colors.GREEN
                   : 'transparent',
@@ -279,9 +300,7 @@ const Home = () => {
                 fill={constants.colors.BGC}
               />
             </TouchableOpacity>
-            <Text style={styles.taskTitle}>
-              {tempGetMonthFromStringDate(dateHeader.current)}
-            </Text>
+            <Text style={styles.taskTitle}>{tempGetMonthFromStringDate}</Text>
           </View>
           <View>
             <Line
@@ -289,6 +308,7 @@ const Home = () => {
               lengthPercentage={100}
               lineColor={constants.colors.UNDER_LINE}
               rotate180
+              style={{elevation: 2.5}}
             />
           </View>
           <View style={styles.triangle} />
@@ -318,6 +338,7 @@ const Home = () => {
                 // }}
                 initialNumToRender={38}
                 // initialScrollIndex={currentDateIndexInFlatList}
+                onMomentumScrollEnd={onDragEnd}
                 renderItem={renderItem}
                 keyExtractor={(item, index) => index.toString()}
                 horizontal
@@ -348,6 +369,15 @@ const Home = () => {
                 }}
               />
             )}
+          </View>
+          <View>
+            <Line
+              strength={1}
+              lengthPercentage={100}
+              lineColor={constants.colors.UNDER_LINE}
+              rotate180
+              style={{elevation: 2.5}}
+            />
           </View>
           <View style={styles.taskListColumnContainer}>
             <DisplayTask data={tasks} isTaskLoading={isTaskLoading} />

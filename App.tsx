@@ -27,17 +27,9 @@ import {Provider} from 'react-redux';
 import {persistor, store} from './src/app/store';
 import {PersistGate} from 'redux-persist/integration/react';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
-import getWeeklyCalendar from './src/components/WeeklyCalender';
-import {setDates} from './src/app/Reducers/User/userSlice';
 I18nManager.forceRTL(true);
 // I18nManager.swapLeftAndRightInRTL(true);
 const App = () => {
-  // useEffect(() => {
-  //   const dates = getWeeklyCalendar();
-  //   store.dispatch(setDates(dates));
-  //   console.log(dates);
-  // }, []);
-
   return (
     <>
       <GestureHandlerRootView style={{flex: 1}}>

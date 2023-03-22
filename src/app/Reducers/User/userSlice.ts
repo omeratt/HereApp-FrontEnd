@@ -1,7 +1,6 @@
 import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 import type {RootState} from '../../store';
-import {WeeksBySundayDate} from '../../../components/WeeklyCalender';
 
 // Define a type for the slice state
 export interface UserState {
@@ -13,7 +12,6 @@ export interface UserState {
   img?: string;
   tasks?: TaskType[];
   token?: string;
-  dates?: WeeksBySundayDate;
 }
 export interface TaskType {
   _id?: string;
@@ -29,7 +27,6 @@ const initialState: UserState = {
   img: undefined,
   isSignIn: false,
   token: '',
-  dates: undefined,
 };
 
 export const userSlice = createSlice({
@@ -56,20 +53,14 @@ export const userSlice = createSlice({
       state = {...initialState};
       return state;
     },
-    setDates: (state, action: PayloadAction<WeeksBySundayDate>) => {
-      state.dates = action.payload;
-      return state;
-    },
   },
 });
 
-export const {setUser, login, logout, setDates} = userSlice.actions;
+export const {setUser, login, logout} = userSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectUser = (state: RootState) => state.reducer.user;
 export const selectUserToken = (state: RootState) => state.reducer.user.token;
 export const selectIsSignIn = (state: RootState) => state.reducer.user.isSignIn;
-export const selectDateSelector = (state: RootState) =>
-  state.reducer.user.dates;
 
 export default userSlice.reducer;

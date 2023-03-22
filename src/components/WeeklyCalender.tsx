@@ -3,14 +3,13 @@ type Day = {
   date: string;
 };
 
-export type Week = Day[];
+export interface DateObject {
+  day: number;
+  dayName: string;
+  month: string;
+  fullDate: Date;
+}
 
-export type WeeksBySundayDate = {
-  [sundayDate: string]: Week;
-};
-
-const DAYS_IN_WEEK = 7;
-const MONTH_DIFFERENCE = 1;
 export const formatDate = (date: Date): string =>
   date.toLocaleDateString('en-GB').split('.').join('/');
 
@@ -24,87 +23,65 @@ const getShortName = (dayOfWeek: number): string => {
   return names[dayOfWeek];
 };
 
-const getWeeklyCalendar = () => {
-  const getWeeksBySundayDate = (): WeeksBySundayDate => {
-    const weeksBySundayDate: WeeksBySundayDate = {};
-
-    // Get the date month ago
-    const startDate = new Date();
-    startDate.setMonth(startDate.getMonth() - MONTH_DIFFERENCE);
-    startDate.setDate(startDate.getDate() - startDate.getDay());
-    // Get the date month from now
-    const endDate = new Date();
-    endDate.setMonth(endDate.getMonth() + MONTH_DIFFERENCE);
-    endDate.setDate(endDate.getDate() + (6 - endDate.getDay()));
-
-    // Loop through each week between the start and end dates
-    let currentDate = startDate;
-    while (currentDate <= endDate) {
-      const week: Week = [];
-      // Loop through each day in the week
-      for (let i = 0; i < DAYS_IN_WEEK; i++) {
-        const day: Day = {
-          name: getShortName(currentDate.getDay()),
-          date: formatDate(currentDate),
-        };
-        week.push(day);
-
-        // Increment the date to the next day
-        currentDate.setDate(currentDate.getDate() + 1);
-      }
-
-      // Store the week in the dictionary with the Sunday date as the key
-      const sundayDate = getSundayDate(currentDate);
-      weeksBySundayDate[sundayDate] = week;
-    }
-
-    return weeksBySundayDate;
-  };
-
-  // const formatDate = (date: Date): string =>
-  //   date.toLocaleDateString('en-GB').split('.').join('/');
-
-  const getSundayDate = (date: Date): string => {
-    const sunday = new Date(date);
-    sunday.setDate(sunday.getDate() - sunday.getDay() - DAYS_IN_WEEK);
-    const formattedDate = formatDate(sunday);
-    return formattedDate;
-  };
-
-  const weeksBySundayDate = getWeeksBySundayDate();
-
-  return weeksBySundayDate;
-};
-
-export interface DateObject {
-  day: number;
-  dayName: string;
-  month: string;
-  fullDate: Date;
-}
-
-export function getDatesForYear(year: number): DateObject[] {
-  const dates = [];
+export function getDatesForYear(_date: Date): Record<string, DateObject> {
+  const year = _date.getFullYear();
+  const _month = _date.getMonth();
+  const dates: Record<string, DateObject> = {};
 
   // Loop over all days of the year
-  for (let month = 0; month < 12; month++) {
+  for (let month = _month - 1; month < _month + 2; month++) {
     const numDaysInMonth = new Date(year, month + 1, 0).getDate();
-
     for (let day = 1; day <= numDaysInMonth; day++) {
       const date = new Date(year, month, day);
       const dayName = getShortName(date.getDay());
       const formattedMonth = date.toLocaleString('default', {month: 'short'});
-
-      dates.push({
+      const key = date.toLocaleDateString();
+      dates[key] = {
         day,
         dayName,
         month: formattedMonth,
         fullDate: date,
-      });
+      };
     }
   }
-
   return dates;
 }
 
-export default getWeeklyCalendar;
+export function generateMonthObjects(date: Date): Record<string, DateObject> {
+  const monthObjects: Record<string, DateObject> = {};
+
+  // Get the start of the month one month before the given date
+  const startDate = new Date(date.getFullYear(), date.getMonth() - 1, 1);
+
+  // Get the end of the month of the given date
+  const endDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+  console.log({endDate, startDate});
+
+  // Loop through each day between the start and end dates
+  for (let day = startDate.getDate(); day <= endDate.getDate(); day++) {
+    const currentDate = new Date(date.getFullYear(), date.getMonth(), day);
+    console.log({month: date.getMonth()});
+    // const dayName = currentDate.toLocaleString('default', {weekday: 'short'});
+    // currentDate.getUTCDate()
+    const dayNumber = currentDate.getUTCDate();
+    const dayName = getShortName(currentDate.getDay());
+
+    const monthName = currentDate.toLocaleString('default', {month: 'short'});
+
+    // Create a DateObject for the current date
+    const dateObject: DateObject = {
+      day: dayNumber,
+      dayName: dayName,
+      month: monthName,
+      // month: monthName.charAt(0).toUpperCase() + monthName.slice(1),
+      fullDate: currentDate,
+    };
+
+    // Add the DateObject to the monthObjects dictionary with the current date as the key
+    // monthObjects[currentDate] = dateObject;
+    const key = currentDate.toISOString();
+    monthObjects[key] = dateObject;
+  }
+
+  return monthObjects;
+}

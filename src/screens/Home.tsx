@@ -18,17 +18,17 @@ import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {DrawerActions, useNavigation} from '@react-navigation/native';
 import {
   DateObject,
-  formatStringToDate,
+  generateMonthObjects,
   getDatesForYear,
 } from '../components/WeeklyCalender';
-import {selectDateSelector} from '../app/Reducers/User/userSlice';
 import Line from '../components/Line';
 
 const DATE_ITEM_WIDTH = constants.WIDTH * 0.108;
 const CURRENT_DATE = new Date();
-const thisYear = CURRENT_DATE.getFullYear();
-const allDates = getDatesForYear(thisYear);
-const flatListData = allDates.slice(60, 100);
+const allDates = getDatesForYear(CURRENT_DATE);
+// const allDates = generateMonthObjects(CURRENT_DATE);
+const flatListData = Object.values(allDates);
+console.log({len: flatListData.length});
 const Home = () => {
   // const [isModalVisible, setModalVisible] = useState(false);
   // const [dates, setDates] = useState<Date[]>([]);
@@ -37,20 +37,15 @@ const Home = () => {
     undefined,
   );
   const [tasks, setTasks] = useState<any[]>([]);
-  // const [selectedDate, setSelectedDate] = useState<string>(
-  //   formatDate(CURRENT_DATE),
-  // );
   const [selectedFinalDate, setSelectedFinalDate] =
     useState<Date>(CURRENT_DATE);
   const [isTaskLoading, setIsTaskLoading] = useState<boolean>(false);
-  const [currentMonth, setCurrentMonth] = useState<string>('');
   const flatListRef = useRef<FlatList<DateObject> | null>(null);
   const selectedScrollDate = useRef<Date>(CURRENT_DATE);
   const selectedDate = useRef<Date>(CURRENT_DATE);
   const [dateHeader, setDateHeader] = useState<DateObject>();
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
-  const datesDict = useAppSelector(selectDateSelector);
   const {
     isLoading: taskLoading,
     data: tasks1,
@@ -62,19 +57,18 @@ const Home = () => {
   const datePress = (date: Date) => {
     setIsTaskLoading(true);
     setSelectedFinalDate(date);
-
     selectedDate.current = date;
-    const result = dispatch(
-      tasksApi.endpoints.getTasksByDate.initiate(formatDate(date)),
-    )
-      .then(res => {
-        setTasks(res.data);
-        console.log(tasks.length);
-      })
-      .catch(err => {
-        console.log('error getting tasks', err);
-      })
-      .finally(() => setIsTaskLoading(false));
+    // const result = dispatch(
+    //   tasksApi.endpoints.getTasksByDate.initiate(formatDate(date)),
+    // )
+    //   .then(res => {
+    //     setTasks(res.data);
+    //     console.log(tasks.length);
+    //   })
+    //   .catch(err => {
+    //     console.log('error getting tasks', err);
+    //   })
+    //   .finally(() => setIsTaskLoading(false));
   };
 
   const compareDates = (date1: Date, date2: Date): boolean => {
@@ -101,21 +95,18 @@ const Home = () => {
     return fixedDate;
   }
 
-  const findDateAndScroll = (DateToCheck: Date) => {
-    if (!datesDict) return 0;
-    const index = Object.values(flatListData).findIndex((val, index) => {
-      if (compareDates(val.fullDate, DateToCheck)) {
-        flatListRef.current?.scrollToIndex({index: index});
-        return index;
-      }
-    });
-    return ~index ? index : 0;
-  };
+  function getIndexByKey(obj: Record<string, any>, key: string): number {
+    const keys = Object.keys(obj);
+    return keys.indexOf(key);
+  }
 
-  // const currentDateIndexInFlatList = useMemo(() => {
-  //   if (!selectedFinalDate) return findDateAndScroll(CURRENT_DATE);
-  //   return findDateAndScroll(selectedFinalDate);
-  // }, [flatListRef.current, selectedFinalDate]);
+  const findDateAndScroll = (DateToCheck: Date) => {
+    const key = DateToCheck.toLocaleDateString();
+    const index = getIndexByKey(allDates, key);
+    if (index < 0) return;
+    flatListRef.current?.scrollToIndex({index});
+    return index;
+  };
 
   useEffect(() => {
     if (!selectedDate.current) findDateAndScroll(CURRENT_DATE);
@@ -162,8 +153,10 @@ const Home = () => {
     });
     return monthName;
   };
-  const tempGetMonthFromStringDate = useMemo(() => {
+  const tempGetMonthFromStringDate = () => {
     if (!dateHeader) return;
+    // const date = new Date(dateHeader.)
+    // console.log(Object.keys(flatListData))
     const monthName = dateHeader?.fullDate.toLocaleString('eng', {
       month: 'long',
     });
@@ -174,9 +167,22 @@ const Home = () => {
       dateHeader.day
     } ${monthName}`;
     return formattedDate;
-  }, [dateHeader]);
+  };
+  // const tempGetMonthFromStringDate = useMemo(() => {
+  //   if (!dateHeader) return;
+  //   const monthName = dateHeader?.fullDate.toLocaleString('eng', {
+  //     month: 'long',
+  //   });
 
-  let prevDate: Date = selectedScrollDate.current;
+  //   const isToday =
+  //     dateHeader?.fullDate.toDateString() === CURRENT_DATE.toDateString();
+  //   const formattedDate = `${isToday ? 'Today' : dateHeader.dayName},${
+  //     dateHeader.day
+  //   } ${monthName}`;
+  //   return formattedDate;
+  // }, [dateHeader]);
+
+  let prevDate: Date | undefined = selectedScrollDate.current;
   const handleViewableChange = useRef((item: any) => {
     const itemsLength = item.viewableItems?.length;
     const currentViewableItemIndex = itemsLength <= 7 ? itemsLength - 1 : 7;
@@ -184,7 +190,7 @@ const Home = () => {
     if (!date) return;
     selectedScrollDate.current = date.fullDate;
     prevDate = date.fullDate;
-    // setDateHeader(date);
+    setDateHeader(date);
 
     // console.log('handleViewableChange');
     // setTimeout(() => {
@@ -194,20 +200,23 @@ const Home = () => {
     // setCurrentMonth(currentDateToDisplay);
   });
   const onDragEnd = useCallback(() => {
-    if (prevDate !== selectedScrollDate.current) {
-      prevDate = selectedScrollDate.current;
-      console.log(selectedScrollDate.current);
-      // setSelectedFinalDate(selectedScrollDate.current);
-      datePress(selectedScrollDate.current);
-      // setDateHeader(prev => {
-      //   return {...prev};
-      // });
-    }
-  }, [selectedScrollDate.current]);
+    if (!prevDate) return;
+    prevDate = undefined;
+    console.log(selectedScrollDate.current);
+    setSelectedFinalDate(selectedScrollDate.current);
+    datePress(selectedScrollDate.current);
+    // setDateHeader(prev => {
+    //   return {...prev};
+    // });
+  }, [selectedScrollDate.current, dateHeader?.fullDate]);
+  // }, [selectedScrollDate.current, dateHeader]);
 
   const renderItem: ListRenderItem<any> | null | undefined = ({item}) => {
     const date2 = item.fullDate;
+    // const areDatesEqual =
+    // dateHeader?.fullDate && compareDates(dateHeader.fullDate, date2);
     const areDatesEqual = compareDates(selectedFinalDate, date2);
+    // console.log({selectedFinalDate});
     return (
       <View
         style={[styles.dateContent, {width: topViewWidth && topViewWidth / 7}]}>
@@ -218,7 +227,7 @@ const Home = () => {
           }}
           onPress={() => {
             datePress(date2);
-            setDateHeader(item);
+            // setDateHeader(item);
           }}>
           <Text style={[styles.dateText, {marginBottom: 1}]}>
             {item.dayName}
@@ -300,7 +309,8 @@ const Home = () => {
                 fill={constants.colors.BGC}
               />
             </TouchableOpacity>
-            <Text style={styles.taskTitle}>{tempGetMonthFromStringDate}</Text>
+            <Text style={styles.taskTitle}>{tempGetMonthFromStringDate()}</Text>
+            {/* <Text style={styles.taskTitle}>{tempGetMonthFromStringDate}</Text> */}
           </View>
           <View>
             <Line
@@ -313,7 +323,7 @@ const Home = () => {
           </View>
           <View style={styles.triangle} />
           <View style={styles.date}>
-            {datesDict && (
+            {
               <FlatList
                 onLayout={e => {
                   setTopViewWidth(e.nativeEvent.layout.width);
@@ -336,7 +346,7 @@ const Home = () => {
                 //     });
                 //   }
                 // }}
-                initialNumToRender={38}
+                initialNumToRender={100}
                 // initialScrollIndex={currentDateIndexInFlatList}
                 onMomentumScrollEnd={onDragEnd}
                 renderItem={renderItem}
@@ -368,7 +378,7 @@ const Home = () => {
                   };
                 }}
               />
-            )}
+            }
           </View>
           <View>
             <Line

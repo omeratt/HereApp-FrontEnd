@@ -3,8 +3,8 @@ import {
   Text,
   TouchableOpacity,
   View,
-  FlatList,
-  ListRenderItem,
+  I18nManager,
+  LayoutChangeEvent,
 } from 'react-native';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import constants from '../assets/constants';
@@ -13,35 +13,20 @@ import NewTask from '../components/NewTask';
 import Animated, {FadeIn, FadeOutUp} from 'react-native-reanimated';
 import {tasksApi, useGetTasksByDateQuery} from '../app/api/taskApi';
 import DisplayTask from '../components/DisplayTask';
-import {useAppDispatch, useAppSelector} from '../app/hooks';
+import {useAppDispatch} from '../app/hooks';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {DrawerActions, useNavigation} from '@react-navigation/native';
-import {
-  DateObject,
-  generateMonthObjects,
-  getDatesForYear,
-  getMoreDays,
-} from '../components/WeeklyCalender';
+import {DateObject, getDatesForYear} from '../components/WeeklyCalender';
 import Line from '../components/Line';
+import {FlashList} from '@shopify/flash-list';
+import RenderItem from '../components/RenderItem';
 
-const DATE_ITEM_WIDTH = constants.WIDTH * 0.108;
 const CURRENT_DATE = new Date();
 const allDates = getDatesForYear(CURRENT_DATE);
-// const allDates = generateMonthObjects(CURRENT_DATE);
 const flatListData = Object.values(allDates);
 const initialNumToRender = flatListData.length;
-const reload = (date: Date) => {
-  const newDate = new Date(new Date().setMonth(date.getMonth()));
-  // console.log({newDate});
-  return getMoreDays(newDate);
-  // return getDatesForYear(newDate);
-};
-// console.log({len: flatListData.length});
+
 const Home = () => {
-  // const [isModalVisible, setModalVisible] = useState(false);
-  // const [dates, setDates] = useState<Date[]>([]);
-  // const [offset, setOffset] = useState(0);
-  const [dada, setDada] = useState<Record<string, DateObject>>(allDates);
   const [topViewWidth, setTopViewWidth] = useState<number | undefined>(
     undefined,
   );
@@ -49,7 +34,7 @@ const Home = () => {
   const [selectedFinalDate, setSelectedFinalDate] =
     useState<Date>(CURRENT_DATE);
   const [isTaskLoading, setIsTaskLoading] = useState<boolean>(false);
-  const flatListRef = useRef<FlatList<DateObject> | null>(null);
+  const flashListRef = useRef<FlashList<DateObject> | null>(null);
   const selectedScrollDate = useRef<Date>(CURRENT_DATE);
   const selectedDate = useRef<Date>(CURRENT_DATE);
   const [dateHeader, setDateHeader] = useState<DateObject>();
@@ -63,35 +48,33 @@ const Home = () => {
     error: tasksError,
     isFetching: taskFetch,
   } = useGetTasksByDateQuery('');
+  React.useEffect(() => {
+    console.log('asd');
+    I18nManager.forceRTL(false);
+    I18nManager.allowRTL(false);
+  }, []);
   const datePress = (date: Date) => {
     setIsTaskLoading(true);
     setSelectedFinalDate(date);
     selectedDate.current = date;
-    // const result = dispatch(
-    //   tasksApi.endpoints.getTasksByDate.initiate(formatDate(date)),
-    // )
-    //   .then(res => {
-    //     setTasks(res.data);
-    //     console.log(tasks.length);
-    //   })
-    //   .catch(err => {
-    //     console.log('error getting tasks', err);
-    //   })
-    //   .finally(() => setIsTaskLoading(false));
+    const result = dispatch(
+      tasksApi.endpoints.getTasksByDate.initiate(formatDate(date)),
+    )
+      .then(res => {
+        setTasks(res.data);
+        console.log(tasks.length);
+      })
+      .catch(err => {
+        console.log('error getting tasks', err);
+      })
+      .finally(() => setIsTaskLoading(false));
   };
-  const compareDates = (date1: Date, date2: Date): boolean => {
-    return date1?.toDateString() === date2?.toDateString();
-  };
-  // const handleBackPress = () => {
-  //   setIsNext(false);
-  //   setOffset(offset - 7);
-  // };
-
-  // const handleNextPress = () => {
-  //   setIsNext(true);
-  //   setOffset(offset + 7);
-  // };
-
+  const snapToOffsets = useMemo(() => {
+    if (!topViewWidth) return null;
+    return Array.from({length: initialNumToRender}, (_, index) => {
+      return (topViewWidth / 7) * index + topViewWidth / 7 / 2;
+    });
+  }, [topViewWidth]);
   function formatDate(date: Date): string {
     const formattedDate = new Intl.DateTimeFormat('heb-IL', {
       day: '2-digit',
@@ -103,23 +86,23 @@ const Home = () => {
     return fixedDate;
   }
 
-  function getIndexByKey(obj: Record<string, any>, key: string): number {
-    const keys = Object.keys(obj);
-    return keys.indexOf(key);
-  }
+  //TODO: find a way to handle scroll to index
+  // function getIndexByKey(obj: Record<string, any>, key: string): number {
+  //   const keys = Object.keys(obj);
+  //   return keys.indexOf(key);
+  // }
+  // const findDateAndScroll = (DateToCheck: Date) => {
+  //   const key = DateToCheck.toLocaleDateString();
+  //   const index = getIndexByKey(allDates, key);
+  //   // flashListRef.current?.scrollToIndex({index});
+  //   if (index < 0) return 0;
+  //   return index;
+  // };
 
-  const findDateAndScroll = (DateToCheck: Date) => {
-    const key = DateToCheck.toLocaleDateString();
-    const index = getIndexByKey(allDates, key);
-    if (index < 0) return 0;
-    flatListRef.current?.scrollToIndex({index});
-    return index;
-  };
-
-  useEffect(() => {
-    if (!selectedDate.current) findDateAndScroll(CURRENT_DATE);
-    else findDateAndScroll(selectedDate.current);
-  }, [topViewWidth, selectedDate.current]);
+  // useEffect(() => {
+  //   if (!selectedDate.current) findDateAndScroll(CURRENT_DATE);
+  //   else findDateAndScroll(selectedDate.current);
+  // }, [topViewWidth, selectedDate.current]);
 
   useEffect(() => {
     if (taskFetch) {
@@ -152,17 +135,8 @@ const Home = () => {
     console.log('handleSheetChanges', index);
   }, []);
 
-  const getMonthFromStringDate = (date: string) => {
-    const [day, month, year] = date.split('/');
-
-    const monthName = new Date(+year, +month - 1, +day).toLocaleString();
-    return monthName;
-  };
   const tempGetMonthFromStringDate = () => {
     if (!dateHeader) return;
-    // const date = new Date(dateHeader.)
-    // console.log(Object.keys(flatListData))
-    // console.log({dateHeader});
     const monthName = dateHeader?.fullDate.toLocaleString('eng', {
       month: 'long',
     });
@@ -174,36 +148,21 @@ const Home = () => {
     } ${monthName}`;
     return formattedDate;
   };
-  // const tempGetMonthFromStringDate = useMemo(() => {
-  //   if (!dateHeader) return;
-  //   const monthName = dateHeader?.fullDate.toLocaleString('eng', {
-  //     month: 'long',
-  //   });
 
-  //   const isToday =
-  //     dateHeader?.fullDate.toDateString() === CURRENT_DATE.toDateString();
-  //   const formattedDate = `${isToday ? 'Today' : dateHeader.dayName},${
-  //     dateHeader.day
-  //   } ${monthName}`;
-  //   return formattedDate;
-  // }, [dateHeader]);
-
+  //  -------------------------------------------------------- flat list callbacks --------------------------------------------------------
   let prevDate: Date | undefined = selectedScrollDate.current;
   const handleViewableChange = useRef((item: any) => {
+    item.viewableItems?.forEach((item: any) => {
+      console.log(item.index, item.item);
+    });
+    console.log('\n\n');
     const itemsLength = item.viewableItems?.length;
-    const currentViewableItemIndex = itemsLength <= 7 ? itemsLength - 1 : 7;
-    const date = item.viewableItems[currentViewableItemIndex]?.item;
+    const currentViewableItemIndex = itemsLength <= 4 ? itemsLength - 1 : 4;
+    const date = item.viewableItems[3]?.item;
     if (!date) return;
     selectedScrollDate.current = date.fullDate;
     prevDate = date.fullDate;
     setDateHeader(date);
-
-    // console.log('handleViewableChange');
-    // setTimeout(() => {
-
-    // }, 100);
-    // const currentDateToDisplay = tempGetMonthFromStringDate(date);
-    // setCurrentMonth(currentDateToDisplay);
   });
   const onDragEnd = useCallback(() => {
     if (!prevDate) return;
@@ -211,90 +170,19 @@ const Home = () => {
     console.log(selectedScrollDate.current);
     setSelectedFinalDate(selectedScrollDate.current);
     datePress(selectedScrollDate.current);
-    // setDateHeader(prev => {
-    //   return {...prev};
-    // });
+    // datePress(selectedScrollDate.current);
   }, [selectedScrollDate.current, dateHeader?.fullDate]);
-  // }, [selectedScrollDate.current, dateHeader]);
 
-  const renderItem: ListRenderItem<any> | null | undefined = ({item}) => {
-    const date2 = item.fullDate;
-    // const areDatesEqual =
-    // dateHeader?.fullDate && compareDates(dateHeader.fullDate, date2);
-    const areDatesEqual = compareDates(selectedFinalDate, date2);
-    // console.log({selectedFinalDate});
-    return (
-      <View
-        style={[styles.dateContent, {width: topViewWidth && topViewWidth / 7}]}>
-        <TouchableOpacity
-          style={{
-            width: '100%',
-            alignItems: 'center',
-          }}
-          onPress={() => {
-            datePress(date2);
-            // setDateHeader(item);
-          }}>
-          <Text style={[styles.dateText, {marginBottom: 1}]}>
-            {item.dayName}
-          </Text>
-          <View
-            style={[
-              styles.datePicker,
-              {
-                width: topViewWidth && topViewWidth / 9,
-                height: topViewWidth && topViewWidth / 9,
-                backgroundColor: areDatesEqual
-                  ? constants.colors.GREEN
-                  : 'transparent',
-                elevation: areDatesEqual ? 5 : 0,
-              },
-            ]}>
-            <Text style={[styles.dateText]}>{item.day}</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-    );
+  const keyExtractor = useCallback(
+    (item: DateObject, index: number) => item.fullDate.toLocaleString(),
+    [],
+  );
+  const onLayout = (e: LayoutChangeEvent) => {
+    setTopViewWidth(e.nativeEvent.layout.width);
+    console.log(e.nativeEvent.layout.width, '*****');
   };
-  // const renderItem: ListRenderItem<Week> | null | undefined = item => {
-  //   return (
-  //     <>
-  //       {item.item.map(day => {
-  //         const date = day.date;
-  //         return (
-  //           <View key={date} style={styles.dateContent}>
-  //             <TouchableOpacity
-  //               style={{
-  //                 width: '100%',
-  //                 alignItems: 'center',
-  //               }}
-  //               onPress={() => {
-  //                 console.log({date});
-  //                 datePress(date);
-  //               }}>
-  //               <Text style={[styles.dateText, {marginBottom: 5}]}>
-  //                 {day.name}
-  //               </Text>
-  //               <View
-  //                 style={[
-  //                   styles.datePicker,
-  //                   {
-  //                     backgroundColor:
-  //                       selectedDate === date
-  //                         ? constants.colors.GREEN
-  //                         : 'transparent',
-  //                     elevation: selectedDate === date ? 5 : 0,
-  //                   },
-  //                 ]}>
-  //                 <Text style={styles.dateText}>{date.substring(0, 2)}</Text>
-  //               </View>
-  //             </TouchableOpacity>
-  //           </View>
-  //         );
-  //       })}
-  //     </>
-  //   );
-  // };
+
+  //  -------------------------------------------------------- flat list callbacks --------------------------------------------------------
   return (
     <Animated.View
       entering={FadeIn}
@@ -316,7 +204,6 @@ const Home = () => {
               />
             </TouchableOpacity>
             <Text style={styles.taskTitle}>{tempGetMonthFromStringDate()}</Text>
-            {/* <Text style={styles.taskTitle}>{tempGetMonthFromStringDate}</Text> */}
           </View>
           <View>
             <Line
@@ -329,63 +216,28 @@ const Home = () => {
           </View>
           <View style={styles.triangle} />
           <View style={styles.date}>
-            {
-              <FlatList
-                onLayout={e => {
-                  setTopViewWidth(e.nativeEvent.layout.width);
-                }}
-                // extraData={[selectedFinalDate, topViewWidth]}
-                ref={flatListRef}
-                data={Object.values(dada)}
-                // data={flatListData}
-                // onContentSizeChange={() => {
-                //   console.log('vhange1', flatListRef.current);
-                //   if (
-                //     flatListRef &&
-                //     flatListRef.current &&
-                //     flatListData &&
-                //     flatListData.length
-                //   ) {
-                //     // console.log('change', flatListRef.current?.props);
-                //     flatListRef.current.scrollToIndex({
-                //       index: currentDateIndexInFlatList,
-                //       animated: false,
-                //     });
-                //   }
-                // }}
-                initialNumToRender={initialNumToRender}
-                onMomentumScrollEnd={onDragEnd}
-                renderItem={renderItem}
-                // keyExtractor={(item, index) => index.toString()}
-                keyExtractor={(item, index) => item.fullDate.toLocaleString()}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{
-                  paddingHorizontal: topViewWidth && topViewWidth / 2,
-                }}
-                // contentOffset={{
-                //   x: (topViewWidth && topViewWidth / 7 / 4) || 0,
-                //   y: 0,
-                // }}
-                inverted
-                pagingEnabled
-                onViewableItemsChanged={handleViewableChange.current}
-                viewabilityConfig={{
-                  itemVisiblePercentThreshold: 24,
-                }}
-                snapToAlignment={'center'}
-                getItemLayout={(data, index) => {
-                  const width = topViewWidth || 360;
-                  return {
-                    index: index,
-                    length: width / 7,
-                    offset:
-                      (width / 7) * (flatListData.length - 1 - index) +
-                      width / 7 / 2,
-                  };
-                }}
-              />
-            }
+            <FlashList
+              ref={flashListRef}
+              onLayout={onLayout}
+              keyExtractor={keyExtractor}
+              renderItem={props => <RenderItem {...props} />}
+              extraData={{
+                selectedFinalDate,
+                topViewWidth,
+                onDatePress: datePress,
+              }}
+              estimatedItemSize={topViewWidth && topViewWidth / 7}
+              data={flatListData}
+              onMomentumScrollEnd={onDragEnd}
+              horizontal
+              contentContainerStyle={{
+                paddingHorizontal: topViewWidth && topViewWidth / 2,
+              }}
+              pagingEnabled
+              onViewableItemsChanged={handleViewableChange.current}
+              snapToAlignment={'center'}
+              snapToOffsets={snapToOffsets ? snapToOffsets : []}
+            />
           </View>
           <View>
             <Line
@@ -398,13 +250,6 @@ const Home = () => {
           </View>
           <View style={styles.taskListColumnContainer}>
             <DisplayTask data={tasks} isTaskLoading={isTaskLoading} />
-            {/* <View style={styles.taskListContainer}>
-              <View style={styles.taskListContent}>
-                <Text style={styles.taskContentTitle}>Home work</Text>
-                <Text style={styles.taskContentBody}>Finish with...</Text>
-              </View>
-              <View style={styles.taskListHighlight}></View>
-            </View> */}
           </View>
         </View>
         <View style={styles.myListContainer}>
@@ -476,16 +321,11 @@ const Home = () => {
           ref={bottomSheetModalRef}
           index={1}
           snapPoints={snapPoints}
-          // android_keyboardInputMode="adjustResize"
-          // keyboardBehavior="fillParent"
-          // keyboardBlurBehavior="restore"
-          // contentHeight={constants.HEIGHT}
           keyboardBlurBehavior="restore"
           handleIndicatorStyle={{backgroundColor: constants.colors.UNDER_LINE}}
           handleStyle={{
             backgroundColor: constants.colors.OFF_WHITE,
           }}
-          // enableDismissOnClose
           onChange={handleSheetChanges}>
           {/* <NewTask
             closeModal={bottomSheetModalRef.current?.dismiss}
@@ -582,86 +422,15 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   date: {
-    // flexDirection: 'row',
-
     height: '23.5%',
     paddingHorizontal: '5%',
     paddingTop: '2.5%',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  dateContent: {
-    // flex: 1,
-    // width: constants.WIDTH,
-    // width: DATE_ITEM_WIDTH * 1.129,
-    width: '30%',
-    height: '80%',
-    alignItems: 'center',
-    flexDirection: 'column',
-    // backgroundColor: 'green',
-    // marginLeft: DATE_ITEM_WIDTH * 0.1255,
-  },
-  dateText: {
-    fontFamily: constants.Fonts.text,
-    color: constants.colors.BLACK,
-    fontSize: constants.WIDTH / 29,
-    textAlign: 'center',
-  },
-  datePicker: {
-    height: DATE_ITEM_WIDTH,
-    width: DATE_ITEM_WIDTH,
-    // marginBottom: '12%',
-    borderRadius: 500,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   taskListColumnContainer: {
     height: `${100 - 23.5 - 15}%`,
     padding: '5%',
-    // backgroundColor: 'green',
-    // justifyContent: 'flex-end',
-    // paddingBottom: '6%',
-    // paddingTop: '6%',
-  },
-  taskListContainer: {
-    // marginTop: '2.5%',
-    height: `42%`,
-    flexDirection: 'row',
-    // padding: '10%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  taskListContent: {
-    height: '100%',
-    borderRadius: 17,
-    borderWidth: 1,
-    borderColor: constants.colors.UNDER_LINE,
-    width: '80%',
-    marginRight: '3%',
-    position: 'relative',
-    padding: '3%',
-  },
-  taskContentTitle: {
-    fontFamily: constants.Fonts.text,
-    fontWeight: 'bold',
-    fontSize: 14,
-    color: constants.colors.BLACK,
-  },
-  taskContentBody: {
-    fontFamily: constants.Fonts.text,
-    // fontWeight: '700',
-    fontSize: 12.5,
-    color: constants.colors.UNDER_LINE,
-  },
-  taskListHighlight: {
-    position: 'absolute',
-    right: 0,
-    backgroundColor: constants.colors.GREEN,
-    height: '45%',
-    width: '8.5%',
-    borderWidth: 1,
-    borderColor: constants.colors.UNDER_LINE,
-    borderRadius: 800,
   },
   myListContainer: {
     height: '24.5%',

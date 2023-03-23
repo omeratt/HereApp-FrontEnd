@@ -10,6 +10,10 @@ export interface DateObject {
   fullDate: Date;
 }
 
+export const compareDates = (date1: Date, date2: Date): boolean => {
+  return date1?.toDateString() === date2?.toDateString();
+};
+
 export const formatDate = (date: Date): string =>
   date.toLocaleDateString('en-GB').split('.').join('/');
 

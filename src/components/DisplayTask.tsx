@@ -131,7 +131,7 @@ export default function DisplayTask({data, isTaskLoading}: props) {
     );
   };
   const emptyList = () => {
-    console.log(data);
+    console.log(data, 'emptyList DisplayTask.tsx');
     if (data === undefined)
       return <ActivityIndicator size={30} color={constants.colors.GREEN} />;
     else return null;

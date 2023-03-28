@@ -3,6 +3,7 @@ import React, {useMemo} from 'react';
 import constants from '../assets/constants';
 import {compareDates, DateObject} from './WeeklyCalender';
 import {ListRenderItem} from '@shopify/flash-list';
+import {DATE_WIDTH} from '../screens/Home';
 
 export interface RenderItemProps {
   item: DateObject;
@@ -11,28 +12,28 @@ export interface RenderItemProps {
   onDatePress: (date: Date) => void;
 }
 
-const RenderItem: ListRenderItem<DateObject> | null | undefined = ({
+const RenderDateItem: ListRenderItem<DateObject> | null | undefined = ({
   item,
   extraData,
 }) => {
-  const {selectedFinalDate, topViewWidth, onDatePress} = extraData;
-  if (!topViewWidth) return <React.Fragment />;
+  const {selectedFinalDate, onDatePress} = extraData;
   const itemDate = item.fullDate;
   const areDatesEqual = compareDates(selectedFinalDate, itemDate);
   const widthAndHeight = useMemo(() => {
-    return topViewWidth && topViewWidth / 9;
-  }, [topViewWidth]);
+    return DATE_WIDTH / 9;
+  }, []);
   return (
     <View
-      onLayout={event => {
-        const {x, y, width, height} = event.nativeEvent.layout;
-        console.log({width, y});
-        console.log({topViewWidth});
-      }}
       style={[
         styles.dateContent,
         {
-          width: topViewWidth && topViewWidth / 7,
+          width: DATE_WIDTH / 7,
+          // backgroundColor: 'brown',
+          // borderColor: 'white',
+          // borderWidth: 1,
+          // height: '100%',
+          padding: 0,
+          margin: 0,
         },
       ]}>
       <TouchableOpacity
@@ -60,7 +61,7 @@ const RenderItem: ListRenderItem<DateObject> | null | undefined = ({
   );
 };
 
-export default React.memo(RenderItem);
+export default React.memo(RenderDateItem);
 
 const styles = StyleSheet.create({
   dateContent: {

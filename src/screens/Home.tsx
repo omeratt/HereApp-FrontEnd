@@ -30,6 +30,7 @@ const Home = () => {
   const [topViewWidth, setTopViewWidth] = useState<number | undefined>(
     undefined,
   );
+  const [realIndex, setRealIndex] = useState(0);
   const [tasks, setTasks] = useState<any[]>([]);
   const [selectedFinalDate, setSelectedFinalDate] =
     useState<Date>(CURRENT_DATE);
@@ -93,7 +94,7 @@ const Home = () => {
     return Array.from({length: initialNumToRender}, (_, index) => {
       return (DATE_WIDTH / 7) * index;
     });
-  }, [DATE_WIDTH, initialNumToRender]);
+  }, [DATE_WIDTH, initialNumToRender, realIndex]);
   const scrollToIndex = useCallback(
     (index: number) => {
       if (!snapToOffsets) return null;
@@ -222,6 +223,14 @@ const Home = () => {
       entering={FadeIn}
       exiting={FadeOutUp}
       style={styles.container}>
+      <Line
+        strength={1}
+        lengthPercentage={100}
+        lineColor={constants.colors.UNDER_LINE}
+        rotate180
+        vertical
+        style={{position: 'absolute', alignSelf: 'center', zIndex: 4}}
+      />
       <View style={styles.topView}>
         <View style={styles.task}>
           <View style={styles.today}>
@@ -267,22 +276,56 @@ const Home = () => {
               extraData={{
                 selectedFinalDate,
                 onDatePress: datePress,
+                realIndex,
               }}
               estimatedItemSize={DATE_WIDTH / 7}
+              // overrideItemLayout={e => {
+              //   e.size = DATE_WIDTH / 7;
+              // }}
               data={flatListData}
-              onMomentumScrollEnd={onDragEnd}
+              // onMomentumScrollEnd={onDragEnd}
               horizontal
               contentContainerStyle={{
-                paddingHorizontal: constants.WIDTH / 2 + 2.7 - DATE_WIDTH / 7,
+                paddingHorizontal: DATE_WIDTH * 0.5 - DATE_WIDTH / 7 / 2,
               }}
+              // snapToAlignment="center"
+              snapToInterval={DATE_WIDTH / 7}
               // pagingEnabled
+              estimatedListSize={{height: 73, width: 17222}}
               // onViewableItemsChanged={handleViewableChange.current}
-              // snapToAlignment={'center'}
+              snapToAlignment={'start'}
+              pagingEnabled
               // initialScrollIndex={getIndexByKey(
               //   allDates,
               //   CURRENT_DATE.toLocaleDateString(),
               // )}
-              snapToOffsets={snapToOffsets && snapToOffsets}
+              // onViewableItemsChanged={({viewableItems, changed}) => {
+              //   console.log('Visible items are', viewableItems);
+              //   console.log('Changed in this iteration', changed);
+              // }}
+              // viewabilityConfig={{
+              //   waitForInteraction: true,
+              //   // At least one of the viewAreaCoveragePercentThreshold or itemVisiblePercentThreshold is required.
+              //   viewAreaCoveragePercentThreshold: 50,
+              //   // itemVisiblePercentThreshold: 75,
+              // }}
+              onScroll={e => {
+                let index = +(
+                  e.nativeEvent.contentOffset.x /
+                  (DATE_WIDTH / 7)
+                ).toFixed(0);
+                index < 0 ? (index = index * -1) : (index = index);
+                console.log(index);
+                if (realIndex === index) return;
+                setRealIndex(index);
+              }}
+              // snapToOffsets={snapToOffsets}
+              onLoad={() => {
+                setRealIndex(
+                  getIndexByKey(allDates, CURRENT_DATE.toLocaleDateString()),
+                );
+              }}
+              // contentOffset={{x: constants.WIDTH / 2 - DATE_WIDTH / 7, y: 0}}
               decelerationRate={'fast'}
             />
             {/* )} */}

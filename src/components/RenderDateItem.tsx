@@ -1,9 +1,16 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React, {useMemo} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import constants from '../assets/constants';
 import {compareDates, DateObject} from './WeeklyCalender';
 import {ListRenderItem} from '@shopify/flash-list';
 import {DATE_WIDTH} from '../screens/Home';
+import Animated, {
+  runOnUI,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 
 export interface RenderItemProps {
   item: DateObject;
@@ -14,27 +21,53 @@ export interface RenderItemProps {
 
 const RenderDateItem: ListRenderItem<DateObject> | null | undefined = ({
   item,
+  index,
   extraData,
 }) => {
-  const {selectedFinalDate, onDatePress} = extraData;
+  const {selectedFinalDate, onDatePress, realIndex} = extraData;
   const itemDate = item.fullDate;
+  const height = useSharedValue('80%');
   const areDatesEqual = compareDates(selectedFinalDate, itemDate);
+  const isRealIndex = realIndex === index;
+  const animatedHeight = useAnimatedStyle(() => {
+    return {
+      height: height.value,
+    };
+  });
+  useEffect(() => {
+    // height.value = '80%';
+    runOnUI(() => {
+      if (isRealIndex) {
+        console.log(item.fullDate);
+        height.value = withTiming('90%', {duration: 300});
+        console.log(height.value);
+      }
+    })();
+    return () => {
+      runOnUI(() => {
+        height.value = withTiming('80%', {duration: 300});
+      })();
+    };
+  }, [isRealIndex]);
   const widthAndHeight = useMemo(() => {
     return DATE_WIDTH / 9;
   }, []);
   return (
-    <View
+    <Animated.View
       style={[
         styles.dateContent,
         {
           width: DATE_WIDTH / 7,
-          // backgroundColor: 'brown',
+          // height: height.value,
+          backgroundColor: 'brown',
           // borderColor: 'white',
           // borderWidth: 1,
-          // height: '100%',
+          // height: '80%',
+          // height: height.value,
           padding: 0,
           margin: 0,
         },
+        animatedHeight,
       ]}>
       <TouchableOpacity
         style={styles.datePress}
@@ -48,16 +81,16 @@ const RenderDateItem: ListRenderItem<DateObject> | null | undefined = ({
             {
               width: widthAndHeight,
               height: widthAndHeight,
-              backgroundColor: areDatesEqual
+              backgroundColor: isRealIndex
                 ? constants.colors.GREEN
                 : 'transparent',
-              elevation: areDatesEqual ? 5 : 0,
+              elevation: isRealIndex ? 5 : 0,
             },
           ]}>
           <Text style={[styles.dateText]}>{item.day}</Text>
         </View>
       </TouchableOpacity>
-    </View>
+    </Animated.View>
   );
 };
 

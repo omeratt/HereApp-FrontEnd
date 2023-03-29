@@ -1,5 +1,5 @@
 import {FlashList} from '@shopify/flash-list';
-import React, {memo, useCallback, useState} from 'react';
+import React, {memo, useCallback} from 'react';
 import {NativeScrollEvent, NativeSyntheticEvent} from 'react-native';
 import {DATE_WIDTH} from '../screens/Home';
 import RenderDateItem from './RenderDateItem';
@@ -7,61 +7,43 @@ import {DateObject} from './WeeklyCalender';
 
 interface Props {
   flashListRef: React.MutableRefObject<FlashList<DateObject> | null>;
-  datePress: (date: Date) => void;
-  FetchTasks: (date: Date) => void;
-  selectedScrollDate: any;
-  setSelectedFinalDate: any;
-  selectedFinalDate: any;
-  flatListData: any;
-  dateHeader: any;
+  datePress: (dateItem: DateObject) => void;
+  selectedScrollDate: Date;
+  // SetDateHeader: (date: DateObject) => void;
+  selectedFinalDate: Date;
+  flatListData: DateObject[];
 }
 const DatesFlatList: React.FC<Props> = ({
   datePress,
-  FetchTasks,
   flashListRef,
   flatListData,
+  // SetDateHeader,
   selectedFinalDate,
   selectedScrollDate,
-  setSelectedFinalDate,
-  dateHeader,
 }) => {
+  const isCanExecuteOnMomentumEnd = React.useRef<boolean>(false);
+
+  const canExecuteOnMomentumEnd = useCallback(() => {
+    isCanExecuteOnMomentumEnd.current = true;
+  }, []);
   const getCurrentIndex = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const {contentOffset} = event.nativeEvent;
     const width = DATE_WIDTH / 7;
     const index = Math.round(contentOffset.x / width);
     return index;
   };
-  let prevDate: Date | undefined = selectedScrollDate;
   const onDragEnd = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-      console.log(getCurrentIndex(e));
-      if (!prevDate) return;
-      prevDate = undefined;
-      console.log(dateHeader?.fullDate);
-      setSelectedFinalDate(dateHeader?.fullDate);
-      FetchTasks(selectedScrollDate);
+      if (!isCanExecuteOnMomentumEnd.current) return;
+      const index = getCurrentIndex(e);
+      const currentItem = flatListData[index];
+      // console.log({currentItem,index});
+      datePress(currentItem);
+      isCanExecuteOnMomentumEnd.current = false;
     },
     [selectedScrollDate],
   );
-  // const onDragEnd = useCallback(
-  //   (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-  //     const {contentOffset} = e.nativeEvent;
-  //     const width = DATE_WIDTH / 7;
-  //     const index = Math.round(contentOffset.x / width);
-  //     console.log(index);
-  //     if (!prevDate) return;
-  //     console.log({prevDate});
-  //     prevDate = undefined;
-  //     // console.log(dateHeader?.fullDate);
-  //     // dateHeader?.fullDate && setSelectedFinalDate(dateHeader.fullDate);
-  //     // SetSelectedFinalDate(selectedScrollDate);
-  //     // datePress(selectedScrollDate.current);
-  //     // runOnJS(FetchTasks)(selectedScrollDate);
-  //     // FetchTasks(selectedScrollDate);
-  //     // datePress(selectedScrollDate.current);
-  //   },
-  //   [selectedScrollDate],
-  // );
+
   const keyExtractor = useCallback(
     (item: DateObject, index: number) => item.fullDate.toLocaleString(),
     [],
@@ -81,6 +63,7 @@ const DatesFlatList: React.FC<Props> = ({
         selectedFinalDate,
         onDatePress: datePress,
       }}
+      onScrollBeginDrag={canExecuteOnMomentumEnd}
       estimatedItemSize={DATE_WIDTH / 7}
       data={flatListData}
       onMomentumScrollEnd={onDragEnd}

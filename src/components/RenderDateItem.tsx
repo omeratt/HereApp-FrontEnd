@@ -9,7 +9,7 @@ export interface RenderItemProps {
   item: DateObject;
   selectedFinalDate: Date;
   topViewWidth?: number;
-  onDatePress: (date: Date) => void;
+  onDatePress: (date: DateObject) => void;
 }
 
 const RenderDateItem: ListRenderItem<DateObject> | null | undefined = ({
@@ -23,7 +23,7 @@ const RenderDateItem: ListRenderItem<DateObject> | null | undefined = ({
     return DATE_WIDTH / 9;
   }, [DATE_WIDTH]);
   const onPress = useCallback(() => {
-    onDatePress?.(itemDate);
+    onDatePress?.(item);
   }, [item.fullDate]);
   return (
     <View

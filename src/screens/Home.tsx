@@ -50,7 +50,6 @@ const Home = () => {
   const SetSelectedDate = useCallback((date: any) => {
     setSelectedDate(date);
   }, []);
-  // const SetDateHeader = useCallback((header:any)=>{setDateHeader(header)},[])
   const {
     isLoading: taskLoading,
     data: tasks1,
@@ -73,12 +72,14 @@ const Home = () => {
       .finally(() => setIsTaskLoading(false));
   }, []);
   const datePress = useCallback(
-    (date: Date) => {
+    (dateItem: DateObject) => {
+      const date = dateItem.fullDate;
       findDateAndScroll(date);
       setIsTaskLoading(true);
-      setSelectedFinalDate(date);
-      setSelectedDate(date);
+      SetSelectedFinalDate(date);
+      SetSelectedDate(date);
       // runOnJS(FetchTasks)(date);
+      SetDateHeader(dateItem);
       FetchTasks(date);
     },
     [selectedFinalDate],
@@ -148,6 +149,7 @@ const Home = () => {
   }, []);
 
   const tempGetMonthFromStringDate = useMemo(() => {
+    // consnole.log({selec})
     if (!dateHeader) return 'Today';
     const monthName = dateHeader?.fullDate.toLocaleString('eng', {
       month: 'long',
@@ -223,12 +225,12 @@ const Home = () => {
             <DatesFlatList
               flashListRef={flashListRef}
               datePress={datePress}
-              FetchTasks={FetchTasks}
+              // FetchTasks={FetchTasks}
               selectedFinalDate={selectedFinalDate}
-              setSelectedFinalDate={SetSelectedFinalDate}
+              // setSelectedFinalDate={SetSelectedFinalDate}
               selectedScrollDate={selectedScrollDate}
               flatListData={flatListData}
-              dateHeader={dateHeader}
+              // dateHeader={dateHeader}
             />
           </View>
           <View>

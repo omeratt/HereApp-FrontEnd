@@ -606,10 +606,6 @@ const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
                     <Animated.View style={[styles.setTimeSubContainer]}>
                       <TodayTab />
                       <DayAndTimeTab />
-                      {/* <DateSelect
-                    handleList={datesList}
-                    setHandleList={setDatesList}
-                  /> */}
                     </Animated.View>
                   </>
                 )}

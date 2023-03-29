@@ -1,5 +1,5 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React, {useMemo} from 'react';
+import React, {useCallback, useMemo} from 'react';
 import constants from '../assets/constants';
 import {compareDates, DateObject} from './WeeklyCalender';
 import {ListRenderItem} from '@shopify/flash-list';
@@ -21,26 +21,23 @@ const RenderDateItem: ListRenderItem<DateObject> | null | undefined = ({
   const areDatesEqual = compareDates(selectedFinalDate, itemDate);
   const widthAndHeight = useMemo(() => {
     return DATE_WIDTH / 9;
-  }, []);
+  }, [DATE_WIDTH]);
+  const onPress = useCallback(() => {
+    onDatePress?.(itemDate);
+  }, [item.fullDate]);
   return (
     <View
       style={[
         styles.dateContent,
         {
           width: DATE_WIDTH / 7,
-          // backgroundColor: 'brown',
+          // backgroundColor: 'cyan',
+          alignItems: 'center',
           // borderColor: 'white',
-          // borderWidth: 1,
-          // height: '100%',
-          padding: 0,
-          margin: 0,
+          // borderWidth: 0.4,
         },
       ]}>
-      <TouchableOpacity
-        style={styles.datePress}
-        onPress={() => {
-          onDatePress?.(itemDate);
-        }}>
+      <TouchableOpacity style={styles.datePress} onPress={onPress}>
         <Text style={styles.dateText}>{item.dayName}</Text>
         <View
           style={[

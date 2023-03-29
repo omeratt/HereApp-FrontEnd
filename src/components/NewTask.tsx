@@ -82,7 +82,7 @@ type tabType =
   | 'NOTE';
 interface props {
   closeModal: any;
-  targetDate: string;
+  targetDate: Date;
   setTargetDate: React.Dispatch<React.SetStateAction<string>>;
 }
 const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
@@ -433,7 +433,6 @@ const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
                 onPress={() => {
                   open('TODAY');
                 }}
-                RTL
                 backgroundColorOff={constants.colors.BGC}
                 backgroundColorOn={constants.colors.OFF_WHITE}
                 circleColorOff={constants.colors.GREEN}
@@ -452,7 +451,7 @@ const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
             <Animated.View
               style={[styles.EveryContainer, EveryContainerStyle('TODAY')]}>
               <Animated.View style={[styles.dateContainer]}>
-                <Text style={{color: 'black'}}>{targetDate}</Text>
+                <Text style={{color: 'black'}}>{'targetDate'}</Text>
               </Animated.View>
             </Animated.View>
           )}
@@ -472,7 +471,6 @@ const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
               onPress={() => {
                 open('DAY_AND_TIME');
               }}
-              RTL
               backgroundColorOff={constants.colors.BGC}
               backgroundColorOn={constants.colors.OFF_WHITE}
               circleColorOff={constants.colors.GREEN}
@@ -495,7 +493,7 @@ const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
           <Animated.View
             style={[styles.EveryContainer, EveryContainerStyle('SET_TIME')]}>
             <Animated.View style={[styles.dateContainer]}>
-              <Text style={{color: 'black'}}>{targetDate}</Text>
+              <Text style={{color: 'black'}}>{'targetDate'}</Text>
             </Animated.View>
           </Animated.View>
         )}
@@ -580,7 +578,6 @@ const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
                     onPress={() => {
                       open('SET_TIME');
                     }}
-                    RTL
                     backgroundColorOff={constants.colors.BGC}
                     backgroundColorOn={constants.colors.OFF_WHITE}
                     circleColorOff={constants.colors.GREEN}
@@ -604,7 +601,6 @@ const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
                     <Line
                       strength={1}
                       lengthPercentage={100}
-                      rotate180
                       lineColor={constants.colors.UNDER_LINE}
                     />
                     <Animated.View style={[styles.setTimeSubContainer]}>
@@ -634,7 +630,6 @@ const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
                     onPress={() => {
                       open('PUSH');
                     }}
-                    RTL
                     backgroundColorOff={constants.colors.BLACK}
                     backgroundColorOn={constants.colors.OFF_WHITE}
                     circleColorOff={constants.colors.GREEN}
@@ -678,7 +673,8 @@ const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
         </TouchableOpacity>
         <DatePickerModal
           isOpen={TABS['DAY_AND_TIME'].stateIsOpen || TABS['TODAY'].stateIsOpen}
-          date={formatStringToDate(targetDate)}
+          date={targetDate}
+          // date={formatStringToDate(targetDate)}
           dateFormat={TABS['DAY_AND_TIME'].stateIsOpen ? 'datetime' : 'time'}
           setDate={setTargetDate}
         />
@@ -717,7 +713,7 @@ const styles = StyleSheet.create({
     // backgroundColor: constants.colors.BLACK,
     height: '80%',
     width: '62%',
-    alignSelf: 'flex-end',
+    alignSelf: 'flex-start',
     justifyContent: 'center',
   },
   newTaskTitleInput: {
@@ -736,7 +732,7 @@ const styles = StyleSheet.create({
     // padding: '5.2%',
     paddingRight: '5.2%',
     paddingLeft: '5.2%',
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'center',
     // backgroundColor: 'yellow',
@@ -775,7 +771,7 @@ const styles = StyleSheet.create({
     // height: '70%',
     width: '100%',
     flex: 1,
-    alignSelf: 'flex-end',
+    alignSelf: 'flex-start',
     justifyContent: 'center',
   },
   descriptionInput: {
@@ -790,7 +786,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   dateContainer: {
-    alignSelf: 'flex-end',
+    alignSelf: 'flex-start',
     justifyContent: 'center',
     width: '100%',
     height: '100%',
@@ -818,9 +814,9 @@ const styles = StyleSheet.create({
   },
   TxtAndToggleInSetTime: {
     // padding: '5.2%',
-    paddingRight: '5.2%',
-    // paddingLeft: '5.2%',
-    flexDirection: 'row',
+    // paddingRight: '5.2%',
+    paddingLeft: '5.2%',
+    flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'center',
     // backgroundColor: 'yellow',

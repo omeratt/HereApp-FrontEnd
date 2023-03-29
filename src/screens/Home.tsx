@@ -5,6 +5,8 @@ import {
   View,
   I18nManager,
   LayoutChangeEvent,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
 } from 'react-native';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import constants from '../assets/constants';
@@ -19,7 +21,7 @@ import {DrawerActions, useNavigation} from '@react-navigation/native';
 import {DateObject, getDatesForYear} from '../components/WeeklyCalender';
 import Line from '../components/Line';
 import {FlashList} from '@shopify/flash-list';
-import RenderItem from '../components/RenderDateItem';
+import DatesFlatList from '../components/DatesFlatList';
 
 const CURRENT_DATE = new Date();
 const allDates = getDatesForYear(CURRENT_DATE);
@@ -27,9 +29,6 @@ const flatListData = Object.values(allDates);
 const initialNumToRender = flatListData.length;
 export const DATE_WIDTH = constants.WIDTH * 0.9;
 const Home = () => {
-  const [topViewWidth, setTopViewWidth] = useState<number | undefined>(
-    undefined,
-  );
   const [tasks, setTasks] = useState<any[]>([]);
   const [selectedFinalDate, setSelectedFinalDate] =
     useState<Date>(CURRENT_DATE);
@@ -60,18 +59,13 @@ const Home = () => {
     error: tasksError,
     isFetching: taskFetch,
   } = useGetTasksByDateQuery(formatDate(CURRENT_DATE));
-  React.useEffect(() => {
-    console.log('asd');
-    I18nManager.forceRTL(false);
-    I18nManager.allowRTL(false);
-  }, []);
   const FetchTasks = useCallback((date: Date) => {
     const result = dispatch(
       tasksApi.endpoints.getTasksByDate.initiate(formatDate(date)),
     )
       .then(res => {
         setTasks(res.data);
-        console.log(tasks.length);
+        // console.log(tasks.length);
       })
       .catch(err => {
         console.log('error getting tasks', err);
@@ -82,27 +76,12 @@ const Home = () => {
     (date: Date) => {
       findDateAndScroll(date);
       setIsTaskLoading(true);
-      SetSelectedFinalDate(date);
-      SetSelectedDate(date);
+      setSelectedFinalDate(date);
+      setSelectedDate(date);
       // runOnJS(FetchTasks)(date);
       FetchTasks(date);
     },
     [selectedFinalDate],
-  );
-  const snapToOffsets = useMemo(() => {
-    return Array.from({length: initialNumToRender}, (_, index) => {
-      return (DATE_WIDTH / 7) * index;
-    });
-  }, [DATE_WIDTH, initialNumToRender]);
-  const scrollToIndex = useCallback(
-    (index: number) => {
-      if (!snapToOffsets) return null;
-      flashListRef.current?.scrollToOffset({
-        offset: snapToOffsets[index],
-        animated: true,
-      });
-    },
-    [snapToOffsets],
   );
 
   function formatDate(date: Date): string {
@@ -120,7 +99,6 @@ const Home = () => {
   const getIndexByKey = useCallback(
     (obj: Record<string, any>, key: string): number => {
       const keys = Object.keys(obj);
-      console.log(keys.indexOf(key));
       return keys.indexOf(key);
     },
     [],
@@ -134,7 +112,7 @@ const Home = () => {
   useEffect(() => {
     // if (!selectedDate.current) findDateAndScroll(CURRENT_DATE);
     // else
-    console.log('first render', selectedDate);
+    // console.log('first render', selectedDate);
     findDateAndScroll(selectedDate);
   }, []);
 
@@ -145,11 +123,11 @@ const Home = () => {
       setIsTaskLoading(false);
     }
     if (tasks1) {
-      console.log('getting tasks', tasks);
+      // console.log('getting tasks', tasks);
       setTasks(tasks1);
     }
     if (tasksError) {
-      console.log('error getting tasks', tasksError);
+      // console.log('error getting tasks', tasksError);
     }
   }, [tasks1, tasksError]);
 
@@ -169,8 +147,8 @@ const Home = () => {
     console.log('handleSheetChanges', index);
   }, []);
 
-  const tempGetMonthFromStringDate = () => {
-    if (!dateHeader) return;
+  const tempGetMonthFromStringDate = useMemo(() => {
+    if (!dateHeader) return 'Today';
     const monthName = dateHeader?.fullDate.toLocaleString('eng', {
       month: 'long',
     });
@@ -181,41 +159,24 @@ const Home = () => {
       dateHeader.day
     } ${monthName}`;
     return formattedDate;
-  };
+  }, [dateHeader, CURRENT_DATE]);
 
   //  -------------------------------------------------------- flat list callbacks --------------------------------------------------------
-  let prevDate: Date | undefined = selectedScrollDate;
-  const handleViewableChange = useRef((item: any) => {
-    item.viewableItems?.forEach((item: any) => {
-      // console.log(item.index, item);
+  const snapToOffsets = useMemo(() => {
+    return Array.from({length: initialNumToRender}, (_, index) => {
+      return (DATE_WIDTH / 7) * index;
     });
-    const itemsLength = item.viewableItems?.length;
-    const currentViewableItemIndex = itemsLength <= 4 ? itemsLength - 1 : 4;
-    const date = item.viewableItems[3]?.item;
-    if (!date) return;
-    prevDate = date.fullDate;
-    SetDateHeader(date);
-    setSelectedScrollDate(date.fullDate);
-    // SetSelectedFinalDate(date.fullDate);
-  });
-  const onDragEnd = useCallback(() => {
-    console.log(prevDate);
-    if (!prevDate) return;
-    prevDate = undefined;
-    console.log(dateHeader?.fullDate);
-    SetSelectedFinalDate(dateHeader?.fullDate);
-    // SetSelectedFinalDate(selectedScrollDate);
-    // datePress(selectedScrollDate.current);
-    // runOnJS(FetchTasks)(selectedScrollDate);
-    FetchTasks(selectedScrollDate);
-    // datePress(selectedScrollDate.current);
-  }, [selectedScrollDate]);
-
-  const keyExtractor = useCallback(
-    (item: DateObject, index: number) => item.fullDate.toLocaleString(),
-    [],
+  }, []);
+  const scrollToIndex = useCallback(
+    (index: number) => {
+      if (!snapToOffsets) return null;
+      flashListRef.current?.scrollToOffset({
+        offset: snapToOffsets[index],
+        animated: true,
+      });
+    },
+    [snapToOffsets],
   );
-
   //  -------------------------------------------------------- flat list callbacks --------------------------------------------------------
   return (
     <Animated.View
@@ -237,7 +198,7 @@ const Home = () => {
                 fill={constants.colors.BGC}
               />
             </TouchableOpacity>
-            <Text style={styles.taskTitle}>{tempGetMonthFromStringDate()}</Text>
+            <Text style={styles.taskTitle}>{tempGetMonthFromStringDate}</Text>
           </View>
           <View>
             <Line
@@ -259,33 +220,16 @@ const Home = () => {
                 // flex: 1,
               },
             ]}>
-            {/* {flatListData && ( */}
-            <FlashList
-              ref={flashListRef}
-              keyExtractor={keyExtractor}
-              renderItem={props => <RenderItem {...props} />}
-              extraData={{
-                selectedFinalDate,
-                onDatePress: datePress,
-              }}
-              estimatedItemSize={DATE_WIDTH / 7}
-              data={flatListData}
-              onMomentumScrollEnd={onDragEnd}
-              horizontal
-              contentContainerStyle={{
-                paddingHorizontal: constants.WIDTH / 2 + 2.7 - DATE_WIDTH / 7,
-              }}
-              // pagingEnabled
-              // onViewableItemsChanged={handleViewableChange.current}
-              // snapToAlignment={'center'}
-              // initialScrollIndex={getIndexByKey(
-              //   allDates,
-              //   CURRENT_DATE.toLocaleDateString(),
-              // )}
-              snapToOffsets={snapToOffsets && snapToOffsets}
-              decelerationRate={'fast'}
+            <DatesFlatList
+              flashListRef={flashListRef}
+              datePress={datePress}
+              FetchTasks={FetchTasks}
+              selectedFinalDate={selectedFinalDate}
+              setSelectedFinalDate={SetSelectedFinalDate}
+              selectedScrollDate={selectedScrollDate}
+              flatListData={flatListData}
+              dateHeader={dateHeader}
             />
-            {/* )} */}
           </View>
           <View>
             <Line
@@ -377,11 +321,11 @@ const Home = () => {
             backgroundColor: constants.colors.OFF_WHITE,
           }}
           onChange={handleSheetChanges}>
-          {/* <NewTask
+          <NewTask
             closeModal={bottomSheetModalRef.current?.dismiss}
             targetDate={selectedDate}
             setTargetDate={SetSelectedDate}
-          /> */}
+          />
         </BottomSheetModal>
       </BottomSheetModalProvider>
     </Animated.View>
@@ -456,7 +400,7 @@ const styles = StyleSheet.create({
   plusIcon: {
     position: 'absolute',
     color: constants.colors.BLACK,
-    left: 0,
+    right: 0,
     top: 0,
     borderRadius: 9999,
     backgroundColor: constants.colors.OFF_WHITE,
@@ -465,7 +409,7 @@ const styles = StyleSheet.create({
   myListPlusIcon: {
     position: 'absolute',
     color: constants.colors.BLACK,
-    left: '6.5%',
+    right: '6.5%',
     borderRadius: 9999,
 
     backgroundColor: constants.colors.OFF_WHITE,

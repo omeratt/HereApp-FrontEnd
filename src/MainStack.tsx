@@ -1,15 +1,12 @@
 import {StyleSheet} from 'react-native';
 import React, {useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
-// import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Auth from './screens/Auth';
 import Welcome from './screens/Welcome';
 import {useMyProfileQuery} from './app/api/userApi';
 import {useAppSelector} from './app/hooks';
 import {selectIsSignIn} from './app/Reducers/User/userSlice';
 import Home from './screens/Home';
-// import DateSelect from './components/DateSelect';
-// import DateList from './components/DateList';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import constants from './assets/constants';
 import CustomDrawer from './Navigation/CustomDrawer';
@@ -24,14 +21,14 @@ export default function MainStack() {
   const {isError, isSuccess, isLoading, data, error, isFetching} =
     useMyProfileQuery(null);
 
-  useEffect(() => {
-    if (isSuccess) {
-      console.log('get profile success', data, isSignIn);
-    }
-    if (isError) {
-      console.log('get profile error', error, isSignIn);
-    }
-  }, [error, data]);
+  // useEffect(() => {
+  //   if (isSuccess) {
+  //     console.log('get profile success', data, isSignIn);
+  //   }
+  //   if (isError) {
+  //     console.log('get profile error', error, isSignIn);
+  //   }
+  // }, [error, data]);
   return (
     <NavigationContainer>
       <Stack.Navigator

@@ -1,9 +1,7 @@
 import {ListRenderItem, ScrollView, StyleSheet, Text, View} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import constants from '../assets/constants';
 import {TouchableOpacity} from 'react-native';
-import SVG from '../assets/svg';
-import {SafeAreaView} from 'react-native-safe-area-context';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -30,7 +28,7 @@ interface RenderItemProps {
   component?: JSX.Element;
 }
 
-export default function AuthModal() {
+const AuthModal: React.FC = () => {
   const [emailFromSignUp, setEmailFromSignUp] = useState('');
   const ref = React.useRef<FlatList>(null);
   const flex = useSharedValue(ZERO);
@@ -58,20 +56,19 @@ export default function AuthModal() {
   const hideScreen = () => {
     transformValue(ZERO, 1.5);
   };
-  const ErrTxt = ({txt, touched}: {txt: any; touched: boolean}) => {
-    if (touched && txt) {
-      return (
-        <View
-          style={{
-            alignItems: 'flex-end',
-            width: '70%',
-            padding: '1%',
-          }}>
-          <Text style={[styles.errors]}>{txt}</Text>
-        </View>
-      );
-    } else null;
-  };
+  const ErrTxt = useMemo(
+    () =>
+      ({txt, touched}: {txt: any; touched: boolean}) => {
+        if (touched && txt) {
+          return (
+            <View style={styles.errTxtContainer}>
+              <Text style={[styles.errors]}>{txt}</Text>
+            </View>
+          );
+        } else null;
+      },
+    [],
+  );
   const screenData: RenderItemProps[] = [
     {
       //TODO: loading
@@ -128,10 +125,13 @@ export default function AuthModal() {
         horizontal
         inverted
         scrollEnabled={false}
-        pagingEnabled></FlatList>
+        pagingEnabled
+      />
     </Animated.View>
   );
-}
+};
+
+export default React.memo(AuthModal);
 
 const styles = StyleSheet.create({
   container: {
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     justifyContent: 'space-between',
     width: '70%',
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
   },
   button: {
     borderRadius: 20,
@@ -178,5 +178,10 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     fontSize: 12,
     fontWeight: '400',
+  },
+  errTxtContainer: {
+    alignItems: 'flex-start',
+    width: '70%',
+    padding: '1%',
   },
 });

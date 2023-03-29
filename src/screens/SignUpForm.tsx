@@ -1,4 +1,10 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React, {Dispatch, SetStateAction, useRef} from 'react';
 import TextInput, {InputHandle} from '../components/TextInput';
 import constants from '../assets/constants';
@@ -132,7 +138,11 @@ export default function SignUpForm({
               style={styles.button}
               disabled={!isValid}
               onPress={() => handleSubmit()}>
-              <Text style={[styles.text]}>Sign Up</Text>
+              {isLoading ? (
+                <ActivityIndicator color={constants.colors.GREY} />
+              ) : (
+                <Text style={[styles.text]}>Sign Up</Text>
+              )}
             </TouchableOpacity>
           </View>
         </>

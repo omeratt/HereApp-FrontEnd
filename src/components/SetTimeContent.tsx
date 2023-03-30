@@ -12,7 +12,7 @@ interface Props {
 
 const SetTimeContent: FC<Props> = ({onPress, title, buttonTxt, dateFormat}) => {
   return (
-    <View style={[styles.flexOneAndJustifyCenter]}>
+    <View style={styles.flexOneAndJustifyCenter}>
       <View style={styles.textAndToggleContainer}>
         <View style={styles.TxtAndToggleInSetTime}>
           <TouchableOpacity style={styles.btn}>
@@ -33,38 +33,18 @@ const SetTimeContent: FC<Props> = ({onPress, title, buttonTxt, dateFormat}) => {
 export default React.memo(SetTimeContent);
 
 const styles = StyleSheet.create({
-  textAndToggle: {
-    paddingHorizontal: '5.2%',
-    // flexDirection: 'row-reverse',
-    // justifyContent: 'space-between',
-    alignItems: 'center',
-    // height: '100%',
-  },
   textAndToggleContainer: {
-    // flex: 1,
     justifyContent: 'center',
-    // backgroundColor: 'yellow',
   },
   flexOneAndJustifyCenter: {
     flex: 1,
     justifyContent: 'center',
-    // alignItems: 'center',
-  },
-  sectionTxt: {
-    color: constants.colors.BLACK,
-    fontFamily: constants.Fonts.text,
-    fontSize: 18,
-    // marginBottom: '1%',
   },
   TxtAndToggleInSetTime: {
-    // padding: '5.2%',
-    // paddingRight: '5.2%',
     paddingLeft: '5.2%',
     flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'center',
-
-    // backgroundColor: 'yellow',
     height: '100%',
   },
   subSectionTxt: {

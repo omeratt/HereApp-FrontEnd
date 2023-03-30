@@ -177,6 +177,7 @@ const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
                   <Line
                     strength={1}
                     lengthPercentage={100}
+                    rotate180
                     lineColor={constants.colors.UNDER_LINE}
                   />
                 </View>

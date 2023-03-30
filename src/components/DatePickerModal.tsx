@@ -51,16 +51,16 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
   };
 
   // variables
-  const snapPoints = useMemo(() => ['27%', '27%'], []);
+  const snapPoints = useMemo(() => ['37%', '37%'], []);
 
   const ModalHeader = () => {
     return (
       <View style={styles.btnContainer}>
         <TouchableOpacity style={styles.btn} onPress={handleConfirm}>
-          <Text style={styles.textBtn}>confirm</Text>
+          <Text style={styles.textBtn}>x</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.btn} onPress={cancelConfirm}>
-          <Text style={styles.textBtn}>cancel</Text>
+          <Text style={styles.textBtn}>Done</Text>
         </TouchableOpacity>
       </View>
     );
@@ -83,6 +83,7 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
         }}
         handleComponent={ModalHeader}
         backgroundStyle={{backgroundColor: constants.colors.BGC}}
+        style={{paddingHorizontal: '4%'}}
         onChange={handleSheetChanges}>
         <View>
           <DatePicker
@@ -90,8 +91,8 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
             mode={dateFormat}
             onDateChange={handleChange}
             fadeToColor={constants.colors.BGC}
-            style={styles.datePicker}
-            textColor={constants.colors.GREEN}
+            style={[styles.datePicker]}
+            textColor={constants.colors.OFF_WHITE}
           />
         </View>
       </BottomSheetModal>
@@ -109,6 +110,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: '7.5%',
     alignItems: 'center',
+    marginBottom: '10%',
   },
   btn: {
     height: '100%',

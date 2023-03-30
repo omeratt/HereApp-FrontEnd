@@ -2,26 +2,18 @@ import {
   ActivityIndicator,
   FlatList,
   ListRenderItem,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import Animated, {
-  FadeInUp,
-  SlideInDown,
-  SlideInRight,
-  SlideOutRight,
-} from 'react-native-reanimated';
+import Animated, {SlideInDown, SlideOutRight} from 'react-native-reanimated';
 import constants from '../assets/constants';
 import CircleCheckBox from './CircleCheckBox';
 import {CheckBox} from '@rneui/themed';
-import Modal from 'react-native-modal';
 import {useDeleteTaskMutation} from '../app/api/taskApi';
-import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import {BottomSheetModal} from '@gorhom/bottom-sheet';
 interface RenderItemProps {
   _id?: string;
   name?: string;
@@ -34,7 +26,6 @@ interface props {
   isTaskLoading: boolean;
 }
 export default function DisplayTask({data, isTaskLoading}: props) {
-  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [
     DeleteTask,
     {isLoading, data: responseDelete, isSuccess, isError, error},
@@ -60,16 +51,11 @@ export default function DisplayTask({data, isTaskLoading}: props) {
   const snapPoints = useMemo(() => ['15%', '15%'], []);
 
   // callbacks
-  const handlePresentModalPress = useCallback((name: string, id: string) => {
-    bottomSheetModalRef.current?.present({name, id});
-  }, []);
   const closeDeleteModal = useCallback(() => {
     bottomSheetModalRef.current?.dismiss();
   }, []);
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log('handleSheetChanges', index);
-  }, []);
   const openDeleteModal = (props: {name: string; id: string}) => {
+    if (timer) clearTimeout(timer);
     setDeleteProps(props);
     //todo without timer - with send props on present()
     timer = setTimeout(() => {
@@ -86,7 +72,7 @@ export default function DisplayTask({data, isTaskLoading}: props) {
         // detached
 
         backgroundStyle={{backgroundColor: constants.colors.GREEN}}
-        // stackBehavior="replace"
+        stackBehavior="replace"
         // onChange={handleSheetChanges}
       >
         <View
@@ -107,8 +93,7 @@ export default function DisplayTask({data, isTaskLoading}: props) {
               width: '70%',
               alignItems: 'center',
               justifyContent: 'space-around',
-
-              flexDirection: 'row',
+              flexDirection: 'row-reverse',
             }}>
             <TouchableOpacity
               style={{
@@ -130,7 +115,7 @@ export default function DisplayTask({data, isTaskLoading}: props) {
     );
   };
   const emptyList = () => {
-    console.log(data);
+    console.log(data, 'emptyList DisplayTask.tsx');
     if (data === undefined)
       return <ActivityIndicator size={30} color={constants.colors.GREEN} />;
     else return null;
@@ -187,24 +172,9 @@ export default function DisplayTask({data, isTaskLoading}: props) {
 
   return (
     <View
-      //   style={styles.taskListContainer}
-
       style={{
-        // height: '100%',
-        // width: '100%',
-
-        // justifyContent: 'center',
-        // flexDirection: 'row',
-        // marginTop: '2.5%',
         paddingTop: '6.5%',
-        // paddingBottom: '2%',
-        // height: `60%`,
-        // flexDirection: 'row',
-        // padding: '10%',
         justifyContent: 'center',
-        // backgroundColor: 'blue',
-        // alignItems: 'center',
-        // alignItems: 'center',
       }}>
       {isTaskLoading ? (
         <ActivityIndicator size={30} color={constants.colors.GREEN} />
@@ -215,7 +185,6 @@ export default function DisplayTask({data, isTaskLoading}: props) {
             ListEmptyComponent={emptyList}
             renderItem={renderItem}
             keyExtractor={item => item._id as string}
-            // viewabilityConfig={}
           />
           <DeleteModal
             _id={deleteProps.id as string}
@@ -230,14 +199,9 @@ export default function DisplayTask({data, isTaskLoading}: props) {
 const styles = StyleSheet.create({
   taskListContainer: {
     marginTop: '3.5%',
-    // height: `60%`,
-    flexDirection: 'row',
-    // padding: '10%',
+    flexDirection: 'row-reverse',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    // backgroundColor: 'blue',
-    // alignContent: 'center',
-    // backgroundColor: 'red',
   },
   taskTxt: {
     fontSize: 15,
@@ -246,26 +210,9 @@ const styles = StyleSheet.create({
     fontFamily: constants.Fonts.text,
   },
   checkBox: {
-    // backgroundColor: constants.colors.BGC,
-    // marginRight: 5,
-    // borderRadius: 100,
     backgroundColor: 'transparent',
     margin: 0,
     padding: 0,
-    // alignItems: 'center',
-    // borderColor: constants.colors.BGC,
-  },
-  Shadow: {
-    borderRadius: 12.5,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.27,
-    shadowRadius: 4.65,
-
-    elevation: 2,
   },
   taskListContent: {
     height: 65,
@@ -273,8 +220,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: constants.colors.UNDER_LINE,
     width: '80%',
-    // marginRight: '3%',
-    // position: 'relative',
     padding: '3%',
     elevation: 5,
     backgroundColor: constants.colors.OFF_WHITE,
@@ -287,19 +232,8 @@ const styles = StyleSheet.create({
   },
   taskContentBody: {
     fontFamily: constants.Fonts.text,
-    // fontWeight: '700',
     fontSize: 12.5,
     color: constants.colors.UNDER_LINE,
-  },
-  taskListHighlight: {
-    position: 'absolute',
-    right: 0,
-    backgroundColor: constants.colors.GREEN,
-    height: '45%',
-    width: '8.5%',
-    borderWidth: 1,
-    borderColor: constants.colors.UNDER_LINE,
-    borderRadius: 800,
   },
   deleteTxt: {
     color: constants.colors.BGC,

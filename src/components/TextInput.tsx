@@ -62,7 +62,7 @@ const TextInput = forwardRef<InputHandle, TextInputProps>((props, ref) => {
     </View>
   );
 });
-export default TextInput;
+export default React.memo(TextInput);
 const styles = StyleSheet.create({
   container: {
     // width: '100%',
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
   eyeIcon: {
     position: 'absolute',
     color: constants.colors.BGC,
-    right: 0.7 * constants.WIDTH - 20,
+    left: 0.7 * constants.WIDTH - 20,
   },
   placeHolder: {
     fontWeight: '300',

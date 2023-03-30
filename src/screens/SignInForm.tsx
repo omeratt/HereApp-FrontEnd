@@ -1,4 +1,10 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React, {useEffect} from 'react';
 import TextInput, {InputHandle} from '../components/TextInput';
 import constants from '../assets/constants';
@@ -108,7 +114,8 @@ export default function SignInForm({
             onBlur={() => setFieldTouched('password')}
           />
           <ErrTxt txt={errors.password} touched={touched.password} />
-          <View style={{marginTop: '7%', width: '70%', alignItems: 'flex-end'}}>
+          <View
+            style={{marginTop: '7%', width: '70%', alignItems: 'flex-start'}}>
             <Text style={[styles.forgotPassword]}>Forgot Password ?</Text>
           </View>
 
@@ -122,7 +129,11 @@ export default function SignInForm({
               style={styles.button}
               disabled={!isValid}
               onPress={() => handleSubmit()}>
-              <Text style={[styles.text]}>Sign In</Text>
+              {isLoading ? (
+                <ActivityIndicator color={constants.colors.GREY} />
+              ) : (
+                <Text style={[styles.text]}>Sign In</Text>
+              )}
             </TouchableOpacity>
           </View>
         </>

@@ -1,75 +1,55 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  I18nManager,
+  LayoutChangeEvent,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+} from 'react-native';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import constants from '../assets/constants';
 import SVG from '../assets/svg';
 import NewTask from '../components/NewTask';
-import Animated, {
-  FadeIn,
-  FadeInUp,
-  FadeOutUp,
-  FadingTransition,
-  FlipInYRight,
-  ZoomInEasyDown,
-} from 'react-native-reanimated';
-import {
-  tasksApi,
-  useGetTasksByDateQuery,
-  useGetTasksQuery,
-} from '../app/api/taskApi';
+import Animated, {FadeIn, FadeOutUp} from 'react-native-reanimated';
+import {tasksApi, useGetTasksByDateQuery} from '../app/api/taskApi';
 import DisplayTask from '../components/DisplayTask';
 import {useAppDispatch} from '../app/hooks';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {DrawerActions, useNavigation} from '@react-navigation/native';
-// import {TouchableOpacity} from 'react-native-gesture-handler';
+import {DateObject, getDatesForYear} from '../components/WeeklyCalender';
+import Line from '../components/Line';
+import {FlashList} from '@shopify/flash-list';
+import DatesFlatList from '../components/DatesFlatList';
 
-const dates = [
-  {
-    dayName: 'Mon',
-    dayNum: '20',
-    key: 'asd123',
-  },
-  {
-    dayName: 'Tue',
-    key: '123312asd',
-    dayNum: '21',
-  },
-  {
-    dayName: 'Wed',
-    key: 'asd1gsd',
-    dayNum: '22',
-  },
-  {
-    dayName: 'Thu',
-    key: 'adgasd3',
-    dayNum: '23',
-  },
-  {
-    dayName: 'Fri',
-    key: 'hderh341',
-    dayNum: '24',
-  },
-  {
-    dayName: 'Sat',
-    key: 'as32tasgz',
-    dayNum: '25',
-  },
-  {
-    key: 'asf32tgzg',
-    dayName: 'Sun',
-    dayNum: '26',
-  },
-];
-
+const CURRENT_DATE = new Date();
+const allDates = getDatesForYear(CURRENT_DATE);
+const flatListData = Object.values(allDates);
+const initialNumToRender = flatListData.length;
+export const DATE_WIDTH = constants.WIDTH * 0.9;
 const Home = () => {
-  const [isModalVisible, setModalVisible] = useState(false);
   const [tasks, setTasks] = useState<any[]>([]);
-  const [dates, setDates] = useState<Date[]>([]);
-  const [selectedDate, setSelectedDate] = useState<string>('');
-  const [offset, setOffset] = useState(0);
+  const [selectedFinalDate, setSelectedFinalDate] =
+    useState<Date>(CURRENT_DATE);
   const [isTaskLoading, setIsTaskLoading] = useState<boolean>(false);
-  const [isNext, setIsNext] = useState<boolean>(false);
+  const flashListRef = useRef<FlashList<DateObject> | null>(null);
+  const [selectedScrollDate, setSelectedScrollDate] =
+    useState<Date>(CURRENT_DATE);
+  const [selectedDate, setSelectedDate] = useState<Date>(CURRENT_DATE);
+
+  const [dateHeader, setDateHeader] = useState<DateObject>();
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
+  const SetDateHeader = useCallback((header: any) => {
+    setDateHeader(header);
+  }, []);
+  const SetSelectedFinalDate = useCallback((date: any) => {
+    setSelectedFinalDate(date);
+  }, []);
+  const SetSelectedDate = useCallback((date: any) => {
+    setSelectedDate(date);
+  }, []);
   const {
     isLoading: taskLoading,
     data: tasks1,
@@ -77,52 +57,65 @@ const Home = () => {
     isError: taskIsError,
     error: tasksError,
     isFetching: taskFetch,
-  } = useGetTasksByDateQuery(selectedDate);
-  const datePress = (date: Date) => {
-    setIsTaskLoading(true);
-    setSelectedDate(date.toLocaleDateString().split('.').join('/'));
+  } = useGetTasksByDateQuery(formatDate(CURRENT_DATE));
+  const FetchTasks = useCallback((date: Date) => {
     const result = dispatch(
-      tasksApi.endpoints.getTasksByDate.initiate(
-        date.toLocaleDateString().split('.').join('/'),
-      ),
+      tasksApi.endpoints.getTasksByDate.initiate(formatDate(date)),
     )
       .then(res => {
         setTasks(res.data);
-        console.log(tasks.length);
+        // console.log(tasks.length);
       })
       .catch(err => {
         console.log('error getting tasks', err);
       })
       .finally(() => setIsTaskLoading(false));
-  };
+  }, []);
+  const datePress = useCallback(
+    (dateItem: DateObject) => {
+      const date = dateItem.fullDate;
+      findDateAndScroll(date);
+      setIsTaskLoading(true);
+      SetSelectedFinalDate(date);
+      SetSelectedDate(date);
+      // runOnJS(FetchTasks)(date);
+      SetDateHeader(dateItem);
+      FetchTasks(date);
+    },
+    [selectedFinalDate],
+  );
+
+  function formatDate(date: Date): string {
+    const formattedDate = new Intl.DateTimeFormat('heb-IL', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }).format(date);
+
+    const fixedDate = formattedDate.split('.').join('/');
+    return fixedDate;
+  }
+
+  // TODO: find a way to handle scroll to index
+  const getIndexByKey = useCallback(
+    (obj: Record<string, any>, key: string): number => {
+      const keys = Object.keys(obj);
+      return keys.indexOf(key);
+    },
+    [],
+  );
+  const findDateAndScroll = useCallback((DateToCheck: Date) => {
+    const key = DateToCheck.toLocaleDateString();
+    const index = getIndexByKey(allDates, key);
+    scrollToIndex(index);
+  }, []);
+
   useEffect(() => {
-    // Generate the dates for the current week
-    const currentDate = new Date();
-    const currentDayOfWeek = currentDate.getDay();
-    const weekDates = [];
-    for (let i = 0; i < 7; i++) {
-      weekDates.push(
-        new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate() - currentDayOfWeek + i + offset,
-        ),
-      );
-    }
-    setDates(weekDates.reverse());
-    // Set the initial selected date to today
-    setSelectedDate(currentDate.toLocaleDateString().split('.').join('/'));
-  }, [offset]);
-
-  const handleBackPress = () => {
-    setIsNext(false);
-    setOffset(offset - 7);
-  };
-
-  const handleNextPress = () => {
-    setIsNext(true);
-    setOffset(offset + 7);
-  };
+    // if (!selectedDate.current) findDateAndScroll(CURRENT_DATE);
+    // else
+    // console.log('first render', selectedDate);
+    findDateAndScroll(selectedDate);
+  }, []);
 
   useEffect(() => {
     if (taskFetch) {
@@ -131,11 +124,11 @@ const Home = () => {
       setIsTaskLoading(false);
     }
     if (tasks1) {
-      console.log('getting tasks', tasks);
+      // console.log('getting tasks', tasks);
       setTasks(tasks1);
     }
     if (tasksError) {
-      console.log('error getting tasks', tasksError);
+      // console.log('error getting tasks', tasksError);
     }
   }, [tasks1, tasksError]);
 
@@ -145,7 +138,7 @@ const Home = () => {
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
   // variables
-  const snapPoints = useMemo(() => ['25%', '100%'], []);
+  const snapPoints = useMemo(() => ['100%'], []);
 
   // callbacks
   const handlePresentModalPress = useCallback(() => {
@@ -155,6 +148,38 @@ const Home = () => {
     console.log('handleSheetChanges', index);
   }, []);
 
+  const tempGetMonthFromStringDate = useMemo(() => {
+    // consnole.log({selec})
+    if (!dateHeader) return 'Today';
+    const monthName = dateHeader?.fullDate.toLocaleString('eng', {
+      month: 'long',
+    });
+
+    const isToday =
+      dateHeader?.fullDate.toDateString() === CURRENT_DATE.toDateString();
+    const formattedDate = `${isToday ? 'Today' : dateHeader.dayName},${
+      dateHeader.day
+    } ${monthName}`;
+    return formattedDate;
+  }, [dateHeader, CURRENT_DATE]);
+
+  //  -------------------------------------------------------- flat list callbacks --------------------------------------------------------
+  const snapToOffsets = useMemo(() => {
+    return Array.from({length: initialNumToRender}, (_, index) => {
+      return (DATE_WIDTH / 7) * index;
+    });
+  }, []);
+  const scrollToIndex = useCallback(
+    (index: number) => {
+      if (!snapToOffsets) return null;
+      flashListRef.current?.scrollToOffset({
+        offset: snapToOffsets[index],
+        animated: true,
+      });
+    },
+    [snapToOffsets],
+  );
+  //  -------------------------------------------------------- flat list callbacks --------------------------------------------------------
   return (
     <Animated.View
       entering={FadeIn}
@@ -164,78 +189,63 @@ const Home = () => {
         <View style={styles.task}>
           <View style={styles.today}>
             <TouchableOpacity
-              // onPress={() => setModalVisible(!isModalVisible)}
               onPress={handlePresentModalPress}
               style={[
-                // styles.plusIcon,
                 {
-                  // backgroundColor: 'green',
-                  // width: 25,
-                  // height: 25,
                   zIndex: 1,
-                  // position: 'absolute',
                 },
               ]}>
               <SVG.plusIconOutlined
-                // onPress={() => setModalVisible(!isModalVisible)}
-                // onPress={() => setModalVisible(!isModalVisible)}
-                // onPressIn={() => setModalVisible(!isModalVisible)}
                 style={[styles.plusIcon]}
-                // height={50}
-                // width={50}
                 fill={constants.colors.BGC}
               />
             </TouchableOpacity>
-            <Text style={styles.taskTitle}>Today</Text>
+            <Text style={styles.taskTitle}>{tempGetMonthFromStringDate}</Text>
           </View>
-          <Animated.View style={styles.date}>
-            {dates.map(date => {
-              const dateString = date.toDateString();
-              return (
-                <View key={dateString} style={styles.dateContent}>
-                  <TouchableOpacity
-                    style={{width: '100%'}}
-                    onPress={() => {
-                      datePress(date);
-                    }}>
-                    {/*TODO: horizontal flatlist*/}
-                    <Text style={[styles.dateText, {marginBottom: '25%'}]}>
-                      {dateString.substring(0, 3)}
-                    </Text>
-                    <View
-                      style={[
-                        styles.datePicker,
-                        {
-                          backgroundColor:
-                            selectedDate ===
-                            date.toLocaleDateString().split('.').join('/')
-                              ? constants.colors.GREEN
-                              : 'transparent',
-                          elevation:
-                            selectedDate ===
-                            date.toLocaleDateString().split('.').join('/')
-                              ? 5
-                              : 0,
-                        },
-                      ]}>
-                      <Text style={styles.dateText}>
-                        {dateString.substring(8, 10)}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-              );
-            })}
-          </Animated.View>
+          <View>
+            <Line
+              strength={1}
+              lengthPercentage={100}
+              lineColor={constants.colors.UNDER_LINE}
+              rotate180
+              style={{elevation: 2.5}}
+            />
+          </View>
+          <View style={styles.triangle} />
+          <View
+            style={[
+              styles.date,
+              {
+                // overflow: 'visible',
+                // backfaceVisibility: 'visible',
+                // backgroundColor: 'red',
+                // flex: 1,
+              },
+            ]}>
+            <DatesFlatList
+              flashListRef={flashListRef}
+              datePress={datePress}
+              // FetchTasks={FetchTasks}
+              selectedFinalDate={selectedFinalDate}
+              // setSelectedFinalDate={SetSelectedFinalDate}
+              selectedScrollDate={selectedScrollDate}
+              flatListData={flatListData}
+              // dateHeader={dateHeader}
+            />
+          </View>
+          <View>
+            <Line
+              strength={1}
+              lengthPercentage={100}
+              lineColor={constants.colors.UNDER_LINE}
+              rotate180
+              style={{elevation: 2.5}}
+            />
+          </View>
           <View style={styles.taskListColumnContainer}>
-            <DisplayTask data={tasks} isTaskLoading={isTaskLoading} />
-            {/* <View style={styles.taskListContainer}>
-              <View style={styles.taskListContent}>
-                <Text style={styles.taskContentTitle}>Home work</Text>
-                <Text style={styles.taskContentBody}>Finish with...</Text>
-              </View>
-              <View style={styles.taskListHighlight}></View>
-            </View> */}
+            {tasks.length > 0 && (
+              <DisplayTask data={tasks} isTaskLoading={isTaskLoading} />
+            )}
           </View>
         </View>
         <View style={styles.myListContainer}>
@@ -305,20 +315,19 @@ const Home = () => {
       <BottomSheetModalProvider>
         <BottomSheetModal
           ref={bottomSheetModalRef}
-          index={1}
+          index={0}
           snapPoints={snapPoints}
-          // android_keyboardInputMode="adjustResize"
-          // keyboardBehavior="fillParent"
-          // keyboardBlurBehavior="restore"
-          // contentHeight={constants.HEIGHT}
           keyboardBlurBehavior="restore"
           handleIndicatorStyle={{backgroundColor: constants.colors.UNDER_LINE}}
           handleStyle={{
             backgroundColor: constants.colors.OFF_WHITE,
           }}
-          // enableDismissOnClose
           onChange={handleSheetChanges}>
-          <NewTask closeModal={bottomSheetModalRef.current?.dismiss} />
+          <NewTask
+            closeModal={bottomSheetModalRef.current?.dismiss}
+            targetDate={selectedDate}
+            setTargetDate={SetSelectedDate}
+          />
         </BottomSheetModal>
       </BottomSheetModalProvider>
     </Animated.View>
@@ -332,7 +341,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     flex: 1,
     backgroundColor: constants.colors.OFF_WHITE,
-    padding: '2.2%',
+    padding: constants.WIDTH * 0.025,
     justifyContent: 'space-evenly',
     alignItems: 'center',
   },
@@ -375,12 +384,13 @@ const styles = StyleSheet.create({
     height: '75.5%',
     borderColor: constants.colors.UNDER_LINE,
     borderBottomWidth: 1,
-    padding: '5%',
+    // padding: '5%',
     position: 'relative',
   },
   today: {
     // backgroundColor: 'blue',
     // marginBottom: 5,
+    padding: '5%',
     height: '20%',
   },
   taskTitle: {
@@ -392,7 +402,7 @@ const styles = StyleSheet.create({
   plusIcon: {
     position: 'absolute',
     color: constants.colors.BLACK,
-    left: 0,
+    right: 0,
     top: 0,
     borderRadius: 9999,
     backgroundColor: constants.colors.OFF_WHITE,
@@ -401,96 +411,27 @@ const styles = StyleSheet.create({
   myListPlusIcon: {
     position: 'absolute',
     color: constants.colors.BLACK,
-    left: '6.5%',
+    right: '6.5%',
     borderRadius: 9999,
 
     backgroundColor: constants.colors.OFF_WHITE,
     elevation: 5,
   },
   date: {
-    flexDirection: 'row',
     height: '23.5%',
-    // width: constants.WIDTH,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-
-    // backgroundColor: constants.colors.BLACK,
-  },
-  dateContent: {
-    width: '11.2%',
-    // height: '70%',
-    alignItems: 'center',
-    flexDirection: 'column',
-    margin: 5,
-    alignContent: 'center',
-    borderRadius: 9999,
-    // backgroundColor: constants.colors.OFF_WHITE,
-    // elevation: 2,
-  },
-  dateText: {
-    fontFamily: constants.Fonts.text,
-    color: constants.colors.BLACK,
-    fontSize: constants.WIDTH / 29,
-    textAlign: 'center',
-  },
-  datePicker: {
-    height: '55%',
-    width: '100%',
-
-    borderRadius: 800,
-    alignItems: 'center',
+    // width: '100%',
+    paddingHorizontal: constants.WIDTH * 0.025,
+    // paddingLeft: constants.WIDTH * 0.025,
+    // paddingRight: constants.WIDTH * 0.025,
+    // width: constants.WIDTH * 0.95,
     justifyContent: 'center',
+    alignSelf: 'center',
+    paddingTop: '2.5%',
+    // alignItems: 'center',
   },
   taskListColumnContainer: {
     height: `${100 - 23.5 - 15}%`,
-    // backgroundColor: 'green',
-    // justifyContent: 'flex-end',
-    // paddingBottom: '6%',
-    // paddingTop: '6%',
-  },
-  taskListContainer: {
-    // marginTop: '2.5%',
-    height: `42%`,
-    flexDirection: 'row',
-    // padding: '10%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    // backgroundColor: 'blue',
-    // alignContent: 'center',
-    // backgroundColor: 'red',
-  },
-  taskListContent: {
-    height: '100%',
-    borderRadius: 17,
-    borderWidth: 1,
-    borderColor: constants.colors.UNDER_LINE,
-    width: '80%',
-    marginRight: '3%',
-    position: 'relative',
-    padding: '3%',
-  },
-  taskContentTitle: {
-    fontFamily: constants.Fonts.text,
-    fontWeight: 'bold',
-    fontSize: 14,
-    color: constants.colors.BLACK,
-  },
-  taskContentBody: {
-    fontFamily: constants.Fonts.text,
-    // fontWeight: '700',
-    fontSize: 12.5,
-    color: constants.colors.UNDER_LINE,
-  },
-  taskListHighlight: {
-    position: 'absolute',
-    right: 0,
-    backgroundColor: constants.colors.GREEN,
-    height: '45%',
-    width: '8.5%',
-    borderWidth: 1,
-    borderColor: constants.colors.UNDER_LINE,
-    borderRadius: 800,
+    padding: '5%',
   },
   myListContainer: {
     height: '24.5%',
@@ -542,5 +483,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
 
     // backgroundColor: 'blue',
+  },
+  triangle: {
+    width: 0,
+    height: 0,
+    backgroundColor: 'transparent',
+    borderStyle: 'solid',
+    borderLeftWidth: 6,
+    borderRightWidth: 6,
+    borderTopWidth: 8.7,
+    // borderBottomWidth: 0,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderBottomColor: 'black',
+    // transform: [{rotate: '180deg'}],
+    alignSelf: 'center',
   },
 });

@@ -29,6 +29,10 @@ export default function MainStack() {
   //     console.log('get profile error', error, isSignIn);
   //   }
   // }, [error, data]);
+  const drawerScreenOptions = {
+    gestureEnabled: true,
+    swipeEnabled: false,
+  };
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -69,6 +73,7 @@ export default function MainStack() {
               name="HomePage"
               component={Home}
               options={{
+                swipeEnabled: false,
                 headerShown: false,
                 drawerIcon: ({color, focused}) => (
                   <Ionicons

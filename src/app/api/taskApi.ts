@@ -10,7 +10,7 @@ export const tasksApi = userApi.injectEndpoints({
       },
     }),
     getTasksByDate: builder.query({
-      query: (date: string) => {
+      query: (date: Date) => {
         return {
           url: 'tasks/date',
           method: 'POST',

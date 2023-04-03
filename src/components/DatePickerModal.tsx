@@ -3,25 +3,25 @@ import React, {useCallback, useMemo, useRef} from 'react';
 import DatePicker from 'react-native-date-picker';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import constants from '../assets/constants';
-import {formatDate} from './WeeklyCalender';
 
 interface DatePickerProps {
   date: Date;
-  setDate: React.Dispatch<React.SetStateAction<string>>;
+  setDate: React.Dispatch<React.SetStateAction<Date>>;
   dateFormat?: 'time' | 'date' | 'datetime';
   isOpen: boolean;
 }
+
+const currDate = new Date();
 const DatePickerModal: React.FC<DatePickerProps> = ({
   isOpen,
   dateFormat,
   setDate,
   date,
 }) => {
-  const [currentDate, setCurrentDate] = React.useState<Date>(new Date());
+  const [currentDate, setCurrentDate] = React.useState<Date>(currDate);
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const handleConfirm = () => {
-    const formattedDate = formatDate(currentDate);
-    setDate(formattedDate);
+    setDate(currentDate);
     close();
   };
   const handleChange = (date: Date) => {
@@ -35,7 +35,7 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
     setCurrentDate(fixedDate);
   };
   const cancelConfirm = () => {
-    setCurrentDate(new Date());
+    setCurrentDate(currentDate);
     close();
   };
 
@@ -56,10 +56,10 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
   const ModalHeader = () => {
     return (
       <View style={styles.btnContainer}>
-        <TouchableOpacity style={styles.btn} onPress={handleConfirm}>
+        <TouchableOpacity style={styles.btn} onPress={cancelConfirm}>
           <Text style={styles.textBtn}>x</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.btn} onPress={cancelConfirm}>
+        <TouchableOpacity style={styles.btn} onPress={handleConfirm}>
           <Text style={styles.textBtn}>Done</Text>
         </TouchableOpacity>
       </View>
@@ -74,7 +74,7 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
       <BottomSheetModal
         ref={bottomSheetModalRef}
         index={1}
-        onDismiss={cancelConfirm}
+        // onDismiss={cancelConfirm}
         snapPoints={snapPoints}
         stackBehavior="push"
         handleIndicatorStyle={{display: 'none'}}
@@ -88,7 +88,8 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
         <View>
           <DatePicker
             date={date}
-            mode={dateFormat}
+            mode={'date'}
+            // mode={dateFormat}
             onDateChange={handleChange}
             fadeToColor={constants.colors.BGC}
             style={[styles.datePicker]}

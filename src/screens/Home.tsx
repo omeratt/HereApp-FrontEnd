@@ -22,6 +22,7 @@ import {DateObject, getDatesForYear} from '../components/WeeklyCalender';
 import Line from '../components/Line';
 import {FlashList} from '@shopify/flash-list';
 import DatesFlatList from '../components/DatesFlatList';
+import moment from 'moment';
 
 const CURRENT_DATE = new Date();
 const allDates = getDatesForYear(CURRENT_DATE);
@@ -47,9 +48,18 @@ const Home = () => {
   const SetSelectedFinalDate = useCallback((date: any) => {
     setSelectedFinalDate(date);
   }, []);
-  const SetSelectedDate = useCallback((date: any) => {
+  const SetSelectedDate = useCallback((date: Date) => {
     setSelectedDate(date);
   }, []);
+
+  // const dada = moment().set({
+  //   hour: 0,
+  //   minute: 0,
+  //   second: 0,
+  // });
+
+  // console.log('asd', dada.format('HH:mm'));
+
   const {
     isLoading: taskLoading,
     data: tasks1,
@@ -57,14 +67,15 @@ const Home = () => {
     isError: taskIsError,
     error: tasksError,
     isFetching: taskFetch,
-  } = useGetTasksByDateQuery(formatDate(CURRENT_DATE));
+  } = useGetTasksByDateQuery(CURRENT_DATE);
   const FetchTasks = useCallback((date: Date) => {
     const result = dispatch(
-      tasksApi.endpoints.getTasksByDate.initiate(formatDate(date)),
+      tasksApi.endpoints.getTasksByDate.initiate(date),
+      // tasksApi.endpoints.getTasksByDate.initiate(formatDate(date)),
     )
       .then(res => {
         setTasks(res.data);
-        // console.log(tasks.length);
+        console.log(tasks?.length, {res: res.data});
       })
       .catch(err => {
         console.log('error getting tasks', err);
@@ -243,7 +254,7 @@ const Home = () => {
             />
           </View>
           <View style={styles.taskListColumnContainer}>
-            {tasks.length > 0 && (
+            {tasks?.length > 0 && (
               <DisplayTask data={tasks} isTaskLoading={isTaskLoading} />
             )}
           </View>

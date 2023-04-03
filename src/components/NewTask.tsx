@@ -20,7 +20,7 @@ import SetTimeContent from './SetTimeContent';
 interface props {
   closeModal: any;
   targetDate: Date;
-  setTargetDate: React.Dispatch<React.SetStateAction<string>>;
+  setTargetDate: React.Dispatch<React.SetStateAction<Date>>;
 }
 type DateFormat = 'datetime' | 'date' | 'time';
 const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
@@ -43,6 +43,9 @@ const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
         name: taskName,
         details: description,
         targetDate,
+        frequency: 'Every week',
+        //issettime
+        //enddate
       }).unwrap();
       console.log(data);
       setDescription('');

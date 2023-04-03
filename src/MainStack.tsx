@@ -12,6 +12,7 @@ import constants from './assets/constants';
 import CustomDrawer from './Navigation/CustomDrawer';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import OnBoarding from './screens/OnBoarding';
 const ICON_SIZE = 20;
 // const Stack = createNativeStackNavigator();
 const Stack = createDrawerNavigator();
@@ -68,6 +69,11 @@ export default function MainStack() {
                   />
                 ),
               }}
+            /> */}
+            {/* <Stack.Screen
+              name="OnBoarding"
+              component={OnBoarding}
+              options={{headerShown: false}}
             /> */}
             <Stack.Screen
               name="HomePage"

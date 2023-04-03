@@ -28,5 +28,21 @@ const constants = {
   },
   HEIGHT,
   WIDTH,
+  OnBoardingList: [
+    {txt: 'Reading Comprehension'},
+    {txt: 'Frustration'},
+    {txt: 'Distractions'},
+    {txt: 'Lack of focus'},
+    {txt: 'Self-expression'},
+    {txt: 'Priorities'},
+    {txt: 'Confusion'},
+    {txt: 'Time management'},
+    {txt: 'Feeling lonely'},
+    {txt: 'Unorganized'},
+    {txt: 'Anxiety'},
+    {txt: 'Feeling abnormal'},
+    {txt: 'Postponement of tasks'},
+    {txt: 'confusion'},
+  ],
 };
 export default constants;

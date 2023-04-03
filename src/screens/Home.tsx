@@ -27,7 +27,7 @@ const CURRENT_DATE = new Date();
 const allDates = getDatesForYear(CURRENT_DATE);
 const flatListData = Object.values(allDates);
 const initialNumToRender = flatListData.length;
-export const DATE_WIDTH = constants.WIDTH * 0.9;
+export const DATE_WIDTH = constants.WIDTH * 0.89444444444444444444444444444444;
 const Home = () => {
   const [tasks, setTasks] = useState<any[]>([]);
   const [selectedFinalDate, setSelectedFinalDate] =

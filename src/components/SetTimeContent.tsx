@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     borderColor: constants.colors.GREY,
     borderWidth: 0.5,
     borderRadius: 15,
-    width: constants.WIDTH * 0.29,
+    width: constants.WIDTH * 0.3,
     alignItems: 'center',
     justifyContent: 'center',
     textAlign: 'center',

@@ -116,6 +116,25 @@ const NewTask: React.FC<props> = ({
       </View>
     );
   }, [pushOnPress, pushOn]);
+  const formattedDate = (date: Date) => {
+    const format = date.toLocaleDateString('en-US', {
+      month: 'long',
+      year: 'numeric',
+    });
+    const day = date.toLocaleDateString('en-US', {
+      day: '2-digit',
+    });
+    const arr = format.split(' ');
+    const fixedString = `${day} ${arr[0]} ${arr[1]}`;
+    return fixedString;
+  };
+
+  const formattedHour = () => {
+    const time = targetDate.toLocaleTimeString();
+    const [hours, minutes] = time.split(':');
+    return `${hours}:${minutes}`;
+  };
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
@@ -214,18 +233,18 @@ const NewTask: React.FC<props> = ({
                   />
                   <SetTimeContent
                     title={'Time of day'}
-                    buttonTxt={'20:40'}
+                    buttonTxt={formattedHour()}
                     onPress={openCloseDatePicker}
                     dateFormat={'time'}
                   />
                   <SetTimeContent
                     title={'Start date'}
-                    buttonTxt={'17 april 2023'}
+                    buttonTxt={formattedDate(targetDate)}
                     onPress={openCloseDatePicker}
                   />
                   <SetTimeContent
                     title={'End Date'}
-                    buttonTxt={'17 april 2023'}
+                    buttonTxt={formattedDate(endDate || targetDate)}
                     onPress={openCloseDatePicker}
                   />
                   {PushForMe}

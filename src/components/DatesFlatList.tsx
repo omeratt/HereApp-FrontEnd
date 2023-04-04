@@ -64,24 +64,24 @@ const DatesFlatList: React.FC<Props> = ({
     [],
   );
 
-  const shouldVibrate = useSharedValue(false);
+  // const shouldVibrate = useSharedValue(false);
   const last = useSharedValue(0);
 
-  const handleVibration = (i: number) => {
-    Vibration.vibrate(1);
-    shouldVibrate.value = false;
-  };
+  // const handleVibration = (i: number) => {
+  //   Vibration.vibrate(1);
+  //   shouldVibrate.value = false;
+  // };
   const animatedScrollHandler = useAnimatedScrollHandler({
     onScroll: ({contentOffset: {x: value}}) => {
       'worklet';
       last.value = scrollX.value;
       scrollX.value = value;
-      const width = DATE_WIDTH / 7;
-      const curI = Math.round(scrollX.value / width);
-      const lastI = Math.round(last.value / width);
-      if (curI !== lastI) {
-        runOnJS(handleVibration)(curI);
-      }
+      // const width = DATE_WIDTH / 7;
+      // const curI = Math.round(scrollX.value / width);
+      // const lastI = Math.round(last.value / width);
+      // if (curI !== lastI) {
+      //   runOnJS(handleVibration)(curI);
+      // }
     },
   });
 

@@ -16,6 +16,7 @@ import {useAddTaskMutation} from '../app/api/taskApi';
 import DatePickerModal from './DatePickerModal';
 import Notes from './Notes';
 import SetTimeContent from './SetTimeContent';
+import FrequencyPickerModal from './FrequencyPickerModal';
 
 interface props {
   closeModal: any;
@@ -23,9 +24,13 @@ interface props {
   setTargetDate: React.Dispatch<React.SetStateAction<Date>>;
 }
 type DateFormat = 'datetime' | 'date' | 'time';
+const FreqData = [...constants.FreqList];
+const currFreq = FreqData[0];
 const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
   const [pushOn, setPushOn] = useState(false);
   const [datePickerOpen, setDatePickerOpen] = useState<boolean>(false);
+  const [freqPickerOpen, setFreqPickerOpen] = useState<boolean>(false);
+  const [freq, setFreq] = useState<string>(currFreq);
   const dateTypeRef = useRef<DateFormat>('datetime');
   const [taskName, setTaskName] = useState<string>();
   const [description, setDescription] = useState<string>();
@@ -35,6 +40,12 @@ const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
 
   const taskNameInputRef = React.useRef<TextInput>(null);
   const taskDescriptionInputRef = React.useRef<TextInput>(null);
+  const SetFreqPickerOpen = useCallback((state: boolean) => {
+    setFreqPickerOpen(state);
+  }, []);
+  const SetFreq = useCallback((freq: string) => {
+    setFreq(freq);
+  }, []);
   const submit = async () => {
     try {
       if (!description || !taskName) return;
@@ -68,6 +79,12 @@ const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
       dateTypeRef.current = dateType;
     },
     [setDatePickerOpen, dateTypeRef],
+  );
+  const openCloseFreqPicker = useCallback(
+    (dateType: DateFormat = 'datetime') => {
+      setFreqPickerOpen(prev => !prev);
+    },
+    [],
   );
   console.log({c: dateTypeRef.current});
   const pushOnPress = useCallback(() => {
@@ -193,8 +210,8 @@ const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
                 <View style={[styles.setTimeSubContainer]}>
                   <SetTimeContent
                     title={'Frequency'}
-                    buttonTxt={'Every day'}
-                    onPress={openCloseDatePicker}
+                    buttonTxt={freq}
+                    onPress={openCloseFreqPicker}
                   />
                   <SetTimeContent
                     title={'TimeOfDay'}
@@ -228,6 +245,13 @@ const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
           date={targetDate}
           dateFormat={dateTypeRef.current}
           setDate={setTargetDate}
+        />
+        <FrequencyPickerModal
+          isOpen={freqPickerOpen}
+          setFreq={SetFreq}
+          data={FreqData}
+          freq={freq}
+          setIsOpen={SetFreqPickerOpen}
         />
       </View>
     </TouchableWithoutFeedback>

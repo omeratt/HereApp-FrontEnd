@@ -4,10 +4,10 @@ const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
 
 const constants = {
-  BASE_URL: 'https://here.cyclic.app/',
+  // BASE_URL: 'https://here.cyclic.app/',
   // BASE_URL: 'https://here-app.onrender.com/',
   /***************** Eliran ***************/
-  // BASE_URL: 'http://192.168.1.30:3000/',
+  BASE_URL: 'http://192.168.1.30:3000/',
 
   /***************** Omer ***************/
   // BASE_URL: 'http://192.168.1.58:3000/',
@@ -29,6 +29,7 @@ const constants = {
   HEIGHT,
   WIDTH,
   FreqList: [
+    'None',
     'Every day',
     'Every 2 days',
     'Every 3 days',

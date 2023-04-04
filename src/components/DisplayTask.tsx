@@ -14,6 +14,8 @@ import CircleCheckBox from './CircleCheckBox';
 import {CheckBox} from '@rneui/themed';
 import {useDeleteTaskMutation} from '../app/api/taskApi';
 import {BottomSheetModal} from '@gorhom/bottom-sheet';
+
+const height = constants.HEIGHT * 0.25143823768886817258883248730964;
 interface RenderItemProps {
   _id?: string;
   name?: string;
@@ -26,6 +28,7 @@ interface props {
   isTaskLoading: boolean;
 }
 export default function DisplayTask({data, isTaskLoading}: props) {
+  // if (!data || data.length === 0) return <React.Fragment />;
   const [
     DeleteTask,
     {isLoading, data: responseDelete, isSuccess, isError, error},
@@ -124,8 +127,9 @@ export default function DisplayTask({data, isTaskLoading}: props) {
     return (
       <Animated.View
         style={styles.taskListContainer}
-        exiting={SlideOutRight.duration(600)}
-        entering={SlideInDown.delay(index * 50).duration(500)}>
+        // exiting={SlideOutRight.duration(600)}
+        // entering={SlideInDown.delay(index * 50).duration(500)}
+      >
         <View style={styles.taskListContent}>
           <TouchableOpacity
             // onPress={() => {
@@ -137,11 +141,40 @@ export default function DisplayTask({data, isTaskLoading}: props) {
                 id: item._id as string,
               })
             }>
+            <Text style={styles.taskContentTitle}>12.00</Text>
             <Text style={styles.taskContentTitle}>{item.name}</Text>
             <Text style={styles.taskContentBody}>{item.details}</Text>
           </TouchableOpacity>
+          <CheckBox
+            checked={item.done}
+            iconRight
+            fontFamily={constants.Fonts.text}
+            containerStyle={{
+              position: 'absolute',
+              right: 2,
+              backgroundColor: 'transparent',
+            }}
+            checkedIcon={
+              <CircleCheckBox
+                size={25}
+                fill={constants.colors.GREEN}
+                borderColor={constants.colors.UNDER_LINE}
+              />
+            }
+            uncheckedIcon={
+              <CircleCheckBox
+                size={25}
+                fill={constants.colors.GREEN}
+                borderColor={constants.colors.UNDER_LINE}
+              />
+            }
+            textStyle={styles.taskTxt}
+            // title="Wednesday"
+            titleProps={{}}
+            uncheckedColor="#F00"
+          />
         </View>
-        <View>
+        {/* <View>
           <CheckBox
             checked={item.done}
             iconRight
@@ -165,32 +198,41 @@ export default function DisplayTask({data, isTaskLoading}: props) {
             titleProps={{}}
             uncheckedColor="#F00"
           />
-        </View>
+        </View> */}
       </Animated.View>
     );
   };
-
+  console.log({he: constants.HEIGHT});
   return (
     <View
       style={{
-        paddingTop: '6.5%',
         justifyContent: 'center',
+        alignItems: 'center',
       }}>
       {isTaskLoading ? (
         <ActivityIndicator size={30} color={constants.colors.GREEN} />
       ) : (
-        <>
+        <View
+          style={{
+            width: '100%',
+            height: constants.HEIGHT * 0.25143823768886817258883248730964,
+          }}
+          onLayout={e => {
+            console.log(e.nativeEvent.layout);
+          }}>
+          {/* <View style={{width: '100%', height: constants.HEIGHT * 0.639 * 0.755}}> */}
           <FlatList
             data={data}
             ListEmptyComponent={emptyList}
             renderItem={renderItem}
             keyExtractor={item => item._id as string}
+            contentContainerStyle={{paddingVertical: 40}}
           />
           <DeleteModal
             _id={deleteProps.id as string}
             name={deleteProps.name as string}
           />
-        </>
+        </View>
       )}
     </View>
   );
@@ -201,7 +243,12 @@ const styles = StyleSheet.create({
     marginTop: '3.5%',
     flexDirection: 'row-reverse',
     justifyContent: 'flex-end',
-    alignItems: 'center',
+    alignSelf: 'center',
+    width: '95%',
+    height: height * 0.45,
+
+    // height
+    // backgroundColor: 'red',
   },
   taskTxt: {
     fontSize: 15,
@@ -215,14 +262,16 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   taskListContent: {
-    height: 65,
+    // height: constants.HEIGHT * 0.1,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: constants.colors.UNDER_LINE,
-    width: '80%',
+    width: '100%',
     padding: '3%',
     elevation: 5,
-    backgroundColor: constants.colors.OFF_WHITE,
+    justifyContent: 'center',
+    // backgroundColor: 'red',
+    // zIndex: 9999,
   },
   taskContentTitle: {
     fontFamily: constants.Fonts.text,

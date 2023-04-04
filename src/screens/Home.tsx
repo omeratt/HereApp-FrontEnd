@@ -222,9 +222,12 @@ const Home = () => {
             />
           </View>
           <View style={styles.taskListColumnContainer}>
-            {tasks?.length > 0 && (
+            {<DisplayTask data={tasks} isTaskLoading={isTaskLoading} />}
+            {/* {tasks?.length > 0 ? (
               <DisplayTask data={tasks} isTaskLoading={isTaskLoading} />
-            )}
+            ) : (
+              <React.Fragment />
+            )} */}
           </View>
         </View>
         <View style={styles.myListContainer}>
@@ -411,8 +414,9 @@ const styles = StyleSheet.create({
     // alignItems: 'center',
   },
   taskListColumnContainer: {
-    height: `${100 - 23.5 - 15}%`,
-    padding: '5%',
+    height: `${100 - 23.5 - 20}%`,
+    // backgroundColor: 'cyan',
+    // padding: '0%',
   },
   myListContainer: {
     height: '24.5%',

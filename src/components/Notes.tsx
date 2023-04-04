@@ -37,6 +37,7 @@ const Notes = () => {
         rotate180
         lengthPercentage={100}
         lineColor={constants.colors.UNDER_LINE}
+        style={{elevation: 1}}
       />
       <TouchableOpacity onPress={handlePress} style={[styles.noteTxtContainer]}>
         <Text style={[styles.sectionTxt]}>Note</Text>

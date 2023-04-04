@@ -124,7 +124,10 @@ const NewTask: React.FC<props> = ({
             />
             <TouchableOpacity onPress={pushOnPress}>
               <Text
-                style={[styles.subSectionTxt, {color: constants.colors.GREY}]}>
+                style={[
+                  styles.subSectionTxt,
+                  {color: constants.colors.UNDER_LINE},
+                ]}>
                 Push it for me
               </Text>
             </TouchableOpacity>
@@ -176,6 +179,7 @@ const NewTask: React.FC<props> = ({
                 lengthPercentage={100}
                 lineColor={constants.colors.UNDER_LINE}
                 rotate180
+                style={{elevation: 1}}
               />
               <View style={[styles.descriptionContent]}>
                 <View style={[styles.description]}>
@@ -185,7 +189,7 @@ const NewTask: React.FC<props> = ({
                     <Text style={[styles.sectionTxt]}>Description</Text>
                   </TouchableOpacity>
                   <Line
-                    strength={0.8}
+                    strength={0.5}
                     lengthPercentage={100}
                     lineColor={constants.colors.UNDER_LINE}
                     rotate180
@@ -213,6 +217,7 @@ const NewTask: React.FC<props> = ({
                 lengthPercentage={100}
                 rotate180
                 lineColor={constants.colors.UNDER_LINE}
+                style={{elevation: 1}}
               />
               <View
                 style={[
@@ -230,7 +235,7 @@ const NewTask: React.FC<props> = ({
                     Set Time
                   </Text>
                   <Line
-                    strength={1}
+                    strength={0.5}
                     lengthPercentage={100}
                     rotate180
                     lineColor={constants.colors.UNDER_LINE}
@@ -321,7 +326,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: '3.2%',
   },
   realContainer: {
-    height: '63.09375%',
+    height: '70.09375%',
     width: '100%',
     borderTopRightRadius: 30,
     borderTopLeftRadius: 30,
@@ -329,7 +334,7 @@ const styles = StyleSheet.create({
     borderColor: constants.colors.UNDER_LINE,
     borderBottomWidth: 0,
   },
-  header: {flex: 0.6, paddingHorizontal: '3.2%'},
+  header: {flex: 0.4, paddingHorizontal: '3.2%'},
   newTaskTitleInput: {
     flex: 1,
     borderWidth: 0,
@@ -360,7 +365,7 @@ const styles = StyleSheet.create({
     fontFamily: constants.Fonts.text,
     fontSize: 12,
   },
-  descriptionContainer: {flex: 1.4, justifyContent: 'center'},
+  descriptionContainer: {flex: 1, justifyContent: 'center'},
   descriptionContent: {flex: 1, justifyContent: 'center'},
   description: {
     paddingHorizontal: '5.2%',

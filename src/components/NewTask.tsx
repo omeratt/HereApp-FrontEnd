@@ -63,13 +63,12 @@ const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
   });
 
   const openCloseDatePicker = useCallback(
-    (dateType: DateFormat = 'datetime') => {
+    (dateType: DateFormat = 'date') => {
       setDatePickerOpen(prev => !prev);
       dateTypeRef.current = dateType;
     },
     [setDatePickerOpen, dateTypeRef],
   );
-  console.log({c: dateTypeRef.current});
   const pushOnPress = useCallback(() => {
     setPushOn(prev => !prev);
   }, []);
@@ -117,7 +116,7 @@ const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
             />
             {/* </View> */}
           </View>
-          <View style={{flex: 8}}>
+          <View style={{flex: 3}}>
             <View style={[styles.descriptionContainer]}>
               <Line
                 strength={1}
@@ -155,7 +154,7 @@ const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
                 </View>
               </View>
             </View>
-            <View style={[styles.flexOneAndJustifyCenter, {flex: 3}]}>
+            <View style={[styles.flexOneAndJustifyCenter, {flex: 2}]}>
               <Line
                 strength={1}
                 lengthPercentage={100}
@@ -197,13 +196,18 @@ const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
                     onPress={openCloseDatePicker}
                   />
                   <SetTimeContent
-                    title={'TimeOfDay'}
+                    title={'Time of day'}
                     buttonTxt={'20:40'}
                     onPress={openCloseDatePicker}
                     dateFormat={'time'}
                   />
                   <SetTimeContent
-                    title={'StartDate'}
+                    title={'Start date'}
+                    buttonTxt={'17 april 2023'}
+                    onPress={openCloseDatePicker}
+                  />
+                  <SetTimeContent
+                    title={'End Date'}
                     buttonTxt={'17 april 2023'}
                     onPress={openCloseDatePicker}
                   />
@@ -249,17 +253,18 @@ const styles = StyleSheet.create({
   realContainer: {
     height: '63.09375%',
     width: '100%',
-    borderTopRightRadius: 40,
-    borderTopLeftRadius: 40,
+    borderTopRightRadius: 30,
+    borderTopLeftRadius: 30,
     borderWidth: 1,
     borderColor: constants.colors.UNDER_LINE,
     borderBottomWidth: 0,
   },
-  header: {flex: 1, padding: '3%'},
+  header: {flex: 0.6, paddingHorizontal: '3.2%'},
   newTaskTitleInput: {
     flex: 1,
     borderWidth: 0,
-    fontSize: 30,
+    fontSize: 26,
+    // backgroundColor: 'red',
     color: constants.colors.BGC,
     alignItems: 'center',
     textAlignVertical: 'center',
@@ -286,7 +291,7 @@ const styles = StyleSheet.create({
     fontFamily: constants.Fonts.text,
     fontSize: 12,
   },
-  descriptionContainer: {flex: 2, justifyContent: 'center'},
+  descriptionContainer: {flex: 1.4, justifyContent: 'center'},
   descriptionContent: {flex: 1, justifyContent: 'center'},
   description: {
     paddingHorizontal: '5.2%',
@@ -308,7 +313,7 @@ const styles = StyleSheet.create({
     height: '11.6%',
   },
   EveryContainer: {
-    flex: 1,
+    flex: 1.5,
     paddingHorizontal: '5.2%',
   },
   TxtAndToggleInSetTime: {

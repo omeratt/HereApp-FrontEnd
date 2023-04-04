@@ -3,6 +3,7 @@ import React, {useCallback, useMemo, useRef} from 'react';
 import DatePicker from 'react-native-date-picker';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import constants from '../assets/constants';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface DatePickerProps {
   date: Date;
@@ -57,7 +58,7 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
     return (
       <View style={styles.btnContainer}>
         <TouchableOpacity style={styles.btn} onPress={cancelConfirm}>
-          <Text style={styles.textBtn}>x</Text>
+          <MaterialCommunityIcons name="close" style={styles.textBtn} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.btn} onPress={handleConfirm}>
           <Text style={styles.textBtn}>Done</Text>
@@ -83,13 +84,12 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
         }}
         handleComponent={ModalHeader}
         backgroundStyle={{backgroundColor: constants.colors.BGC}}
-        style={{paddingHorizontal: '4%'}}
+        style={{paddingHorizontal: '8%'}}
         onChange={handleSheetChanges}>
         <View>
           <DatePicker
             date={date}
-            mode={'date'}
-            // mode={dateFormat}
+            mode={dateFormat}
             onDateChange={handleChange}
             fadeToColor={constants.colors.BGC}
             style={[styles.datePicker]}
@@ -109,18 +109,19 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: '7.5%',
     alignItems: 'center',
     marginBottom: '10%',
   },
   btn: {
     height: '100%',
     justifyContent: 'center',
+    marginTop: '2%',
+    marginHorizontal: '2%',
   },
   textBtn: {
-    fontFamily: constants.Fonts.paragraph,
+    fontFamily: constants.Fonts.text,
     color: constants.colors.GREEN,
-    fontSize: 20,
+    fontSize: 15,
   },
   datePicker: {
     backgroundColor: constants.colors.BGC,

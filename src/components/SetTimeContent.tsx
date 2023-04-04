@@ -16,7 +16,9 @@ const SetTimeContent: FC<Props> = ({onPress, title, buttonTxt, dateFormat}) => {
       <View style={styles.textAndToggleContainer}>
         <View style={styles.TxtAndToggleInSetTime}>
           <TouchableOpacity style={styles.btn}>
-            <Text style={styles.btnTxt}>{buttonTxt}</Text>
+            <Text style={styles.btnTxt} numberOfLines={1}>
+              {buttonTxt}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
@@ -56,8 +58,10 @@ const styles = StyleSheet.create({
     borderColor: constants.colors.GREY,
     borderWidth: 0.5,
     borderRadius: 15,
-    width: '32%',
+    width: constants.WIDTH * 0.29,
     alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
   },
   btnTxt: {color: '#0500FF', textAlign: 'center'},
 });

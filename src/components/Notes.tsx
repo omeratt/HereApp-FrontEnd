@@ -53,8 +53,8 @@ const styles = StyleSheet.create({
     borderColor: constants.colors.UNDER_LINE,
     borderWidth: 1,
     borderTopWidth: 0,
-    borderBottomRightRadius: 40,
-    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 30,
+    borderBottomLeftRadius: 30,
   },
   noteTxtContainer: {
     padding: '5.2%',

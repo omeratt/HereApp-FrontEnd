@@ -20,16 +20,23 @@ import SetTimeContent from './SetTimeContent';
 interface props {
   closeModal: any;
   targetDate: Date;
-  setTargetDate: React.Dispatch<React.SetStateAction<Date>>;
+  setTargetDate: (date: Date) => void;
+  minimumDate: Date;
+  maximumDate: Date;
 }
 type DateFormat = 'datetime' | 'date' | 'time';
-const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
+const NewTask: React.FC<props> = ({
+  closeModal,
+  targetDate,
+  setTargetDate,
+  minimumDate,
+  maximumDate,
+}) => {
   const [pushOn, setPushOn] = useState(false);
   const [datePickerOpen, setDatePickerOpen] = useState<boolean>(false);
   const dateTypeRef = useRef<DateFormat>('datetime');
   const [taskName, setTaskName] = useState<string>();
   const [description, setDescription] = useState<string>();
-
   const [AddTask, {isLoading, data, isSuccess, isError, error}] =
     useAddTaskMutation();
 
@@ -232,6 +239,8 @@ const NewTask: React.FC<props> = ({closeModal, targetDate, setTargetDate}) => {
           date={targetDate}
           dateFormat={dateTypeRef.current}
           setDate={setTargetDate}
+          minimumDate={minimumDate}
+          maximumDate={maximumDate}
         />
       </View>
     </TouchableWithoutFeedback>

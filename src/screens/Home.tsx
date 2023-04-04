@@ -1,13 +1,4 @@
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  I18nManager,
-  LayoutChangeEvent,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
-} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import constants from '../assets/constants';
 import SVG from '../assets/svg';
@@ -52,14 +43,6 @@ const Home = () => {
     setSelectedDate(date);
   }, []);
 
-  // const dada = moment().set({
-  //   hour: 0,
-  //   minute: 0,
-  //   second: 0,
-  // });
-
-  // console.log('asd', dada.format('HH:mm'));
-
   const {
     isLoading: taskLoading,
     data: tasks1,
@@ -69,13 +52,9 @@ const Home = () => {
     isFetching: taskFetch,
   } = useGetTasksByDateQuery(CURRENT_DATE);
   const FetchTasks = useCallback((date: Date) => {
-    const result = dispatch(
-      tasksApi.endpoints.getTasksByDate.initiate(date),
-      // tasksApi.endpoints.getTasksByDate.initiate(formatDate(date)),
-    )
+    const result = dispatch(tasksApi.endpoints.getTasksByDate.initiate(date))
       .then(res => {
         setTasks(res.data);
-        console.log(tasks?.length, {res: res.data});
       })
       .catch(err => {
         console.log('error getting tasks', err);
@@ -95,17 +74,6 @@ const Home = () => {
     },
     [selectedFinalDate],
   );
-
-  function formatDate(date: Date): string {
-    const formattedDate = new Intl.DateTimeFormat('heb-IL', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    }).format(date);
-
-    const fixedDate = formattedDate.split('.').join('/');
-    return fixedDate;
-  }
 
   // TODO: find a way to handle scroll to index
   const getIndexByKey = useCallback(
@@ -338,6 +306,8 @@ const Home = () => {
             closeModal={bottomSheetModalRef.current?.dismiss}
             targetDate={selectedDate}
             setTargetDate={SetSelectedDate}
+            maximumDate={flatListData[initialNumToRender - 1]?.fullDate}
+            minimumDate={flatListData[0]?.fullDate}
           />
         </BottomSheetModal>
       </BottomSheetModalProvider>

@@ -7,9 +7,11 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 interface DatePickerProps {
   date: Date;
-  setDate: React.Dispatch<React.SetStateAction<Date>>;
+  setDate: (date: Date) => void;
   dateFormat?: 'time' | 'date' | 'datetime';
   isOpen: boolean;
+  minimumDate: Date;
+  maximumDate: Date;
 }
 
 const currDate = new Date();
@@ -18,6 +20,8 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
   dateFormat,
   setDate,
   date,
+  minimumDate,
+  maximumDate,
 }) => {
   const [currentDate, setCurrentDate] = React.useState<Date>(currDate);
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -94,6 +98,8 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
             fadeToColor={constants.colors.BGC}
             style={[styles.datePicker]}
             textColor={constants.colors.OFF_WHITE}
+            minimumDate={minimumDate}
+            maximumDate={maximumDate}
           />
         </View>
       </BottomSheetModal>

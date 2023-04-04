@@ -34,14 +34,20 @@ const NewTask: React.FC<props> = ({
 }) => {
   const [pushOn, setPushOn] = useState(false);
   const [datePickerOpen, setDatePickerOpen] = useState<boolean>(false);
-  const dateTypeRef = useRef<DateFormat>('datetime');
   const [taskName, setTaskName] = useState<string>();
   const [description, setDescription] = useState<string>();
+  const [endDate, setEndDate] = useState<Date>();
   const [AddTask, {isLoading, data, isSuccess, isError, error}] =
     useAddTaskMutation();
-
+  const isEndDate = useRef<boolean>(false);
+  const isSetTime = useRef<boolean>(false);
+  const dateTypeRef = useRef<DateFormat>('datetime');
   const taskNameInputRef = React.useRef<TextInput>(null);
   const taskDescriptionInputRef = React.useRef<TextInput>(null);
+  const SetEndDate = useCallback((date: Date) => {
+    setEndDate(date);
+  }, []);
+
   const submit = async () => {
     try {
       if (!description || !taskName) return;
@@ -51,8 +57,8 @@ const NewTask: React.FC<props> = ({
         details: description,
         targetDate,
         frequency: 'Every week',
-        //issettime
-        //enddate
+        ...(endDate && {endDate}),
+        ...(isSetTime.current && {isSetTime: true}),
       }).unwrap();
       console.log(data);
       setDescription('');
@@ -69,10 +75,15 @@ const NewTask: React.FC<props> = ({
     taskDescriptionInputRef?.current?.blur();
   });
 
+  /**
+   * @param type which format to use in date picker
+   * @param _isDateEnd should date picker use setTargetDate or setEndDate
+   */
   const openCloseDatePicker = useCallback(
-    (dateType: DateFormat = 'date') => {
+    (dateType: DateFormat = 'date', _isEndDate: boolean = false) => {
       setDatePickerOpen(prev => !prev);
       dateTypeRef.current = dateType;
+      isEndDate.current = _isEndDate;
     },
     [setDatePickerOpen, dateTypeRef],
   );
@@ -121,7 +132,6 @@ const NewTask: React.FC<props> = ({
               style={styles.newTaskTitleInput}
               onSubmitEditing={Keyboard.dismiss}
             />
-            {/* </View> */}
           </View>
           <View style={{flex: 3}}>
             <View style={[styles.descriptionContainer]}>
@@ -238,9 +248,10 @@ const NewTask: React.FC<props> = ({
           isOpen={datePickerOpen}
           date={targetDate}
           dateFormat={dateTypeRef.current}
-          setDate={setTargetDate}
+          setDate={isEndDate.current ? SetEndDate : setTargetDate}
           minimumDate={minimumDate}
           maximumDate={maximumDate}
+          isSetTimeRef={isSetTime}
         />
       </View>
     </TouchableWithoutFeedback>
@@ -273,7 +284,6 @@ const styles = StyleSheet.create({
     flex: 1,
     borderWidth: 0,
     fontSize: 26,
-    // backgroundColor: 'red',
     color: constants.colors.BGC,
     alignItems: 'center',
     textAlignVertical: 'center',

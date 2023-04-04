@@ -12,6 +12,7 @@ interface DatePickerProps {
   isOpen: boolean;
   minimumDate: Date;
   maximumDate: Date;
+  isSetTimeRef: React.MutableRefObject<boolean>;
 }
 
 const currDate = new Date();
@@ -22,6 +23,7 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
   date,
   minimumDate,
   maximumDate,
+  isSetTimeRef,
 }) => {
   const [currentDate, setCurrentDate] = React.useState<Date>(currDate);
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -38,6 +40,7 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
     const [hours, minutes] = time.split(':');
     const fixedDate = new Date(date.setUTCHours(+hours, +minutes));
     setCurrentDate(fixedDate);
+    isSetTimeRef.current = true;
   };
   const cancelConfirm = () => {
     setCurrentDate(currentDate);

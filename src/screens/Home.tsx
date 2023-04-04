@@ -28,7 +28,7 @@ const Home = () => {
   const flashListRef = useRef<FlashList<DateObject> | null>(null);
   const [selectedScrollDate, setSelectedScrollDate] =
     useState<Date>(CURRENT_DATE);
-  const [selectedDate, setSelectedDate] = useState<Date>(CURRENT_DATE);
+  const [selectedDate, setSelectedDate] = useState<Date>(CURRENT_DATE); // target date
 
   const [dateHeader, setDateHeader] = useState<DateObject>();
   const navigation = useNavigation();

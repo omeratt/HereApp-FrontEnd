@@ -5,7 +5,11 @@ import constants from '../assets/constants';
 type DateFormat = 'datetime' | 'time' | 'date';
 interface Props {
   dateFormat?: DateFormat;
-  onPress: (type?: DateFormat) => void;
+  /**
+   * @param type which format to use in date picker
+   * @param _isDateEnd should date picker use setTargetDate or setEndDate
+   */
+  onPress: (type: DateFormat, _isDateEnd: boolean) => void;
   title: string;
   buttonTxt: string;
 }
@@ -22,7 +26,7 @@ const SetTimeContent: FC<Props> = ({onPress, title, buttonTxt, dateFormat}) => {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              onPress(dateFormat);
+              onPress(dateFormat || 'date', title === 'End Date');
             }}>
             <Text style={[styles.subSectionTxt]}>{title}</Text>
           </TouchableOpacity>

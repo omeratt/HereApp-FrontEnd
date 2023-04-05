@@ -3,7 +3,11 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import constants from '../assets/constants';
 import SVG from '../assets/svg';
 import NewTask from '../components/NewTask';
-import Animated, {FadeIn, FadeOutUp} from 'react-native-reanimated';
+import Animated, {
+  FadeIn,
+  FadeOutUp,
+  useSharedValue,
+} from 'react-native-reanimated';
 import {tasksApi, useGetTasksByDateQuery} from '../app/api/taskApi';
 import DisplayTask from '../components/DisplayTask';
 import {useAppDispatch} from '../app/hooks';
@@ -27,6 +31,18 @@ export const TASK_CONTAINER_HEIGHT =
   8.7 - //triangle
   constants.WIDTH * 0.025; //container padding
 const Home = () => {
+  const getIndexByKey = useCallback(
+    (obj: Record<string, any>, key: string): number => {
+      const keys = Object.keys(obj);
+      return keys.indexOf(key);
+    },
+    [],
+  );
+  const findIndexByDate = useCallback((DateToCheck: Date) => {
+    const key = DateToCheck.toLocaleDateString();
+    const index = getIndexByKey(allDates, key);
+    return index;
+  }, []);
   const [tasks, setTasks] = useState<any[]>([]);
   const [selectedFinalDate, setSelectedFinalDate] =
     useState<Date>(CURRENT_DATE);
@@ -35,7 +51,7 @@ const Home = () => {
   const [selectedScrollDate, setSelectedScrollDate] =
     useState<Date>(CURRENT_DATE);
   const [selectedDate, setSelectedDate] = useState<Date>(CURRENT_DATE); // target date
-
+  const sharedDatesIndex = useSharedValue(findIndexByDate(CURRENT_DATE));
   const [dateHeader, setDateHeader] = useState<DateObject>();
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
@@ -48,7 +64,7 @@ const Home = () => {
   const SetSelectedDate = useCallback((date: Date) => {
     setSelectedDate(date);
   }, []);
-
+  const sharedX = useSharedValue(0);
   const {
     isLoading: taskLoading,
     data: tasks1,
@@ -82,13 +98,7 @@ const Home = () => {
   );
 
   // TODO: find a way to handle scroll to index
-  const getIndexByKey = useCallback(
-    (obj: Record<string, any>, key: string): number => {
-      const keys = Object.keys(obj);
-      return keys.indexOf(key);
-    },
-    [],
-  );
+
   const findDateAndScroll = useCallback((DateToCheck: Date) => {
     const key = DateToCheck.toLocaleDateString();
     const index = getIndexByKey(allDates, key);
@@ -207,6 +217,8 @@ const Home = () => {
               selectedScrollDate={selectedScrollDate}
               flatListData={flatListData}
               // dateHeader={dateHeader}
+              sharedX={sharedX}
+              sharedDatesIndex={sharedDatesIndex}
             />
           </View>
           <View>
@@ -219,7 +231,18 @@ const Home = () => {
             />
           </View>
           <View style={styles.taskListColumnContainer}>
-            {<DisplayTask data={tasks} isTaskLoading={isTaskLoading} />}
+            {
+              <DisplayTask
+                data={tasks}
+                isTaskLoading={isTaskLoading}
+                sharedX={sharedX}
+                flashListRef={flashListRef}
+                sharedDatesIndex={sharedDatesIndex}
+                datePress={datePress}
+                flatListData={flatListData}
+                snapToOffsets={snapToOffsets}
+              />
+            }
             {/* {tasks?.length > 0 ? (
               <DisplayTask data={tasks} isTaskLoading={isTaskLoading} />
             ) : (
@@ -416,6 +439,7 @@ const styles = StyleSheet.create({
   taskListColumnContainer: {
     // height: `${100 - 22.7 - 20}%`,
     height: TASK_CONTAINER_HEIGHT, //container padding
+    overflow: 'hidden',
     // backgroundColor: 'cyan',
     // borderColor: 'brown',
     // borderWidth: 1,

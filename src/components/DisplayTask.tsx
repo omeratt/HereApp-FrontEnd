@@ -8,16 +8,22 @@ import {
   View,
 } from 'react-native';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import Animated, {SlideInDown, SlideOutRight} from 'react-native-reanimated';
+import Animated, {
+  SharedValue,
+  runOnJS,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 import constants from '../assets/constants';
 import CircleCheckBox from './CircleCheckBox';
 import {CheckBox} from '@rneui/themed';
 import {useDeleteTaskMutation} from '../app/api/taskApi';
 import {BottomSheetModal} from '@gorhom/bottom-sheet';
 import SVG from '../assets/svg';
-import {TASK_CONTAINER_HEIGHT} from '../screens/Home';
+import {Gesture, GestureDetector} from 'react-native-gesture-handler';
+import {FlashList} from '@shopify/flash-list';
+import {DateObject} from './WeeklyCalender';
 
-const height = TASK_CONTAINER_HEIGHT;
 interface RenderItemProps {
   _id?: string;
   name?: string;
@@ -28,8 +34,31 @@ interface RenderItemProps {
 interface props {
   data: any[];
   isTaskLoading: boolean;
+  sharedX: SharedValue<number>;
+  flashListRef: React.MutableRefObject<FlashList<DateObject> | null>;
+  sharedDatesIndex: SharedValue<number>;
+  datePress: (dateItem: DateObject) => void;
+  flatListData: DateObject[];
+  snapToOffsets: number[];
 }
-export default function DisplayTask({data, isTaskLoading}: props) {
+const TASK_CONTAINER_HEIGHT =
+  constants.HEIGHT * 0.64 * 0.84 - //topView till lists
+  constants.HEIGHT * 0.64 * 0.84 * 0.2 - //date header
+  constants.HEIGHT * 0.64 * 0.84 * 0.2 - //dates list
+  8.7 - //triangle
+  constants.WIDTH * 0.025;
+const height = TASK_CONTAINER_HEIGHT;
+
+export default function DisplayTask({
+  data,
+  isTaskLoading,
+  sharedX,
+  flashListRef,
+  sharedDatesIndex,
+  datePress,
+  flatListData,
+  snapToOffsets,
+}: props) {
   // if (!data || data.length === 0) return <React.Fragment />;
   const [
     DeleteTask,
@@ -125,92 +154,138 @@ export default function DisplayTask({data, isTaskLoading}: props) {
       return <ActivityIndicator size={30} color={constants.colors.GREEN} />;
     else return null;
   };
-  const renderItem: ListRenderItem<RenderItemProps> = ({item, index}) => {
-    return (
-      <Animated.View
-        style={[styles.taskListContainer, {...(!index && {marginTop: 0})}]}
-        // exiting={SlideOutRight.duration(600)}
-        // entering={SlideInDown.delay(index * 50).duration(500)}
-      >
-        <View style={styles.taskListContent}>
-          <TouchableOpacity
-            // onPress={() => {
-            //   handlePresentModalPress(item.name as string, item._id as string);
-            // }}
-            onPress={() =>
-              openDeleteModal({
-                name: item.name as string,
-                id: item._id as string,
-              })
-            }>
-            <Text style={styles.taskContentTitle}>12.00</Text>
-            <Text style={styles.taskContentTitle}>{item.name}</Text>
-            <Text style={styles.taskContentBody}>{item.details}</Text>
-          </TouchableOpacity>
-          <CheckBox
-            checked={item.done}
-            iconRight
-            fontFamily={constants.Fonts.text}
-            containerStyle={{
-              position: 'absolute',
-              right: 2,
-              backgroundColor: 'transparent',
-            }}
-            checkedIcon={
-              <CircleCheckBox
-                size={25}
-                fill={constants.colors.GREEN}
-                borderColor={constants.colors.UNDER_LINE}
-              />
+  const springConfig = useMemo(() => {
+    return {stiffness: 100, mass: 0.5};
+  }, []);
+  const TASK_WIDTH = constants.WIDTH * 0.975;
+  const RenderItem: ListRenderItem<RenderItemProps> = useCallback(
+    ({item, index}) => {
+      // const inputRange = [-TASK_WIDTH / 2, 0, TASK_WIDTH / 2];
+      // const outputRange = [0.3, 1, 0.3];
+      // const scaleStyle = useAnimatedStyle(() => {
+      //   const scale = interpolate(sharedX.value, inputRange, outputRange);
+      //   return {
+      //     transform: [{scaleY: scale}],
+      //   };
+      // });
+      useEffect(() => {
+        // console.log('useEffect', sharedX.value);
+        if (sharedX.value > 0) {
+          sharedX.value = -TASK_WIDTH;
+        } else {
+          sharedX.value = TASK_WIDTH;
+        }
+        sharedX.value = withSpring(0, springConfig);
+      }, []);
+      return (
+        <Animated.View
+          style={[styles.taskListContainer, {...(!index && {marginTop: 0})}]}
+          // exiting={SlideOutRight.duration(600)}
+          // entering={SlideInDown.delay(index * 50).duration(500)}
+        >
+          <View style={styles.taskListContent}>
+            <TouchableOpacity
+              // onPress={() => {
+              //   handlePresentModalPress(item.name as string, item._id as string);
+              // }}
+              onPress={() =>
+                openDeleteModal({
+                  name: item.name as string,
+                  id: item._id as string,
+                })
+              }>
+              <Text style={styles.taskContentTitle}>12.00</Text>
+              <Text style={styles.taskContentTitle}>{item.name}</Text>
+              <Text style={styles.taskContentBody}>{item.details}</Text>
+            </TouchableOpacity>
+            <CheckBox
+              checked={item.done}
+              iconRight
+              fontFamily={constants.Fonts.text}
+              containerStyle={{
+                position: 'absolute',
+                right: 2,
+                backgroundColor: 'transparent',
+              }}
+              checkedIcon={
+                <CircleCheckBox
+                  size={25}
+                  fill={constants.colors.GREEN}
+                  borderColor={constants.colors.UNDER_LINE}
+                />
+              }
+              uncheckedIcon={
+                <CircleCheckBox
+                  size={25}
+                  fill={constants.colors.GREEN}
+                  borderColor={constants.colors.UNDER_LINE}
+                />
+              }
+              textStyle={styles.taskTxt}
+              // title="Wednesday"
+              titleProps={{}}
+              uncheckedColor="#F00"
+            />
+          </View>
+        </Animated.View>
+      );
+    },
+    [],
+  );
+  const startX = useSharedValue(sharedDatesIndex.value);
+  const DATE_WIDTH = (constants.WIDTH * 0.89444444444444444444444444444444) / 7;
+
+  const scroll = useCallback((x: number) => {
+    const offset = snapToOffsets[startX.value] - (x / DATE_WIDTH) * 15;
+    flashListRef?.current?.scrollToOffset({
+      offset: offset,
+    });
+  }, []);
+
+  const press: () => void = useCallback(() => {
+    datePress(flatListData[sharedDatesIndex.value]);
+  }, []);
+
+  const endScroll: () => void = useCallback(() => {
+    flashListRef?.current?.scrollToOffset({
+      offset: snapToOffsets[sharedDatesIndex.value],
+      animated: true,
+    });
+  }, []);
+
+  const gestureX = useMemo(
+    () =>
+      Gesture.Pan()
+        .activeOffsetX([-10, 10])
+        .onStart(e => {
+          startX.value = sharedDatesIndex.value;
+        })
+        .onUpdate(e => {
+          sharedX.value = e.translationX;
+          runOnJS(scroll)(e.translationX);
+        })
+        .onEnd(e => {
+          if (startX.value !== sharedDatesIndex.value) {
+            if (sharedX.value > 0) {
+              sharedX.value = withSpring(TASK_WIDTH, springConfig);
+            } else {
+              sharedX.value = withSpring(-TASK_WIDTH, springConfig);
             }
-            uncheckedIcon={
-              <CircleCheckBox
-                size={25}
-                fill={constants.colors.GREEN}
-                borderColor={constants.colors.UNDER_LINE}
-              />
-            }
-            textStyle={styles.taskTxt}
-            // title="Wednesday"
-            titleProps={{}}
-            uncheckedColor="#F00"
-          />
-        </View>
-        {/* <View>
-          <CheckBox
-            checked={item.done}
-            iconRight
-            fontFamily={constants.Fonts.text}
-            containerStyle={styles.checkBox}
-            checkedIcon={
-              <CircleCheckBox
-                size={25}
-                fill={constants.colors.GREEN}
-                borderColor={constants.colors.UNDER_LINE}
-              />
-            }
-            uncheckedIcon={
-              <CircleCheckBox
-                size={25}
-                borderColor={constants.colors.UNDER_LINE}
-              />
-            }
-            textStyle={styles.taskTxt}
-            // title="Wednesday"
-            titleProps={{}}
-            uncheckedColor="#F00"
-          />
-        </View> */}
-      </Animated.View>
-    );
-  };
-  console.log({he: constants.HEIGHT});
+          } else {
+            sharedX.value = withSpring(0);
+          }
+          runOnJS(endScroll)();
+          runOnJS(press)();
+          startX.value = sharedDatesIndex.value;
+        }),
+    [],
+  );
   return (
     <View
       style={{
         justifyContent: 'flex-start',
         alignItems: 'center',
-        height: TASK_CONTAINER_HEIGHT,
+        height: height,
         // height: height,
         // backgroundColor: 'blue',
       }}>
@@ -233,18 +308,18 @@ export default function DisplayTask({data, isTaskLoading}: props) {
           // borderBottomWidth: 3,
           // borderBottomColor: 'orange',
           // zIndex: 9999,
-        }}
-        onLayout={e => {
-          console.log(e.nativeEvent.layout);
         }}>
         {/* <View style={{width: '100%', height: constants.HEIGHT * 0.639 * 0.755}}> */}
-        <FlatList
-          data={data}
-          ListEmptyComponent={emptyList}
-          renderItem={renderItem}
-          keyExtractor={item => item._id as string}
-          contentContainerStyle={{paddingBottom: height * 0.01}}
-        />
+        <GestureDetector gesture={gestureX}>
+          <Animated.FlatList
+            style={{transform: [{translateX: sharedX}]}}
+            data={data}
+            ListEmptyComponent={emptyList}
+            renderItem={props => <RenderItem {...props} />}
+            keyExtractor={item => item._id as string}
+            contentContainerStyle={{paddingBottom: height * 0.01}}
+          />
+        </GestureDetector>
         <View
           style={{
             alignItems: 'center',

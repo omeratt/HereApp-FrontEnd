@@ -127,6 +127,10 @@ const FrequencyPickerModal: React.FC<FrequencyPickerModalProps> = ({
   };
   return (
     <Modal
+      backdropOpacity={0}
+      useNativeDriver
+      animationIn={'fadeInUp'}
+      animationOut={'fadeOutDown'}
       onBackdropPress={cancelConfirm}
       style={styles.modal}
       isVisible={isOpen}>

@@ -139,7 +139,7 @@ const NewTask: React.FC<props> = ({
   const formattedDate = (date: Date) => {
     const format = date.toLocaleDateString('en-US', {
       month: 'long',
-      year: 'numeric',
+      year: '2-digit',
     });
     const day = date.toLocaleDateString('en-US', {
       day: '2-digit',

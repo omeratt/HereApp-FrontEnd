@@ -14,8 +14,10 @@ import CircleCheckBox from './CircleCheckBox';
 import {CheckBox} from '@rneui/themed';
 import {useDeleteTaskMutation} from '../app/api/taskApi';
 import {BottomSheetModal} from '@gorhom/bottom-sheet';
+import SVG from '../assets/svg';
+import {TASK_CONTAINER_HEIGHT} from '../screens/Home';
 
-const height = constants.HEIGHT * 0.25143823768886817258883248730964;
+const height = TASK_CONTAINER_HEIGHT;
 interface RenderItemProps {
   _id?: string;
   name?: string;
@@ -119,14 +121,14 @@ export default function DisplayTask({data, isTaskLoading}: props) {
   };
   const emptyList = () => {
     console.log(data, 'emptyList DisplayTask.tsx');
-    if (data === undefined)
+    if (isTaskLoading)
       return <ActivityIndicator size={30} color={constants.colors.GREEN} />;
     else return null;
   };
   const renderItem: ListRenderItem<RenderItemProps> = ({item, index}) => {
     return (
       <Animated.View
-        style={styles.taskListContainer}
+        style={[styles.taskListContainer, {...(!index && {marginTop: 0})}]}
         // exiting={SlideOutRight.duration(600)}
         // entering={SlideInDown.delay(index * 50).duration(500)}
       >
@@ -206,49 +208,96 @@ export default function DisplayTask({data, isTaskLoading}: props) {
   return (
     <View
       style={{
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         alignItems: 'center',
+        height: TASK_CONTAINER_HEIGHT,
+        // height: height,
+        // backgroundColor: 'blue',
       }}>
-      {isTaskLoading ? (
+      {/* {isTaskLoading ? (
         <ActivityIndicator size={30} color={constants.colors.GREEN} />
-      ) : (
+      ) : ( */}
+      <View style={styles.header}>
+        <SVG.plusIconOutlined
+          style={styles.PlusIcon}
+          fill={constants.colors.BGC}
+        />
+        <Text style={styles.taskHeaderTitle}>Tasks</Text>
+      </View>
+      <View
+        style={{
+          width: '100%',
+
+          height: height - 0.185 * height,
+          // backgroundColor: 'red',
+          // borderBottomWidth: 3,
+          // borderBottomColor: 'orange',
+          // zIndex: 9999,
+        }}
+        onLayout={e => {
+          console.log(e.nativeEvent.layout);
+        }}>
+        {/* <View style={{width: '100%', height: constants.HEIGHT * 0.639 * 0.755}}> */}
+        <FlatList
+          data={data}
+          ListEmptyComponent={emptyList}
+          renderItem={renderItem}
+          keyExtractor={item => item._id as string}
+          contentContainerStyle={{paddingBottom: height * 0.01}}
+        />
         <View
           style={{
-            width: '100%',
-            height: constants.HEIGHT * 0.25143823768886817258883248730964,
-          }}
-          onLayout={e => {
-            console.log(e.nativeEvent.layout);
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: height * 0.03,
+            // backgroundColor: 'red',
           }}>
-          {/* <View style={{width: '100%', height: constants.HEIGHT * 0.639 * 0.755}}> */}
-          <FlatList
-            data={data}
-            ListEmptyComponent={emptyList}
-            renderItem={renderItem}
-            keyExtractor={item => item._id as string}
-            contentContainerStyle={{paddingVertical: 40}}
-          />
-          <DeleteModal
-            _id={deleteProps.id as string}
-            name={deleteProps.name as string}
-          />
+          <SVG.ArrowDown />
         </View>
-      )}
+        <DeleteModal
+          _id={deleteProps.id as string}
+          name={deleteProps.name as string}
+        />
+      </View>
+      {/* )} */}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   taskListContainer: {
-    marginTop: '3.5%',
+    marginTop: '2.2%',
     flexDirection: 'row-reverse',
     justifyContent: 'flex-end',
     alignSelf: 'center',
-    width: '95%',
-    height: height * 0.45,
-
+    width: '90.36%',
+    height: height * 0.3663,
     // height
     // backgroundColor: 'red',
+  },
+  PlusIcon: {
+    position: 'absolute',
+    color: constants.colors.BLACK,
+    right: '6.5%',
+    borderRadius: 9999,
+    backgroundColor: constants.colors.OFF_WHITE,
+    elevation: 5,
+  },
+  header: {
+    // marginBottom: 6,
+    width: '100%',
+    paddingLeft: '5%',
+    paddingRight: '5%',
+    // backgroundColor: 'red',
+    height: height * 0.17,
+    justifyContent: 'center',
+    // alignItems: 'center',
+  },
+  taskHeaderTitle: {
+    fontFamily: constants.Fonts.paragraph,
+    color: constants.colors.BLACK,
+    fontSize: 20,
+    // fontWeight: '600',
   },
   taskTxt: {
     fontSize: 15,
@@ -268,7 +317,8 @@ const styles = StyleSheet.create({
     borderColor: constants.colors.UNDER_LINE,
     width: '100%',
     padding: '3%',
-    elevation: 5,
+    elevation: 2,
+    backgroundColor: constants.colors.OFF_WHITE,
     justifyContent: 'center',
     // backgroundColor: 'red',
     // zIndex: 9999,

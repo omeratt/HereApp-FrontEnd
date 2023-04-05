@@ -20,6 +20,12 @@ const allDates = getDatesForYear(CURRENT_DATE);
 const flatListData = Object.values(allDates);
 const initialNumToRender = flatListData.length;
 export const DATE_WIDTH = constants.WIDTH * 0.89444444444444444444444444444444;
+export const TASK_CONTAINER_HEIGHT =
+  constants.HEIGHT * 0.64 * 0.84 - //topView till lists
+  constants.HEIGHT * 0.64 * 0.84 * 0.2 - //date header
+  constants.HEIGHT * 0.64 * 0.84 * 0.2 - //dates list
+  8.7 - //triangle
+  constants.WIDTH * 0.025; //container padding
 const Home = () => {
   const [tasks, setTasks] = useState<any[]>([]);
   const [selectedFinalDate, setSelectedFinalDate] =
@@ -191,16 +197,7 @@ const Home = () => {
             />
           </View>
           <View style={styles.triangle} />
-          <View
-            style={[
-              styles.date,
-              {
-                // overflow: 'visible',
-                // backfaceVisibility: 'visible',
-                // backgroundColor: 'red',
-                // flex: 1,
-              },
-            ]}>
+          <View style={[styles.date]}>
             <DatesFlatList
               flashListRef={flashListRef}
               datePress={datePress}
@@ -330,7 +327,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   topView: {
-    height: '63.9%',
+    height: '64%',
     width: '100%',
     alignItems: 'center',
     borderRadius: 40,
@@ -365,11 +362,12 @@ const styles = StyleSheet.create({
   boxPlusIcon: {},
 
   task: {
-    height: '75.5%',
+    height: '84%',
     borderColor: constants.colors.UNDER_LINE,
     borderBottomWidth: 1,
+    // backgroundColor: 'cyan',
     // padding: '5%',
-    position: 'relative',
+    // position: 'relative',
   },
   today: {
     // backgroundColor: 'blue',
@@ -402,8 +400,10 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   date: {
-    height: '23.5%',
+    height: '20%',
     // width: '100%',
+    // backgroundColor: 'blue',
+
     paddingHorizontal: constants.WIDTH * 0.025,
     // paddingLeft: constants.WIDTH * 0.025,
     // paddingRight: constants.WIDTH * 0.025,
@@ -414,14 +414,20 @@ const styles = StyleSheet.create({
     // alignItems: 'center',
   },
   taskListColumnContainer: {
-    height: `${100 - 23.5 - 20}%`,
+    // height: `${100 - 22.7 - 20}%`,
+    height: TASK_CONTAINER_HEIGHT, //container padding
     // backgroundColor: 'cyan',
-    // padding: '0%',
+    // borderColor: 'brown',
+    // borderWidth: 1,
+    padding: '0%',
   },
   myListContainer: {
-    height: '24.5%',
-    paddingTop: '3%',
+    // height: '16%',
+    paddingVertical: '1.5%',
+    // justifyContent: 'flex-end',
     // backgroundColor: 'blue',
+    // borderColor: 'brown',
+    // borderWidth: 2,
   },
   myList: {
     marginBottom: 6,
@@ -431,7 +437,7 @@ const styles = StyleSheet.create({
   myListTitle: {
     fontFamily: constants.Fonts.paragraph,
     color: constants.colors.BLACK,
-    fontSize: 22,
+    fontSize: 20,
     // fontWeight: '600',
   },
   categoryContainer: {
@@ -443,7 +449,7 @@ const styles = StyleSheet.create({
     // backgroundColor: constants.colors.BLACK,
   },
   myListCategory: {
-    height: '80.5%',
+    // height: '80.5%',
     width: '31%',
     padding: '0.1%',
     borderRadius: 40,

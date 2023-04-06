@@ -13,6 +13,7 @@ interface DatePickerProps {
   minimumDate: Date;
   maximumDate: Date;
   isSetTimeRef: React.MutableRefObject<boolean>;
+  targetDateHoursRef?: React.MutableRefObject<string>;
 }
 
 const currDate = new Date();
@@ -24,11 +25,18 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
   minimumDate,
   maximumDate,
   isSetTimeRef,
+  targetDateHoursRef,
 }) => {
   const [currentDate, setCurrentDate] = React.useState<Date>(currDate);
+  const [hours, setHours] = React.useState<string>('');
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const handleConfirm = () => {
     setDate(currentDate);
+    if (dateFormat !== 'time') return close();
+    const [_hours, minutes] = hours.split(':');
+    const fixedDate = new Date(date.setUTCHours(+_hours, +minutes));
+    setDate(fixedDate);
+    isSetTimeRef.current = true;
     close();
   };
   const handleChange = (date: Date) => {
@@ -38,9 +46,13 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
   const handleHoursChange = (date: Date) => {
     const time = date.toLocaleTimeString();
     const [hours, minutes] = time.split(':');
-    const fixedDate = new Date(date.setUTCHours(+hours, +minutes));
+    const formattedTime = `${hours}:${minutes}`;
+    setHours(formattedTime);
+    if (targetDateHoursRef && targetDateHoursRef.current)
+      targetDateHoursRef.current = formattedTime;
+
+    const fixedDate = new Date(currentDate.setUTCHours(+hours, +minutes));
     setCurrentDate(fixedDate);
-    isSetTimeRef.current = true;
   };
   const cancelConfirm = () => {
     setCurrentDate(currentDate);
@@ -55,12 +67,12 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
     bottomSheetModalRef.current?.present();
   };
   const close = () => {
+    setCurrentDate(currDate);
     bottomSheetModalRef.current?.dismiss();
   };
 
   // variables
   const snapPoints = useMemo(() => ['37%', '37%'], []);
-
   const ModalHeader = () => {
     return (
       <View style={styles.btnContainer}>
@@ -82,7 +94,6 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
       <BottomSheetModal
         ref={bottomSheetModalRef}
         index={1}
-        // onDismiss={cancelConfirm}
         snapPoints={snapPoints}
         stackBehavior="push"
         handleIndicatorStyle={{display: 'none'}}

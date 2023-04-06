@@ -47,6 +47,7 @@ const NewTask: React.FC<props> = ({
     useAddTaskMutation();
   const isEndDate = useRef<boolean>(false);
   const isSetTime = useRef<boolean>(false);
+  const targetDateHoursRef = useRef<string>('00:00');
   const taskNameInputRef = React.useRef<TextInput>(null);
   const taskDescriptionInputRef = React.useRef<TextInput>(null);
   const SetFreqPickerOpen = useCallback((state: boolean) => {
@@ -103,7 +104,6 @@ const NewTask: React.FC<props> = ({
     },
     [],
   );
-  console.log({c: dateTypeRef.current});
   const pushOnPress = useCallback(() => {
     setPushOn(prev => !prev);
   }, []);
@@ -136,24 +136,19 @@ const NewTask: React.FC<props> = ({
       </View>
     );
   }, [pushOnPress, pushOn]);
-  const formattedDate = (date: Date) => {
-    const format = date.toLocaleDateString('en-US', {
+  const formattedDate = useCallback((date: Date) => {
+    const date1 = new Date(date.toISOString().split('T')[0]);
+    const format = date1.toLocaleDateString('default', {
       month: 'long',
       year: 'numeric',
     });
-    const day = date.toLocaleDateString('en-US', {
+    const day = date1.toLocaleDateString('default', {
       day: '2-digit',
     });
     const arr = format.split(' ');
     const fixedString = `${day} ${arr[0]} ${arr[1]}`;
     return fixedString;
-  };
-
-  const formattedHour = () => {
-    const time = targetDate.toLocaleTimeString();
-    const [hours, minutes] = time.split(':');
-    return `${hours}:${minutes}`;
-  };
+  }, []);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -255,7 +250,7 @@ const NewTask: React.FC<props> = ({
                   />
                   <SetTimeContent
                     title={'Time of day'}
-                    buttonTxt={formattedHour()}
+                    buttonTxt={targetDateHoursRef.current}
                     onPress={openCloseDatePicker}
                     dateFormat={'time'}
                   />
@@ -293,6 +288,7 @@ const NewTask: React.FC<props> = ({
           minimumDate={minimumDate}
           maximumDate={maximumDate}
           isSetTimeRef={isSetTime}
+          targetDateHoursRef={targetDateHoursRef}
         />
         <FrequencyPickerModal
           isOpen={freqPickerOpen}

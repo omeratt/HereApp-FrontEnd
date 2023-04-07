@@ -3,25 +3,40 @@ import React, {useCallback, useMemo, useRef} from 'react';
 import DatePicker from 'react-native-date-picker';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import constants from '../assets/constants';
-import {formatDate} from './WeeklyCalender';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface DatePickerProps {
   date: Date;
-  setDate: React.Dispatch<React.SetStateAction<string>>;
+  setDate: (date: Date) => void;
   dateFormat?: 'time' | 'date' | 'datetime';
   isOpen: boolean;
+  minimumDate: Date;
+  maximumDate: Date;
+  isSetTimeRef: React.MutableRefObject<boolean>;
+  targetDateHoursRef?: React.MutableRefObject<string>;
 }
+
+const currDate = new Date();
 const DatePickerModal: React.FC<DatePickerProps> = ({
   isOpen,
   dateFormat,
   setDate,
   date,
+  minimumDate,
+  maximumDate,
+  isSetTimeRef,
+  targetDateHoursRef,
 }) => {
-  const [currentDate, setCurrentDate] = React.useState<Date>(new Date());
+  const [currentDate, setCurrentDate] = React.useState<Date>(currDate);
+  const [hours, setHours] = React.useState<string>('');
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const handleConfirm = () => {
-    const formattedDate = formatDate(currentDate);
-    setDate(formattedDate);
+    setDate(currentDate);
+    if (dateFormat !== 'time') return close();
+    const [_hours, minutes] = hours.split(':');
+    const fixedDate = new Date(date.setUTCHours(+_hours, +minutes));
+    setDate(fixedDate);
+    isSetTimeRef.current = true;
     close();
   };
   const handleChange = (date: Date) => {
@@ -31,11 +46,16 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
   const handleHoursChange = (date: Date) => {
     const time = date.toLocaleTimeString();
     const [hours, minutes] = time.split(':');
-    const fixedDate = new Date(date.setUTCHours(+hours, +minutes));
+    const formattedTime = `${hours}:${minutes}`;
+    setHours(formattedTime);
+    if (targetDateHoursRef && targetDateHoursRef.current)
+      targetDateHoursRef.current = formattedTime;
+
+    const fixedDate = new Date(currentDate.setUTCHours(+hours, +minutes));
     setCurrentDate(fixedDate);
   };
   const cancelConfirm = () => {
-    setCurrentDate(new Date());
+    setCurrentDate(currentDate);
     close();
   };
 
@@ -47,20 +67,20 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
     bottomSheetModalRef.current?.present();
   };
   const close = () => {
+    setCurrentDate(currDate);
     bottomSheetModalRef.current?.dismiss();
   };
 
   // variables
-  const snapPoints = useMemo(() => ['27%', '27%'], []);
-
+  const snapPoints = useMemo(() => ['37%', '37%'], []);
   const ModalHeader = () => {
     return (
       <View style={styles.btnContainer}>
-        <TouchableOpacity style={styles.btn} onPress={handleConfirm}>
-          <Text style={styles.textBtn}>confirm</Text>
-        </TouchableOpacity>
         <TouchableOpacity style={styles.btn} onPress={cancelConfirm}>
-          <Text style={styles.textBtn}>cancel</Text>
+          <MaterialCommunityIcons name="close" style={styles.textBtn} />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.btn} onPress={handleConfirm}>
+          <Text style={styles.textBtn}>Done</Text>
         </TouchableOpacity>
       </View>
     );
@@ -74,7 +94,6 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
       <BottomSheetModal
         ref={bottomSheetModalRef}
         index={1}
-        onDismiss={cancelConfirm}
         snapPoints={snapPoints}
         stackBehavior="push"
         handleIndicatorStyle={{display: 'none'}}
@@ -83,6 +102,7 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
         }}
         handleComponent={ModalHeader}
         backgroundStyle={{backgroundColor: constants.colors.BGC}}
+        style={{paddingHorizontal: '8%'}}
         onChange={handleSheetChanges}>
         <View>
           <DatePicker
@@ -90,8 +110,10 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
             mode={dateFormat}
             onDateChange={handleChange}
             fadeToColor={constants.colors.BGC}
-            style={styles.datePicker}
-            textColor={constants.colors.GREEN}
+            style={[styles.datePicker]}
+            textColor={constants.colors.OFF_WHITE}
+            minimumDate={minimumDate}
+            maximumDate={maximumDate}
           />
         </View>
       </BottomSheetModal>
@@ -107,17 +129,19 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: '7.5%',
     alignItems: 'center',
+    marginBottom: '10%',
   },
   btn: {
     height: '100%',
     justifyContent: 'center',
+    marginTop: '2%',
+    marginHorizontal: '2%',
   },
   textBtn: {
-    fontFamily: constants.Fonts.paragraph,
+    fontFamily: constants.Fonts.text,
     color: constants.colors.GREEN,
-    fontSize: 20,
+    fontSize: 15,
   },
   datePicker: {
     backgroundColor: constants.colors.BGC,

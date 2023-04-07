@@ -135,7 +135,6 @@ export default React.memo(AuthModal);
 
 const styles = StyleSheet.create({
   container: {
-    // width: '100%',
     width: constants.WIDTH,
   },
   flatList: {

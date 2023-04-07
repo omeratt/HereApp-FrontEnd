@@ -2,6 +2,7 @@ import {FlashList} from '@shopify/flash-list';
 import React, {memo, useCallback, useMemo} from 'react';
 import {NativeScrollEvent, NativeSyntheticEvent, Vibration} from 'react-native';
 import Animated, {
+  SharedValue,
   runOnJS,
   useAnimatedScrollHandler,
   useSharedValue,
@@ -9,6 +10,7 @@ import Animated, {
 import {DATE_WIDTH} from '../screens/Home';
 import RenderDateItem from './RenderDateItem';
 import {DateObject} from './WeeklyCalender';
+import constants from '../assets/constants';
 
 interface Props {
   flashListRef: any;
@@ -16,6 +18,8 @@ interface Props {
   selectedScrollDate: Date;
   selectedFinalDate: Date;
   flatListData: DateObject[];
+  sharedX: SharedValue<number>;
+  sharedDatesIndex: SharedValue<number>;
 }
 const DatesFlatList: React.FC<Props> = ({
   datePress,
@@ -23,6 +27,8 @@ const DatesFlatList: React.FC<Props> = ({
   flatListData,
   selectedFinalDate,
   selectedScrollDate,
+  sharedX,
+  sharedDatesIndex,
 }) => {
   const isCanExecuteOnMomentumEnd = React.useRef<boolean>(false);
   const scrollX = useSharedValue(0);
@@ -64,23 +70,31 @@ const DatesFlatList: React.FC<Props> = ({
     [],
   );
 
-  const shouldVibrate = useSharedValue(false);
+  // const shouldVibrate = useSharedValue(false);
   const last = useSharedValue(0);
 
-  const handleVibration = (i: number) => {
-    Vibration.vibrate(1);
-    shouldVibrate.value = false;
-  };
+  // const handleVibration = (i: number) => {
+  //   Vibration.vibrate(1);
+  //   shouldVibrate.value = false;
+  // };
+
   const animatedScrollHandler = useAnimatedScrollHandler({
     onScroll: ({contentOffset: {x: value}}) => {
       'worklet';
+      const width = DATE_WIDTH / 7;
       last.value = scrollX.value;
       scrollX.value = value;
-      const width = DATE_WIDTH / 7;
       const curI = Math.round(scrollX.value / width);
       const lastI = Math.round(last.value / width);
+      // console.log('first');
+      // scrollX.value = (TASK_CONTAINER_WIDTH - curI - sharedX.value) * width;
+      // flashListRef.current.scrollToOffset({offset:})
+      // sharedX.value = (width * curI - value) * TASK_CONTAINER_WIDTH;
+      // console.log((width * curI - value) * TASK_CONTAINER_WIDTH);
       if (curI !== lastI) {
-        runOnJS(handleVibration)(curI);
+        sharedDatesIndex.value = curI;
+        // sharedX.value = 0;
+        // runOnJS(handleVibration)(curI);
       }
     },
   });

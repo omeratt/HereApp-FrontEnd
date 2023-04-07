@@ -1,18 +1,13 @@
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  I18nManager,
-  LayoutChangeEvent,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
-} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import constants from '../assets/constants';
 import SVG from '../assets/svg';
 import NewTask from '../components/NewTask';
-import Animated, {FadeIn, FadeOutUp} from 'react-native-reanimated';
+import Animated, {
+  FadeIn,
+  FadeOutUp,
+  useSharedValue,
+} from 'react-native-reanimated';
 import {tasksApi, useGetTasksByDateQuery} from '../app/api/taskApi';
 import DisplayTask from '../components/DisplayTask';
 import {useAppDispatch} from '../app/hooks';
@@ -22,13 +17,32 @@ import {DateObject, getDatesForYear} from '../components/WeeklyCalender';
 import Line from '../components/Line';
 import {FlashList} from '@shopify/flash-list';
 import DatesFlatList from '../components/DatesFlatList';
+import moment from 'moment';
 
 const CURRENT_DATE = new Date();
 const allDates = getDatesForYear(CURRENT_DATE);
 const flatListData = Object.values(allDates);
 const initialNumToRender = flatListData.length;
 export const DATE_WIDTH = constants.WIDTH * 0.89444444444444444444444444444444;
+export const TASK_CONTAINER_HEIGHT =
+  constants.HEIGHT * 0.64 * 0.84 - //topView till lists
+  constants.HEIGHT * 0.64 * 0.84 * 0.2 - //date header
+  constants.HEIGHT * 0.64 * 0.84 * 0.2 - //dates list
+  8.7 - //triangle
+  constants.WIDTH * 0.025; //container padding
 const Home = () => {
+  const getIndexByKey = useCallback(
+    (obj: Record<string, any>, key: string): number => {
+      const keys = Object.keys(obj);
+      return keys.indexOf(key);
+    },
+    [],
+  );
+  const findIndexByDate = useCallback((DateToCheck: Date) => {
+    const key = DateToCheck.toLocaleDateString();
+    const index = getIndexByKey(allDates, key);
+    return index;
+  }, []);
   const [tasks, setTasks] = useState<any[]>([]);
   const [selectedFinalDate, setSelectedFinalDate] =
     useState<Date>(CURRENT_DATE);
@@ -36,8 +50,8 @@ const Home = () => {
   const flashListRef = useRef<FlashList<DateObject> | null>(null);
   const [selectedScrollDate, setSelectedScrollDate] =
     useState<Date>(CURRENT_DATE);
-  const [selectedDate, setSelectedDate] = useState<Date>(CURRENT_DATE);
-
+  const [selectedDate, setSelectedDate] = useState<Date>(CURRENT_DATE); // target date
+  const sharedDatesIndex = useSharedValue(findIndexByDate(CURRENT_DATE));
   const [dateHeader, setDateHeader] = useState<DateObject>();
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
@@ -47,9 +61,10 @@ const Home = () => {
   const SetSelectedFinalDate = useCallback((date: any) => {
     setSelectedFinalDate(date);
   }, []);
-  const SetSelectedDate = useCallback((date: any) => {
+  const SetSelectedDate = useCallback((date: Date) => {
     setSelectedDate(date);
   }, []);
+  const sharedX = useSharedValue(0);
   const {
     isLoading: taskLoading,
     data: tasks1,
@@ -57,14 +72,11 @@ const Home = () => {
     isError: taskIsError,
     error: tasksError,
     isFetching: taskFetch,
-  } = useGetTasksByDateQuery(formatDate(CURRENT_DATE));
+  } = useGetTasksByDateQuery(CURRENT_DATE);
   const FetchTasks = useCallback((date: Date) => {
-    const result = dispatch(
-      tasksApi.endpoints.getTasksByDate.initiate(formatDate(date)),
-    )
+    const result = dispatch(tasksApi.endpoints.getTasksByDate.initiate(date))
       .then(res => {
         setTasks(res.data);
-        // console.log(tasks.length);
       })
       .catch(err => {
         console.log('error getting tasks', err);
@@ -85,25 +97,8 @@ const Home = () => {
     [selectedFinalDate],
   );
 
-  function formatDate(date: Date): string {
-    const formattedDate = new Intl.DateTimeFormat('heb-IL', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    }).format(date);
-
-    const fixedDate = formattedDate.split('.').join('/');
-    return fixedDate;
-  }
-
   // TODO: find a way to handle scroll to index
-  const getIndexByKey = useCallback(
-    (obj: Record<string, any>, key: string): number => {
-      const keys = Object.keys(obj);
-      return keys.indexOf(key);
-    },
-    [],
-  );
+
   const findDateAndScroll = useCallback((DateToCheck: Date) => {
     const key = DateToCheck.toLocaleDateString();
     const index = getIndexByKey(allDates, key);
@@ -212,16 +207,7 @@ const Home = () => {
             />
           </View>
           <View style={styles.triangle} />
-          <View
-            style={[
-              styles.date,
-              {
-                // overflow: 'visible',
-                // backfaceVisibility: 'visible',
-                // backgroundColor: 'red',
-                // flex: 1,
-              },
-            ]}>
+          <View style={[styles.date]}>
             <DatesFlatList
               flashListRef={flashListRef}
               datePress={datePress}
@@ -231,6 +217,8 @@ const Home = () => {
               selectedScrollDate={selectedScrollDate}
               flatListData={flatListData}
               // dateHeader={dateHeader}
+              sharedX={sharedX}
+              sharedDatesIndex={sharedDatesIndex}
             />
           </View>
           <View>
@@ -243,9 +231,23 @@ const Home = () => {
             />
           </View>
           <View style={styles.taskListColumnContainer}>
-            {tasks.length > 0 && (
+            {
+              <DisplayTask
+                data={tasks}
+                isTaskLoading={isTaskLoading}
+                sharedX={sharedX}
+                flashListRef={flashListRef}
+                sharedDatesIndex={sharedDatesIndex}
+                datePress={datePress}
+                flatListData={flatListData}
+                snapToOffsets={snapToOffsets}
+              />
+            }
+            {/* {tasks?.length > 0 ? (
               <DisplayTask data={tasks} isTaskLoading={isTaskLoading} />
-            )}
+            ) : (
+              <React.Fragment />
+            )} */}
           </View>
         </View>
         <View style={styles.myListContainer}>
@@ -327,6 +329,8 @@ const Home = () => {
             closeModal={bottomSheetModalRef.current?.dismiss}
             targetDate={selectedDate}
             setTargetDate={SetSelectedDate}
+            maximumDate={flatListData[initialNumToRender - 1]?.fullDate}
+            minimumDate={flatListData[0]?.fullDate}
           />
         </BottomSheetModal>
       </BottomSheetModalProvider>
@@ -346,7 +350,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   topView: {
-    height: '63.9%',
+    height: '64%',
     width: '100%',
     alignItems: 'center',
     borderRadius: 40,
@@ -381,11 +385,12 @@ const styles = StyleSheet.create({
   boxPlusIcon: {},
 
   task: {
-    height: '75.5%',
+    height: '84%',
     borderColor: constants.colors.UNDER_LINE,
     borderBottomWidth: 1,
+    // backgroundColor: 'cyan',
     // padding: '5%',
-    position: 'relative',
+    // position: 'relative',
   },
   today: {
     // backgroundColor: 'blue',
@@ -418,8 +423,10 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   date: {
-    height: '23.5%',
+    height: '20%',
     // width: '100%',
+    // backgroundColor: 'blue',
+
     paddingHorizontal: constants.WIDTH * 0.025,
     // paddingLeft: constants.WIDTH * 0.025,
     // paddingRight: constants.WIDTH * 0.025,
@@ -430,13 +437,21 @@ const styles = StyleSheet.create({
     // alignItems: 'center',
   },
   taskListColumnContainer: {
-    height: `${100 - 23.5 - 15}%`,
-    padding: '5%',
+    // height: `${100 - 22.7 - 20}%`,
+    height: TASK_CONTAINER_HEIGHT, //container padding
+    overflow: 'hidden',
+    // backgroundColor: 'cyan',
+    // borderColor: 'brown',
+    // borderWidth: 1,
+    padding: '0%',
   },
   myListContainer: {
-    height: '24.5%',
-    paddingTop: '3%',
+    // height: '16%',
+    paddingVertical: '1.5%',
+    // justifyContent: 'flex-end',
     // backgroundColor: 'blue',
+    // borderColor: 'brown',
+    // borderWidth: 2,
   },
   myList: {
     marginBottom: 6,
@@ -446,7 +461,7 @@ const styles = StyleSheet.create({
   myListTitle: {
     fontFamily: constants.Fonts.paragraph,
     color: constants.colors.BLACK,
-    fontSize: 22,
+    fontSize: 20,
     // fontWeight: '600',
   },
   categoryContainer: {
@@ -458,7 +473,7 @@ const styles = StyleSheet.create({
     // backgroundColor: constants.colors.BLACK,
   },
   myListCategory: {
-    height: '80.5%',
+    // height: '80.5%',
     width: '31%',
     padding: '0.1%',
     borderRadius: 40,

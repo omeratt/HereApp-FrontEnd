@@ -19,7 +19,11 @@ const SetTimeContent: FC<Props> = ({onPress, title, buttonTxt, dateFormat}) => {
     <View style={styles.flexOneAndJustifyCenter}>
       <View style={styles.textAndToggleContainer}>
         <View style={styles.TxtAndToggleInSetTime}>
-          <TouchableOpacity style={styles.btn}>
+          <TouchableOpacity
+            style={styles.btn}
+            onPress={() => {
+              onPress(dateFormat || 'date', title === 'End Date');
+            }}>
             <Text style={styles.btnTxt} numberOfLines={1}>
               {buttonTxt}
             </Text>
@@ -56,7 +60,7 @@ const styles = StyleSheet.create({
   subSectionTxt: {
     color: constants.colors.BLACK,
     fontFamily: constants.Fonts.text,
-    fontSize: 12,
+    fontSize: 14,
   },
   btn: {
     borderColor: constants.colors.GREY,
@@ -67,5 +71,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     textAlign: 'center',
   },
-  btnTxt: {color: '#0500FF', textAlign: 'center'},
+  btnTxt: {
+    color: '#0500FF',
+    textAlign: 'center',
+    fontSize: 12,
+    fontFamily: constants.Fonts.text,
+  },
 });

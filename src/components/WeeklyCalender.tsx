@@ -14,6 +14,14 @@ const getShortName = (dayOfWeek: number): string => {
   return names[dayOfWeek];
 };
 
+export const getTimeFromDateString = (date?: string) => {
+  if (!date) return ' ';
+  const itemTime = date.split('T')[1];
+  const [hours, minutes] = itemTime.split(':');
+  const itemHours = `${hours}:${minutes}`;
+  return itemHours;
+};
+
 export function getDatesForYear(_date: Date): Record<string, DateObject> {
   const year = _date.getFullYear();
   const _month = _date.getMonth();

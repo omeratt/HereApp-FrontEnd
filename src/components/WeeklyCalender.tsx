@@ -14,11 +14,14 @@ const getShortName = (dayOfWeek: number): string => {
   return names[dayOfWeek];
 };
 
-export const getTimeFromDateString = (date?: string) => {
+export const getTimeFromDateString = (date?: string, isIn24Hours?: boolean) => {
   if (!date) return ' ';
   const itemTime = date.split('T')[1];
   const [hours, minutes] = itemTime.split(':');
-  const itemHours = `${hours}:${minutes}`;
+  if (isIn24Hours) return `${hours}:${minutes} `;
+  const amOrPm = +hours >= 12 ? 'PM' : 'AM';
+  const hoursIn12Hour = +hours % 12 || 12;
+  const itemHours = `${hoursIn12Hour}:${minutes} ${amOrPm}`;
   return itemHours;
 };
 

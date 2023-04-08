@@ -7,6 +7,7 @@ import MenuIcon from './MenuIcon.svg';
 import plusIconOutlined from './plusIconOutlined.svg';
 import BoxIcon from './BoxIcon.svg';
 import ArrowDown from './ArrowDown.svg';
+import NumCheckbox from './NumCheckBox.svg';
 const SVG = {
   HereLogo,
   DoneButton,
@@ -17,5 +18,6 @@ const SVG = {
   plusIconOutlined,
   BoxIcon,
   ArrowDown,
+  NumCheckbox,
 };
 export default SVG;

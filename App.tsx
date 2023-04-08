@@ -19,6 +19,8 @@ import {Provider} from 'react-redux';
 import {persistor, store} from './src/app/store';
 import {PersistGate} from 'redux-persist/integration/react';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+// import NewList from './src/screens/list/NewList';
+import MyLists from './src/screens/list/MyLists';
 const App = () => {
   return (
     <>
@@ -26,7 +28,9 @@ const App = () => {
         <PersistGate persistor={persistor} loading={<Text>Loading...</Text>}>
           <Provider store={store}>
             <BottomSheetModalProvider>
-              <MainStack />
+              {/* <MainStack /> */}
+              <MyLists />
+              {/* <NewList /> */}
             </BottomSheetModalProvider>
           </Provider>
         </PersistGate>
@@ -38,22 +42,6 @@ const App = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
   },
 });
 

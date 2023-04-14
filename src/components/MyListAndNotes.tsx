@@ -8,6 +8,7 @@ export const PADDING_HORIZONTAL = constants.WIDTH * 0.0848;
 type Children<P> = P & {children?: ReactNode};
 interface Props {
   onDonePress?: () => void;
+  onRightBtnPress?: () => void;
   children?: Children<ReactNode>;
   title?: string;
   numberOfLines?: number;
@@ -19,6 +20,7 @@ const MyListAndNotes: FC<Props> = ({
   title,
   numberOfLines = 2,
   rightBtn,
+  onRightBtnPress,
 }) => {
   const onPress = useCallback(() => {
     console.log('click on done');
@@ -38,8 +40,7 @@ const MyListAndNotes: FC<Props> = ({
           {rightBtn && (
             <TouchableOpacity
               style={[{height: '100%'}]}
-              // onPress={onNumbersLIPress}
-            >
+              onPress={onRightBtnPress}>
               <SVG.plusIconOutlined
                 width={25}
                 height={25}

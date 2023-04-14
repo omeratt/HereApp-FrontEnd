@@ -20,7 +20,6 @@ const NewList = () => {
   }, []);
   return (
     <MyListAndNotes title={'New list category'} rightBtn={false}>
-      {/* <View style={styles.listContainerContent}> */}
       <TextInput
         ref={textInputRef}
         maxLength={19}
@@ -31,7 +30,6 @@ const NewList = () => {
         style={styles.newTaskTitleInput}
         onChangeText={onChangeText}
       />
-      {/* </View> */}
     </MyListAndNotes>
   );
 };

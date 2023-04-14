@@ -13,6 +13,7 @@ import CustomDrawer from './Navigation/CustomDrawer';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import OnBoarding from './screens/OnBoarding';
+import ListAndNotesNavigator from './Navigation/ListNavigation';
 const ICON_SIZE = 20;
 // const Stack = createNativeStackNavigator();
 const Stack = createDrawerNavigator();
@@ -84,6 +85,21 @@ export default function MainStack() {
                 drawerIcon: ({color, focused}) => (
                   <Ionicons
                     name={focused ? 'home' : 'home-outline'}
+                    size={ICON_SIZE}
+                    style={[styles.icon, {color}]}
+                  />
+                ),
+              }}
+            />
+            <Stack.Screen
+              name="ListAndNotesStack"
+              component={ListAndNotesNavigator}
+              options={{
+                swipeEnabled: false,
+                headerShown: false,
+                drawerIcon: ({color, focused}) => (
+                  <Ionicons
+                    name={focused ? 'list' : 'ios-list-outline'}
                     size={ICON_SIZE}
                     style={[styles.icon, {color}]}
                   />

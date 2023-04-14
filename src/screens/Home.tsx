@@ -130,6 +130,9 @@ const Home = () => {
   const openDrawer = () => {
     navigation.dispatch(DrawerActions.openDrawer());
   };
+  const handleListPlusIcon = useCallback(() => {
+    navigation.navigate('ListAndNotesStack' as never);
+  }, [navigation]);
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
   // variables
@@ -252,10 +255,25 @@ const Home = () => {
         </View>
         <View style={styles.myListContainer}>
           <View style={styles.myList}>
-            <SVG.plusIconOutlined
+            {/* <SVG.plusIconOutlined
               style={styles.myListPlusIcon}
               fill={constants.colors.BGC}
-            />
+              onPress={() => {
+                console.log('asf');
+              }}
+            /> */}
+            <TouchableOpacity
+              onPress={handleListPlusIcon}
+              style={[
+                {
+                  zIndex: 1,
+                },
+              ]}>
+              <SVG.plusIconOutlined
+                style={[styles.plusIcon]}
+                fill={constants.colors.BGC}
+              />
+            </TouchableOpacity>
             <Text style={styles.myListTitle}>My lists</Text>
           </View>
           <View style={styles.categoryContainer}>

@@ -3,49 +3,94 @@ import React from 'react';
 import CheckBox from '../../components/CheckBox';
 import Line from '../../components/Line';
 import constants from '../../assets/constants';
-import Feather from 'react-native-vector-icons/Feather';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import TextInput from '../../components/TextInput';
 import {PADDING_HORIZONTAL} from '../../components/MyListAndNotes';
+import {CheckBoxListType} from './MyLists';
 
 interface ListItemProps {
-  iconSize: number;
+  iconSize?: number;
+  isCheckBox?: boolean;
+  showLine?: boolean;
+  type: CheckBoxListType;
+  index: number;
+  flag?: boolean;
+  description?: string;
 }
-const ListItem: React.FC<ListItemProps> = ({iconSize}) => {
+const ListItem: React.FC<ListItemProps> = ({
+  index,
+  iconSize = 25,
+  type,
+  isCheckBox = true,
+  showLine = true,
+  flag,
+  description,
+}) => {
+  const width = constants.WIDTH - PADDING_HORIZONTAL * 2 - iconSize * 2 - 20;
   return (
-    <View>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-        }}>
-        <CheckBox size={iconSize} isElevation={false} type={'DOTS'} />
-        <TextInput
-          containerStyle={{justifyContent: 'flex-start'}}
-          style={{
-            // backgroundColor: 'cyan',
-            marginTop: 0,
-            padding: 0,
-            borderBottomWidth: 0,
-            width: constants.WIDTH - PADDING_HORIZONTAL * 2 - iconSize * 2 - 20,
-            fontSize: iconSize,
-            textAlignVertical: 'bottom',
-            height: iconSize,
-          }}
-          placeholder="hahahahaha"
+    <View style={{paddingBottom: '4%'}}>
+      <View style={styles.topContainer}>
+        {isCheckBox && (
+          <CheckBox size={iconSize} type={type} index={index + 1} />
+        )}
+        {!description ? (
+          <TextInput
+            containerStyle={styles.inputContentStyle}
+            style={[
+              styles.input,
+              {
+                width,
+                fontSize: iconSize,
+                height: iconSize,
+              },
+            ]}
+            placeholder="Please add your task...."
+          />
+        ) : (
+          <Text
+            style={[
+              styles.input,
+              {
+                width,
+                fontSize: iconSize,
+                height: iconSize,
+              },
+            ]}>
+            {description}
+          </Text>
+        )}
+        <Ionicons
+          name={flag ? 'flag' : 'flag-outline'}
+          size={iconSize}
+          color={constants.colors.BLACK}
         />
-        <Feather name="flag" size={iconSize} color={'black'} />
       </View>
-      <Line
-        lengthPercentage={100}
-        strength={1}
-        rotate180
-        lineColor={constants.colors.UNDER_LINE}
-      />
+      {showLine && (
+        <Line
+          lengthPercentage={100}
+          strength={1}
+          lineColor={constants.colors.UNDER_LINE}
+        />
+      )}
     </View>
   );
 };
 
 export default ListItem;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  topContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  input: {
+    marginTop: 0,
+    padding: 0,
+    borderBottomWidth: 0,
+    textAlignVertical: 'bottom',
+    fontFamily: constants.Fonts.text,
+    color: constants.colors.BLACK,
+  },
+  inputContentStyle: {justifyContent: 'flex-start'},
+});

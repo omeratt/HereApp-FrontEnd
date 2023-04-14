@@ -1,78 +1,42 @@
-import {
-  Keyboard,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import React, {memo, useCallback, useEffect, useRef} from 'react';
+import {FlatList, StyleSheet, TouchableOpacity, View} from 'react-native';
+import React, {memo, useCallback, useEffect, useRef, useState} from 'react';
 import constants from '../../assets/constants';
 import SVG from '../../assets/svg';
 import MyListAndNotes from '../../components/MyListAndNotes';
 import ListItem from './ListItem';
-import CheckBox from '../../components/CheckBox';
 export type CheckBoxListType = 'NUMBERS' | 'DOTS' | 'V' | 'NONE';
 const MyLists = () => {
+  const [checkboxType, setCheckboxType] = useState<CheckBoxListType>('V');
   const height = constants.HEIGHT * (71 / 896);
   const width = constants.WIDTH * (71 / 414);
-  const textInputRef = useRef<TextInput>(null);
-  const InputRef = useRef<string>('');
   const onListItemTypePress = useCallback((type: CheckBoxListType) => {
-    console.log('click on checkbox, type is ', type);
+    setCheckboxType(type);
   }, []);
-  const onChangeText = useCallback((text: string) => {
-    InputRef.current = text;
-  }, []);
-  const onKeyboardDismiss = () => {
-    textInputRef.current?.blur();
-  };
-  const onVCheckboxPress = useCallback(() => onListItemTypePress('V'), []);
+
+  const onVCheckboxPress = useCallback(
+    () => onListItemTypePress('V'),
+    [onListItemTypePress],
+  );
   const onDotsCheckboxPress = useCallback(
     () => onListItemTypePress('DOTS'),
-    [],
+    [onListItemTypePress],
   );
   const onNumbersCheckboxPress = useCallback(
     () => onListItemTypePress('NUMBERS'),
-    [],
+    [onListItemTypePress],
   );
-  useEffect(() => {
-    Keyboard.addListener('keyboardDidHide', onKeyboardDismiss);
-  }, []);
+
+  const data = [1, 2, 3, 4, 5];
   const checkBoxSize = constants.HEIGHT * (22.95 / 896);
   return (
     <MyListAndNotes title="Homework">
-      <View style={styles.listContainerContent}>
-        <ListItem iconSize={checkBoxSize} />
-        <ListItem iconSize={checkBoxSize} />
-        <ListItem iconSize={checkBoxSize} />
-        <ListItem iconSize={checkBoxSize} />
-        {/* <CheckBox
-          size={checkBoxSize}
-          fill="black"
-          isElevation={false}
-          type={'DOTS'}
-        /> */}
-        {/* <CheckBox size={checkBoxSize} fill="black" isElevation={false} />
-        <CheckBox
-          size={checkBoxSize}
-          fill="black"
-          isElevation={false}
-          type={'V'}
-        />
-        <CheckBox
-          size={checkBoxSize}
-          fill="black"
-          isElevation={false}
-          type={'NUMBERS'}
-        />
-        <CheckBox
-          size={checkBoxSize}
-          fill="black"
-          isElevation={false}
-          type={'NUMBERS'}
-        /> */}
-      </View>
+      <FlatList
+        data={data}
+        renderItem={props => (
+          <ListItem iconSize={checkBoxSize} type={checkboxType} {...props} />
+        )}
+        style={styles.listContainerContent}
+      />
       <View style={styles.listContainerFooter}>
         <TouchableOpacity
           style={[styles.containerFooterBtn, {height, width}]}

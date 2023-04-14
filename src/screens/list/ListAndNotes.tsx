@@ -6,12 +6,14 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import React, {memo, useEffect, useRef} from 'react';
+import React, {memo, useCallback, useEffect, useRef} from 'react';
 import constants from '../../assets/constants';
 import MyListAndNotes from '../../components/MyListAndNotes';
 import BallonTxt from '../../components/BallonTxt';
+import {useNavigation} from '@react-navigation/native';
 
 const NewCategory = () => {
+  const navigation = useNavigation();
   let categories = [
     {txt: 'brow'},
     {txt: 'To-Do Lists'},
@@ -41,8 +43,14 @@ const NewCategory = () => {
   //   {txt: 'Recipe Lists'},
   //   {txt: 'Goal Lists'},
   // ];
+  const navigateToAddCategory = useCallback(() => {
+    navigation.navigate('NewList' as never);
+  }, []);
   return (
-    <MyListAndNotes rightBtn title="All my lists and notes">
+    <MyListAndNotes
+      rightBtn
+      title="All my lists and notes"
+      onRightBtnPress={navigateToAddCategory}>
       <FlatList
         data={categories}
         renderItem={props => <BallonTxt txt={props.item.txt} {...props} />}

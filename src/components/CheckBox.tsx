@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity} from 'react-native';
 import React from 'react';
 import constants from '../assets/constants';
 import {CheckBoxListType} from '../screens/list/MyLists';
@@ -6,26 +6,16 @@ import SVG from '../assets/svg';
 
 interface props {
   size: number;
-  fill?: string;
-  borderColor?: string;
-  isElevation?: boolean;
+  index?: number;
   type?: CheckBoxListType;
 }
-export default function CheckBox({
-  size,
-  fill,
-  borderColor,
-  isElevation = true,
-  type,
-}: props) {
+export default function CheckBox({size, type, index}: props) {
   const [isFilled, setIsFilled] = React.useState<boolean>(false);
   const onClick = () => {
     setIsFilled(prev => !prev);
   };
   const isNumber = type === 'NUMBERS';
-  //   if (type === 'NUMBERS' || true) {
-  //     return <Text style={{color: constants.Fonts.paragraph}}>1.</Text>;
-  //   }
+
   return (
     <TouchableOpacity
       onPress={onClick}
@@ -40,10 +30,6 @@ export default function CheckBox({
               ? constants.colors.BLACK
               : constants.colors.OFF_WHITE,
           borderRadius: size / 2,
-          elevation: isElevation ? 5 : 0,
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: 5,
         },
       ]}>
       {type === 'V' && isFilled && (
@@ -56,7 +42,7 @@ export default function CheckBox({
             color: constants.colors.BLACK,
             fontSize: size / 1.2,
           }}>
-          1.
+          {`${index}.`}
         </Text>
       )}
     </TouchableOpacity>
@@ -68,5 +54,8 @@ const styles = StyleSheet.create({
     // borderRadius: 9999,
     borderWidth: 1,
     borderColor: constants.colors.GREY,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: '1.5%',
   },
 });

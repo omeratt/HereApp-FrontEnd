@@ -1,18 +1,54 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, {FC, ReactNode, memo, useCallback} from 'react';
 import constants from '../assets/constants';
+import SVG from '../assets/svg';
+
+export const PADDING_HORIZONTAL = constants.WIDTH * 0.0848;
 
 type Children<P> = P & {children?: ReactNode};
 interface Props {
   onDonePress?: () => void;
   children?: Children<ReactNode>;
+  title?: string;
+  numberOfLines?: number;
+  rightBtn?: boolean;
 }
-const MyListAndNotes: FC<Props> = ({children, onDonePress}) => {
+const MyListAndNotes: FC<Props> = ({
+  children,
+  onDonePress,
+  title,
+  numberOfLines = 2,
+  rightBtn,
+}) => {
   const onPress = useCallback(() => {
     console.log('click on done');
   }, []);
   return (
     <View style={styles.container}>
+      {title && (
+        <View style={styles.topContainer}>
+          <View style={styles.titleContainer}>
+            <Text
+              style={styles.title}
+              numberOfLines={numberOfLines}
+              textBreakStrategy="balanced">
+              {title}
+            </Text>
+          </View>
+          {rightBtn && (
+            <TouchableOpacity
+              style={[{height: '100%'}]}
+              // onPress={onNumbersLIPress}
+            >
+              <SVG.plusIconOutlined
+                width={25}
+                height={25}
+                fill={constants.colors.BLACK}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
       <View style={styles.listContainer}>{children}</View>
       <View style={styles.footer}>
         <TouchableOpacity
@@ -33,18 +69,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: constants.colors.OFF_WHITE,
   },
+  topContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingTop: '10%',
+    width: '100%',
+    paddingHorizontal: PADDING_HORIZONTAL,
+  },
+  titleContainer: {width: '55%'},
+  title: {
+    fontFamily: constants.Fonts.paragraph,
+    color: constants.colors.BLACK,
+    fontSize: 32,
+    width: '100%',
+    lineHeight: 32,
+  },
   listContainer: {
-    // padding: 10,
-    flex: 0.9,
+    // backgroundColor: 'cyan',
+    flex: 4.5,
     borderWidth: 1.2,
     borderColor: constants.colors.UNDER_LINE,
     borderBottomLeftRadius: 50,
     borderBottomRightRadius: 50,
     width: '100%',
     borderTopWidth: 0,
-    marginTop: '10%',
-    // paddingHorizontal: '7.48%',
-    paddingHorizontal: constants.WIDTH * 0.0748,
+    paddingHorizontal: PADDING_HORIZONTAL,
     alignSelf: 'flex-start',
   },
   listContainerHeader: {
@@ -97,8 +147,11 @@ const styles = StyleSheet.create({
     marginLeft: '13%',
   },
   footer: {
-    flex: 0.15,
-    justifyContent: 'center',
+    // backgroundColor: 'red',
+    flex: 0.7,
+    // justifyContent: 'center',
+    justifyContent: 'flex-start',
+    paddingTop: '4%',
   },
   footerBtn: {
     borderWidth: 0.5,

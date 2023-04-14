@@ -1,35 +1,56 @@
-import {Keyboard, StyleSheet, Text, TextInput, View} from 'react-native';
+import {
+  FlatList,
+  Keyboard,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import React, {memo, useEffect, useRef} from 'react';
 import constants from '../../assets/constants';
-import PlusIcon from '../../components/PlusIcon';
 import MyListAndNotes from '../../components/MyListAndNotes';
 import BallonTxt from '../../components/BallonTxt';
 
 const NewCategory = () => {
+  let categories = [
+    {txt: 'brow'},
+    {txt: 'To-Do Lists'},
+    {txt: 'Wish Lists'},
+    {txt: 'Bucaaaew'},
+    {txt: 'TraLists'},
+    {txt: 'gsa'},
+    {txt: 'Reading'},
+    {txt: 'Lists'},
+    {txt: 'Recipe Lists'},
+    {txt: 'Goal Lists'},
+    {txt: 'Goal Lists'},
+    {txt: 'Goal Lists'},
+    {txt: 'Goal Lists'},
+    {txt: 'Goal Lists'},
+    {txt: 'Goal Lists'},
+  ];
+  // let categories = [
+  //   {txt: 'Grocery Lists'},
+  //   {txt: 'To-Do Lists'},
+  //   {txt: 'Wish Lists'},
+  //   {txt: 'Bucket Lists'},
+  //   {txt: 'Travel Lists'},
+  //   {txt: 'Shopping Lists'},
+  //   {txt: 'Reading Lists'},
+  //   {txt: 'Movie Lists'},
+  //   {txt: 'Recipe Lists'},
+  //   {txt: 'Goal Lists'},
+  // ];
   return (
-    <MyListAndNotes>
-      <View style={styles.bottomContainer}>
-        <View style={styles.wordsContainer}>
-          <BallonTxt index={1} txt="bal" selectedItems={['s']} />
-          <BallonTxt index={1} txt="homework" selectedItems={['s']} />
-          <BallonTxt index={1} txt="design" selectedItems={['s']} />
-          <BallonTxt index={1} txt="balance" selectedItems={['s']} />
-          <BallonTxt index={1} txt="balhomework" selectedItems={['s']} />
-          <BallonTxt index={1} txt="homework" selectedItems={['s']} />
-          <BallonTxt index={1} txt="design" selectedItems={['s']} />
-          <BallonTxt index={1} txt="balancehomework" selectedItems={['s']} />
-          <BallonTxt index={1} txt="bal" selectedItems={['s']} />
-          <BallonTxt index={1} txt="bal" selectedItems={['s']} />
-          <BallonTxt index={1} txt="bal" selectedItems={['s']} />
-          <BallonTxt index={1} txt="homework" selectedItems={['s']} />
-          <BallonTxt
-            index={1}
-            txt="designbalancehomework"
-            selectedItems={['s']}
-          />
-          <BallonTxt index={1} txt="balance" selectedItems={['s']} />
-        </View>
-      </View>
+    <MyListAndNotes rightBtn title="All my lists and notes">
+      <FlatList
+        data={categories}
+        renderItem={props => <BallonTxt txt={props.item.txt} {...props} />}
+        style={styles.wordsContainer}
+        contentContainerStyle={{width: '100%'}}
+        numColumns={2}
+        showsVerticalScrollIndicator={false}
+      />
     </MyListAndNotes>
   );
 };
@@ -37,37 +58,12 @@ const NewCategory = () => {
 export default memo(NewCategory);
 
 const styles = StyleSheet.create({
-  // listContainerHeader: {
-  //   // flex: 1,
-  //   backgroundColor: constants.colors.BGC,
-  //   paddingHorizontal: constants.WIDTH * 0.071449,
-  //   paddingVertical: constants.HEIGHT * 0.0591,
-  // },
-  bottomContainer: {
-    // backgroundColor: 'cyan',
-    // paddingHorizontal: constants.WIDTH * 0.071449,
-    // paddingVertical: constants.HEIGHT * 0.0591,
-    height: '76.2277%',
-    alignSelf: 'flex-start',
-  },
   wordsContainer: {
-    // backgroundColor: 'red',
-    // flex: 1,
+    // backgroundColor: 'cyan',
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    width: '100%',
   },
-  // listContainerHeader: {
-  //   flexDirection: 'row',
-  //   flex: 1,
-  //   // flex:'w'
-  //   flexWrap: 'wrap',
-  //   flexGrow: 2,
-
-  //   justifyContent: 'space-between',
-  //   alignSelf: 'center',
-  //   // width: '100%',
-  // },
   textHeader: {
     fontFamily: constants.Fonts.text,
     color: constants.colors.BLACK,

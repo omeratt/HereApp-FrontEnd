@@ -10,13 +10,15 @@ import React, {memo, useCallback, useEffect, useRef} from 'react';
 import constants from '../../assets/constants';
 import SVG from '../../assets/svg';
 import MyListAndNotes from '../../components/MyListAndNotes';
-type CheckboxListItem = 'circle' | 'filledCircle' | 'numbers' | 'note';
+import ListItem from './ListItem';
+import CheckBox from '../../components/CheckBox';
+export type CheckBoxListType = 'NUMBERS' | 'DOTS' | 'V' | 'NONE';
 const MyLists = () => {
   const height = constants.HEIGHT * (71 / 896);
   const width = constants.WIDTH * (71 / 414);
   const textInputRef = useRef<TextInput>(null);
   const InputRef = useRef<string>('');
-  const onListItemTypePress = useCallback((type: CheckboxListItem) => {
+  const onListItemTypePress = useCallback((type: CheckBoxListType) => {
     console.log('click on checkbox, type is ', type);
   }, []);
   const onChangeText = useCallback((text: string) => {
@@ -25,66 +27,70 @@ const MyLists = () => {
   const onKeyboardDismiss = () => {
     textInputRef.current?.blur();
   };
-  const onCircleLIPress = useCallback(() => onListItemTypePress('circle'), []);
-  const onFilledCircleLIPress = useCallback(
-    () => onListItemTypePress('filledCircle'),
+  const onVCheckboxPress = useCallback(() => onListItemTypePress('V'), []);
+  const onDotsCheckboxPress = useCallback(
+    () => onListItemTypePress('DOTS'),
     [],
   );
-  const onNumbersLIPress = useCallback(
-    () => onListItemTypePress('numbers'),
+  const onNumbersCheckboxPress = useCallback(
+    () => onListItemTypePress('NUMBERS'),
     [],
   );
   useEffect(() => {
     Keyboard.addListener('keyboardDidHide', onKeyboardDismiss);
   }, []);
-  const ListItem = () => {
-    return (
-      <View style={{backgroundColor: 'cyan', alignItems: 'flex-start'}}>
-        <TouchableOpacity style={[styles.innerBtnCircleCheckbox]} />
-        <TouchableOpacity style={[styles.innerBtnCircleCheckbox]} />
-        <TouchableOpacity style={[styles.innerBtnCircleCheckbox]} />
-      </View>
-    );
-  };
+  const checkBoxSize = constants.HEIGHT * (22.95 / 896);
   return (
-    <MyListAndNotes>
-      <View style={styles.listContainerHeader}>
-        <View>
-          <Text style={styles.textHeader}>Home-work</Text>
-          <Text style={styles.textHeader}>design</Text>
-        </View>
-      </View>
+    <MyListAndNotes title="Homework">
       <View style={styles.listContainerContent}>
-        <TextInput
-          ref={textInputRef}
-          maxLength={19}
-          placeholder="Notes"
-          placeholderTextColor={constants.colors.UNDER_LINE}
-          selectionColor={constants.colors.GREEN}
-          cursorColor={constants.colors.GREEN}
-          style={styles.newTaskTitleInput}
-          onChangeText={onChangeText}
+        <ListItem iconSize={checkBoxSize} />
+        <ListItem iconSize={checkBoxSize} />
+        <ListItem iconSize={checkBoxSize} />
+        <ListItem iconSize={checkBoxSize} />
+        {/* <CheckBox
+          size={checkBoxSize}
+          fill="black"
+          isElevation={false}
+          type={'DOTS'}
+        /> */}
+        {/* <CheckBox size={checkBoxSize} fill="black" isElevation={false} />
+        <CheckBox
+          size={checkBoxSize}
+          fill="black"
+          isElevation={false}
+          type={'V'}
         />
-        <ListItem />
+        <CheckBox
+          size={checkBoxSize}
+          fill="black"
+          isElevation={false}
+          type={'NUMBERS'}
+        />
+        <CheckBox
+          size={checkBoxSize}
+          fill="black"
+          isElevation={false}
+          type={'NUMBERS'}
+        /> */}
       </View>
       <View style={styles.listContainerFooter}>
         <TouchableOpacity
           style={[styles.containerFooterBtn, {height, width}]}
-          onPress={onCircleLIPress}>
+          onPress={onVCheckboxPress}>
           <View style={styles.innerBtnCircleCheckbox} />
           <View style={styles.innerBtnCircleCheckbox} />
           <View style={styles.innerBtnCircleCheckbox} />
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.containerFooterBtn, {height, width}]}
-          onPress={onFilledCircleLIPress}>
+          onPress={onDotsCheckboxPress}>
           <View style={innerBtnFillCircleCheckbox} />
           <View style={innerBtnFillCircleCheckbox} />
           <View style={innerBtnFillCircleCheckbox} />
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.containerFooterBtn, {height, width}]}
-          onPress={onNumbersLIPress}>
+          onPress={onNumbersCheckboxPress}>
           <SVG.NumCheckbox style={{marginLeft: '13%'}} />
         </TouchableOpacity>
       </View>
@@ -106,7 +112,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
   },
   listContainerContent: {
-    marginTop: '10%',
+    // marginTop: '10%',
   },
   newTaskTitleInput: {
     borderWidth: 0,

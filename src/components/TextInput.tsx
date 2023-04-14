@@ -6,6 +6,8 @@ import {
   TextInputProps,
   Dimensions,
   Keyboard,
+  StyleProp,
+  ViewStyle,
 } from 'react-native';
 import React, {forwardRef, useImperativeHandle, useRef, useState} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -16,7 +18,10 @@ export interface InputHandle {
   onFocus: () => void;
   setText: (value: string) => void;
 }
-const TextInput = forwardRef<InputHandle, TextInputProps>((props, ref) => {
+interface MyTextInputProps extends TextInputProps {
+  containerStyle?: StyleProp<ViewStyle>;
+}
+const TextInput = forwardRef<InputHandle, MyTextInputProps>((props, ref) => {
   const [isSecurePass, setSecurePass] = useState(
     props.secureTextEntry ? true : false,
   );
@@ -36,7 +41,8 @@ const TextInput = forwardRef<InputHandle, TextInputProps>((props, ref) => {
     textInputRef?.current?.blur();
   });
   return (
-    <View style={styles.container}>
+    <View
+      style={[styles.container, props?.containerStyle && props.containerStyle]}>
       <Input
         {...props}
         style={
@@ -65,8 +71,6 @@ const TextInput = forwardRef<InputHandle, TextInputProps>((props, ref) => {
 export default React.memo(TextInput);
 const styles = StyleSheet.create({
   container: {
-    // width: '100%',
-    // display: 'flex',
     flexDirection: 'row',
     alignItems: 'flex-end',
     justifyContent: 'flex-end',

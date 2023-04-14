@@ -8,6 +8,7 @@ import plusIconOutlined from './plusIconOutlined.svg';
 import BoxIcon from './BoxIcon.svg';
 import ArrowDown from './ArrowDown.svg';
 import NumCheckbox from './NumCheckBox.svg';
+import VIcon from './vIcon.svg';
 const SVG = {
   HereLogo,
   DoneButton,
@@ -19,5 +20,6 @@ const SVG = {
   BoxIcon,
   ArrowDown,
   NumCheckbox,
+  VIcon,
 };
 export default SVG;

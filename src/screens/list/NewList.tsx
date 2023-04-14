@@ -19,25 +19,19 @@ const NewList = () => {
     Keyboard.addListener('keyboardDidHide', onKeyboardDismiss);
   }, []);
   return (
-    <MyListAndNotes>
-      <View style={styles.listContainerHeader}>
-        <View>
-          <Text style={styles.textHeader}>New list</Text>
-          <Text style={styles.textHeader}>category</Text>
-        </View>
-      </View>
-      <View style={styles.listContainerContent}>
-        <TextInput
-          ref={textInputRef}
-          maxLength={19}
-          placeholder="List name"
-          placeholderTextColor={constants.colors.UNDER_LINE}
-          selectionColor={constants.colors.GREEN}
-          cursorColor={constants.colors.GREEN}
-          style={styles.newTaskTitleInput}
-          onChangeText={onChangeText}
-        />
-      </View>
+    <MyListAndNotes title={'New list category'} rightBtn={false}>
+      {/* <View style={styles.listContainerContent}> */}
+      <TextInput
+        ref={textInputRef}
+        maxLength={19}
+        placeholder="List name"
+        placeholderTextColor={constants.colors.UNDER_LINE}
+        selectionColor={constants.colors.GREEN}
+        cursorColor={constants.colors.GREEN}
+        style={styles.newTaskTitleInput}
+        onChangeText={onChangeText}
+      />
+      {/* </View> */}
     </MyListAndNotes>
   );
 };
@@ -45,20 +39,6 @@ const NewList = () => {
 export default memo(NewList);
 
 const styles = StyleSheet.create({
-  listContainerHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignSelf: 'center',
-    width: '100%',
-  },
-  textHeader: {
-    fontFamily: constants.Fonts.text,
-    color: constants.colors.BLACK,
-    fontSize: 25,
-  },
-  listContainerContent: {
-    marginTop: '10%',
-  },
   newTaskTitleInput: {
     borderWidth: 0,
     fontSize: 20,
@@ -66,6 +46,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     textAlignVertical: 'center',
     fontFamily: constants.Fonts.text,
-    marginLeft: '2%',
   },
 });

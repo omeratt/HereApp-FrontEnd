@@ -1,7 +1,6 @@
 import {Keyboard, StyleSheet, Text, TextInput, View} from 'react-native';
 import React, {memo, useEffect, useRef} from 'react';
 import constants from '../../assets/constants';
-import PlusIcon from '../../components/PlusIcon';
 import MyListAndNotes from '../../components/MyListAndNotes';
 
 const NewList = () => {
@@ -26,7 +25,6 @@ const NewList = () => {
           <Text style={styles.textHeader}>New list</Text>
           <Text style={styles.textHeader}>category</Text>
         </View>
-        <PlusIcon style={{marginTop: '30%'}} size={20} />
       </View>
       <View style={styles.listContainerContent}>
         <TextInput

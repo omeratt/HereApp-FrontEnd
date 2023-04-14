@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
     backgroundColor: constants.colors.OFF_WHITE,
   },
   listContainer: {
-    padding: 10,
+    // padding: 10,
     flex: 0.9,
     borderWidth: 1.2,
     borderColor: constants.colors.UNDER_LINE,
@@ -43,7 +43,9 @@ const styles = StyleSheet.create({
     width: '100%',
     borderTopWidth: 0,
     marginTop: '10%',
-    paddingHorizontal: '15%',
+    // paddingHorizontal: '7.48%',
+    paddingHorizontal: constants.WIDTH * 0.0748,
+    alignSelf: 'flex-start',
   },
   listContainerHeader: {
     flexDirection: 'row',

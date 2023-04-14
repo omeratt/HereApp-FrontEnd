@@ -19,8 +19,9 @@ import {Provider} from 'react-redux';
 import {persistor, store} from './src/app/store';
 import {PersistGate} from 'redux-persist/integration/react';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
-// import NewList from './src/screens/list/NewList';
-import MyLists from './src/screens/list/MyLists';
+import NewList from './src/screens/list/NewList';
+import NewCategory from './src/screens/list/NewCategory';
+// import MyLists from './src/screens/list/MyLists';
 const App = () => {
   return (
     <>
@@ -29,8 +30,9 @@ const App = () => {
           <Provider store={store}>
             <BottomSheetModalProvider>
               {/* <MainStack /> */}
-              <MyLists />
+              {/* <MyLists /> */}
               {/* <NewList /> */}
+              <NewCategory />
             </BottomSheetModalProvider>
           </Provider>
         </PersistGate>

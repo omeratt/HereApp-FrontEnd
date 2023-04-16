@@ -28,6 +28,7 @@ interface ListItemProps {
   state?: ListItemType[];
   item?: any;
   done?: boolean;
+  listLength?: number;
 }
 const ListItem: React.FC<ListItemProps> = ({
   item,
@@ -43,21 +44,36 @@ const ListItem: React.FC<ListItemProps> = ({
   dispatch,
   state,
   done,
+  listLength,
 }) => {
   const width = constants.WIDTH - PADDING_HORIZONTAL * 2 - iconSize * 2 - 20;
+  const isLast = React.useMemo(
+    () => listLength && index === listLength - 1,
+    [listLength],
+  );
   const textInputRef = useRef<InputHandle>(null);
+  const focus = useCallback(() => {
+    if (!isLast) return;
+    dispatch?.({type: 'INPUT', index, payload: ''});
+  }, [isLast]);
+  const blur = useCallback(() => {
+    console.log(isLast || inputTxt.length > 0, index);
+    if (isLast || inputTxt.length > 0) return;
+    dispatch?.({type: 'POP', index, payload: ''});
+  }, [listLength, inputTxt, isLast, index]);
+
   const onChangeText = useCallback(
     (value: string) => {
       dispatch?.({type: 'INPUT', index, payload: value});
     },
-    [dispatch],
+    [dispatch, index],
   );
   const onFlagPress = useCallback(() => {
     dispatch?.({type: 'FLAG', index, payload: 'change flag'});
-  }, [dispatch]);
+  }, [dispatch, index]);
   const onCheckboxPress = useCallback(() => {
     dispatch?.({type: 'CHECK', index, payload: 'change checkbox'});
-  }, [dispatch]);
+  }, [dispatch, index]);
   return (
     <View
       style={{
@@ -89,7 +105,9 @@ const ListItem: React.FC<ListItemProps> = ({
                 color: constants.colors.GREY,
               },
             ]}
+            onFocus={focus}
             placeholder="Finish with ..."
+            onBlur={blur}
             onChangeText={onChangeText}
           />
         ) : (

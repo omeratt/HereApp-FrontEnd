@@ -9,7 +9,6 @@ import {
 import React, {
   memo,
   useCallback,
-  useEffect,
   useMemo,
   useReducer,
   useRef,
@@ -21,6 +20,9 @@ import MyListsWrapper from './MyListsWrapper';
 import ListItem from './ListItem';
 import {RouteProp, useRoute} from '@react-navigation/native';
 import {useGetListsQuery} from '../../app/api/listApi';
+import {InputHandle} from '../../components/TextInput';
+import uuid from 'react-native-uuid';
+// import { v4 as uuidv4 } from 'uuid';
 export type CheckBoxListType = 'NUMBERS' | 'DOTS' | 'V' | 'NONE';
 
 type RootStackParamList = {
@@ -31,28 +33,48 @@ export interface ListItemType {
   description?: string;
   done?: boolean;
   flag?: boolean;
+  new?: boolean;
 }
 
-// export interface P {
-//   type: 'INPUT' | 'FLAG' | 'CHECK';
-//   // index: number;
-//   payload: any;
-// }
 export interface Action {
-  type: 'INPUT' | 'FLAG' | 'CHECK';
+  type: 'INPUT' | 'FLAG' | 'CHECK' | 'POP';
   index: number;
   payload: any;
 }
+function generateID(): string {
+  const characters =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const idLength = 18;
+  let id = '';
+  for (let i = 0; i < idLength; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    id += characters.charAt(randomIndex);
+  }
+  return id;
+}
 type CreateOrEditListProp = RouteProp<RootStackParamList, 'CreateOrEditList'>;
+const newItem: ListItemType = {
+  description: '',
+  done: false,
+  flag: false,
+  new: true,
+  _id: uuid.v4() + '',
+};
 const reducer = (state: ListItemType[], action: Action) => {
   switch (action.type) {
     case 'CHECK':
       state[action.index].done = !state[action.index].done;
       // state[action.index].done = action.payload;
       return [...state];
+    case 'POP':
+      console.log(action.index, 'in pop');
+      state.splice(action.index, 1);
+      return [...state];
     case 'INPUT':
-      // state[action.index].description = action.payload;
-      // return state;
+      if (action.index === state.length - 1) {
+        state.push({...newItem, _id: uuid.v4() + ''});
+        return [...state];
+      }
       return state.map((item, index) => {
         if (index === action.index) {
           return {...item, description: action.payload};
@@ -67,10 +89,12 @@ const reducer = (state: ListItemType[], action: Action) => {
       return state;
   }
 };
+
 const checkBoxSize = constants.HEIGHT * (26.95 / 896);
 const height = constants.HEIGHT * (71 / 896);
 const width = constants.WIDTH * (71 / 414);
 const CreateOrEditList = () => {
+  const textInputRef = useRef<InputHandle>(null);
   const {
     data: lists,
     error: listsFetchError,
@@ -80,12 +104,12 @@ const CreateOrEditList = () => {
     useRoute<CreateOrEditListProp>().params.categoryIndex;
   const listIndex: number = useRoute<CreateOrEditListProp>().params.listIndex;
 
-  // dispatch({type:'INPUT', payload:  item});
   const [state, dispatch] = useReducer(
     reducer,
-    lists ? [...lists[categoryIndex].lists[listIndex].listItems] : [],
+    lists
+      ? [...lists[categoryIndex].lists[listIndex].listItems, {...newItem}]
+      : [],
   );
-  // console.log(state);
   const title =
     '' +
     lists![categoryIndex].name +
@@ -114,19 +138,21 @@ const CreateOrEditList = () => {
     [onListItemTypePress],
   );
 
-  const FooterComponent = useCallback(
-    () => (
-      <ListItem
-        iconSize={checkBoxSize}
-        type={checkboxType}
-        flag={false}
-        index={lastIndex}
-      />
-    ),
-    [checkboxType, lastIndex],
-  );
+  // const FooterComponent = useCallback(
+  //   () => (
+  //     <ListItem
+  //       iconSize={checkBoxSize}
+  //       type={checkboxType}
+  //       flag={false}
+  //       index={lastIndex}
+  //       dispatch={dispatch}
+  //     />
+  //   ),
+  //   [checkboxType, lastIndex, dispatch],
+  // );
+  console.log({state});
   const keyExtractor: (item: ListItemType, index: number) => string =
-    useCallback((item: ListItemType) => item._id!, []);
+    useCallback((item: ListItemType) => item._id!, [state]);
   const RenderItem: ListRenderItem<ListItemType> = useCallback(
     props => (
       <ListItem
@@ -136,6 +162,9 @@ const CreateOrEditList = () => {
         done={state[props.index].done}
         inputTxt={state[props.index].description}
         dispatch={dispatch}
+        // isLast={props.index === state.length - 1}
+        listLength={state.length}
+        // {...(props.index === state.length - 1 && {textInputRef})}
         {...props}
       />
     ),
@@ -146,7 +175,7 @@ const CreateOrEditList = () => {
       <FlatList
         // data={lists![categoryIndex].lists[listIndex].listItems}
         data={state}
-        ListFooterComponent={FooterComponent}
+        // ListFooterComponent={FooterComponent}
         keyExtractor={keyExtractor}
         renderItem={RenderItem}
         // extraData={state}

@@ -26,9 +26,10 @@ interface ListItemProps {
   inputTxt?: string;
   dispatch?: React.Dispatch<Action>;
   state?: ListItemType[];
-  item?: any;
+  item: ListItemType;
   done?: boolean;
   listLength?: number;
+  setDeleted?: React.Dispatch<React.SetStateAction<ListItemType[]>>;
 }
 const ListItem: React.FC<ListItemProps> = ({
   item,
@@ -45,6 +46,7 @@ const ListItem: React.FC<ListItemProps> = ({
   state,
   done,
   listLength,
+  setDeleted,
 }) => {
   const width = constants.WIDTH - PADDING_HORIZONTAL * 2 - iconSize * 2 - 20;
   const isLast = React.useMemo(
@@ -57,8 +59,8 @@ const ListItem: React.FC<ListItemProps> = ({
     dispatch?.({type: 'INPUT', index, payload: ''});
   }, [isLast]);
   const blur = useCallback(() => {
-    console.log(isLast || inputTxt.length > 0, index);
     if (isLast || inputTxt.length > 0) return;
+    if (!item.new) setDeleted?.(prev => [...prev, item]);
     dispatch?.({type: 'POP', index, payload: ''});
   }, [listLength, inputTxt, isLast, index]);
 

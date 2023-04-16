@@ -54,7 +54,6 @@ const reducer = (state: ListItemType[], action: Action) => {
       state[action.index].done = !state[action.index].done;
       return [...state];
     case 'POP':
-      console.log(action.index, 'in pop');
       state.splice(action.index, 1);
       return [...state];
     case 'INPUT':
@@ -91,6 +90,7 @@ const CreateOrEditList = () => {
   const categoryIndex: number =
     useRoute<CreateOrEditListProp>().params.categoryIndex;
   const listIndex: number = useRoute<CreateOrEditListProp>().params.listIndex;
+  const [deleted, setDeleted] = React.useState<ListItemType[]>([]);
 
   const [state, dispatch] = useReducer(
     reducer,
@@ -113,6 +113,7 @@ const CreateOrEditList = () => {
     const items = {
       listId: lists![categoryIndex].lists[listIndex]._id,
       items: state,
+      deleted,
     };
     addItemSubmit(items)
       .then(data => {
@@ -121,7 +122,7 @@ const CreateOrEditList = () => {
       .catch(error => {
         console.log('error on handleSubmit add items, error', state);
       });
-  }, [addItemSubmit, state]);
+  }, [addItemSubmit, state, deleted]);
   const onListItemTypePress = useCallback((type: CheckBoxListType) => {
     setCheckboxType(type);
   }, []);
@@ -164,6 +165,7 @@ const CreateOrEditList = () => {
         dispatch={dispatch}
         // isLast={props.index === state.length - 1}
         listLength={state.length}
+        setDeleted={setDeleted}
         // {...(props.index === state.length - 1 && {textInputRef})}
         {...props}
       />

@@ -1,5 +1,6 @@
 import {
   FlatList,
+  ListRenderItem,
   ListRenderItemInfo,
   StyleSheet,
   TouchableOpacity,
@@ -50,8 +51,14 @@ const reducer = (state: ListItemType[], action: Action) => {
       // state[action.index].done = action.payload;
       return [...state];
     case 'INPUT':
-      state[action.index].description = action.payload;
-      return [...state];
+      // state[action.index].description = action.payload;
+      // return state;
+      return state.map((item, index) => {
+        if (index === action.index) {
+          return {...item, description: action.payload};
+        }
+        return item;
+      });
     case 'FLAG':
       state[action.index].flag = !state[action.index].flag;
       return [...state];
@@ -107,32 +114,42 @@ const CreateOrEditList = () => {
     [onListItemTypePress],
   );
 
-  const [fl, setfl] = useState(false);
-
+  const FooterComponent = useCallback(
+    () => (
+      <ListItem
+        iconSize={checkBoxSize}
+        type={checkboxType}
+        flag={false}
+        index={lastIndex}
+      />
+    ),
+    [checkboxType, lastIndex],
+  );
+  const keyExtractor: (item: ListItemType, index: number) => string =
+    useCallback((item: ListItemType) => item._id!, []);
+  const RenderItem: ListRenderItem<ListItemType> = useCallback(
+    props => (
+      <ListItem
+        iconSize={checkBoxSize}
+        type={checkboxType}
+        flag={state[props.index].flag}
+        done={state[props.index].done}
+        inputTxt={state[props.index].description}
+        dispatch={dispatch}
+        {...props}
+      />
+    ),
+    [state, checkboxType, checkBoxSize],
+  );
   return (
     <MyListsWrapper title={title}>
       <FlatList
         // data={lists![categoryIndex].lists[listIndex].listItems}
         data={state}
-        // ListFooterComponent={() => (
-        //   <ListItem
-        //     iconSize={checkBoxSize}
-        //     type={checkboxType}
-        //     flag={false}
-        //     index={lastIndex}
-        //   />
-        // )}
-        renderItem={props => (
-          <ListItem
-            iconSize={checkBoxSize}
-            type={checkboxType}
-            // flag={state[props.index].flag}
-            state={state}
-            dispatch={dispatch}
-            {...props}
-          />
-        )}
-        extraData={state}
+        ListFooterComponent={FooterComponent}
+        keyExtractor={keyExtractor}
+        renderItem={RenderItem}
+        // extraData={state}
         style={styles.listContainerContent}
       />
       <View style={styles.listContainerFooter}>

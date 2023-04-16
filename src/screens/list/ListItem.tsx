@@ -27,6 +27,7 @@ interface ListItemProps {
   dispatch?: React.Dispatch<Action>;
   state?: ListItemType[];
   item?: any;
+  done?: boolean;
 }
 const ListItem: React.FC<ListItemProps> = ({
   item,
@@ -41,6 +42,7 @@ const ListItem: React.FC<ListItemProps> = ({
   inputTxt = '',
   dispatch,
   state,
+  done,
 }) => {
   const width = constants.WIDTH - PADDING_HORIZONTAL * 2 - iconSize * 2 - 20;
   const textInputRef = useRef<InputHandle>(null);
@@ -67,7 +69,7 @@ const ListItem: React.FC<ListItemProps> = ({
             size={iconSize / 1.05}
             type={type}
             index={index + 1}
-            isFilled={state?.[index].done}
+            isFilled={done}
             onPress={onCheckboxPress}
           />
         )}
@@ -77,9 +79,7 @@ const ListItem: React.FC<ListItemProps> = ({
             selectionColor={constants.colors.GREEN}
             cursorColor={constants.colors.GREEN}
             containerStyle={styles.inputContentStyle}
-            //TODO: MAKE INPUT BUG
-            value={state ? state[index]?.description : 'inputTxt'}
-            // value={inputTxt}
+            value={inputTxt}
             style={[
               styles.input,
               {
@@ -108,7 +108,7 @@ const ListItem: React.FC<ListItemProps> = ({
           </TouchableOpacity>
         )}
         <Ionicons
-          name={state?.[index]?.flag ? 'flag' : 'flag-outline'}
+          name={flag ? 'flag' : 'flag-outline'}
           // name={state?.[index]?.flag ? 'flag' : 'flag-outline'}
           size={iconSize}
           color={constants.colors.BGC}

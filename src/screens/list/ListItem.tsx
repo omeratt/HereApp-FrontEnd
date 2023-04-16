@@ -5,14 +5,14 @@ import {
   View,
   TextInput as InputText,
 } from 'react-native';
-import React, {useRef} from 'react';
+import React, {useCallback, useRef} from 'react';
 import CheckBox from '../../components/CheckBox';
 import Line from '../../components/Line';
 import constants from '../../assets/constants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import TextInput, {InputHandle} from '../../components/TextInput';
 import {PADDING_HORIZONTAL} from './MyListsWrapper';
-import {CheckBoxListType} from './CreateOrEditList';
+import {Action, CheckBoxListType, ListItemType} from './CreateOrEditList';
 
 interface ListItemProps {
   iconSize?: number;
@@ -24,8 +24,12 @@ interface ListItemProps {
   description?: string;
   textPress?: (index: number) => void;
   inputTxt?: string;
+  dispatch?: React.Dispatch<Action>;
+  state?: ListItemType[];
+  item?: any;
 }
 const ListItem: React.FC<ListItemProps> = ({
+  item,
   index,
   iconSize = 25,
   type,
@@ -35,22 +39,37 @@ const ListItem: React.FC<ListItemProps> = ({
   description,
   textPress,
   inputTxt = '',
+  dispatch,
+  state,
 }) => {
   const width = constants.WIDTH - PADDING_HORIZONTAL * 2 - iconSize * 2 - 20;
   const textInputRef = useRef<InputHandle>(null);
-  const InputRef = useRef<string>(inputTxt);
+  const onChangeText = useCallback(
+    (value: string) => {
+      dispatch?.({type: 'INPUT', index, payload: value});
+    },
+    [dispatch],
+  );
+  const onFlagPress = useCallback(() => {
+    dispatch?.({type: 'FLAG', index, payload: 'change flag'});
+  }, [dispatch]);
+  const onCheckboxPress = useCallback(() => {
+    dispatch?.({type: 'CHECK', index, payload: 'change checkbox'});
+  }, [dispatch]);
   return (
     <View
       style={{
         marginBottom: '4%',
-        // height: 45,
-        // backgroundColor: 'red',
-        // borderWidth: 1,
-        // justifyContent: 'center',
       }}>
       <View style={styles.topContainer}>
         {isCheckBox && (
-          <CheckBox size={iconSize / 1.05} type={type} index={index + 1} />
+          <CheckBox
+            size={iconSize / 1.05}
+            type={type}
+            index={index + 1}
+            isFilled={state?.[index].done}
+            onPress={onCheckboxPress}
+          />
         )}
         {!description ? (
           <TextInput
@@ -58,7 +77,9 @@ const ListItem: React.FC<ListItemProps> = ({
             selectionColor={constants.colors.GREEN}
             cursorColor={constants.colors.GREEN}
             containerStyle={styles.inputContentStyle}
-            value={InputRef.current}
+            //TODO: MAKE INPUT BUG
+            value={state ? state[index]?.description : 'inputTxt'}
+            // value={inputTxt}
             style={[
               styles.input,
               {
@@ -69,6 +90,7 @@ const ListItem: React.FC<ListItemProps> = ({
               },
             ]}
             placeholder="Finish with ..."
+            onChangeText={onChangeText}
           />
         ) : (
           <TouchableOpacity onPress={textPress && (() => textPress(index))}>
@@ -86,9 +108,11 @@ const ListItem: React.FC<ListItemProps> = ({
           </TouchableOpacity>
         )}
         <Ionicons
-          name={flag ? 'flag' : 'flag-outline'}
+          name={state?.[index]?.flag ? 'flag' : 'flag-outline'}
+          // name={state?.[index]?.flag ? 'flag' : 'flag-outline'}
           size={iconSize}
           color={constants.colors.BGC}
+          onPress={onFlagPress}
         />
       </View>
       {showLine && (
@@ -102,7 +126,7 @@ const ListItem: React.FC<ListItemProps> = ({
   );
 };
 
-export default ListItem;
+export default React.memo(ListItem);
 
 const styles = StyleSheet.create({
   topContainer: {

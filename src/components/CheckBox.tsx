@@ -7,18 +7,23 @@ import SVG from '../assets/svg';
 interface props {
   size: number;
   index?: number;
+  isFilled?: boolean;
+  onPress?: () => void;
   type?: CheckBoxListType;
 }
-export default function CheckBox({size, type, index}: props) {
-  const [isFilled, setIsFilled] = React.useState<boolean>(false);
-  const onClick = () => {
-    setIsFilled(prev => !prev);
-  };
+export default function CheckBox({
+  size,
+  type,
+  index,
+  onPress,
+  isFilled,
+}: props) {
   const isNumber = type === 'NUMBERS';
+  console.log({isFilled});
 
   return (
     <TouchableOpacity
-      onPress={onClick}
+      onPress={onPress}
       style={[
         styles.circle,
         {

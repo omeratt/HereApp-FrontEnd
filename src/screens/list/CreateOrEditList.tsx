@@ -1,4 +1,10 @@
-import {FlatList, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {
+  FlatList,
+  ListRenderItemInfo,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React, {
   memo,
   useCallback,
@@ -8,7 +14,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import constants from '../../assets/constants';
+import constants, {ListsType} from '../../assets/constants';
 import SVG from '../../assets/svg';
 import MyListsWrapper from './MyListsWrapper';
 import ListItem from './ListItem';
@@ -19,14 +25,41 @@ export type CheckBoxListType = 'NUMBERS' | 'DOTS' | 'V' | 'NONE';
 type RootStackParamList = {
   CreateOrEditList: {categoryIndex: number; listIndex: number};
 };
-interface ListItemType {
+export interface ListItemType {
   _id?: string;
   description?: string;
   done?: boolean;
   flag?: boolean;
 }
-type CreateOrEditListProp = RouteProp<RootStackParamList, 'CreateOrEditList'>;
 
+// export interface P {
+//   type: 'INPUT' | 'FLAG' | 'CHECK';
+//   // index: number;
+//   payload: any;
+// }
+export interface Action {
+  type: 'INPUT' | 'FLAG' | 'CHECK';
+  index: number;
+  payload: any;
+}
+type CreateOrEditListProp = RouteProp<RootStackParamList, 'CreateOrEditList'>;
+const reducer = (state: ListItemType[], action: Action) => {
+  switch (action.type) {
+    case 'CHECK':
+      state[action.index].done = !state[action.index].done;
+      // state[action.index].done = action.payload;
+      return [...state];
+    case 'INPUT':
+      state[action.index].description = action.payload;
+      return [...state];
+    case 'FLAG':
+      state[action.index].flag = !state[action.index].flag;
+      return [...state];
+    default:
+      // console.log({action: action.type});
+      return state;
+  }
+};
 const checkBoxSize = constants.HEIGHT * (26.95 / 896);
 const height = constants.HEIGHT * (71 / 896);
 const width = constants.WIDTH * (71 / 414);
@@ -40,18 +73,12 @@ const CreateOrEditList = () => {
     useRoute<CreateOrEditListProp>().params.categoryIndex;
   const listIndex: number = useRoute<CreateOrEditListProp>().params.listIndex;
 
-  // const [state, dispatch] = useReducer(first, second)
-
-  // interface Action{
-  //   type: 'INPUT'|'FLAG'| 'CHECK';
-  //   payload:
-  // }
-  const reducer = (state, action) => {
-    switch (action.type) {
-      default:
-        return state;
-    }
-  };
+  // dispatch({type:'INPUT', payload:  item});
+  const [state, dispatch] = useReducer(
+    reducer,
+    lists ? [...lists[categoryIndex].lists[listIndex].listItems] : [],
+  );
+  // console.log(state);
   const title =
     '' +
     lists![categoryIndex].name +
@@ -80,27 +107,32 @@ const CreateOrEditList = () => {
     [onListItemTypePress],
   );
 
+  const [fl, setfl] = useState(false);
+
   return (
     <MyListsWrapper title={title}>
       <FlatList
-        data={lists![categoryIndex].lists[listIndex].listItems}
-        ListFooterComponent={() => (
-          <ListItem
-            iconSize={checkBoxSize}
-            type={checkboxType}
-            flag={false}
-            index={lastIndex}
-          />
-        )}
+        // data={lists![categoryIndex].lists[listIndex].listItems}
+        data={state}
+        // ListFooterComponent={() => (
+        //   <ListItem
+        //     iconSize={checkBoxSize}
+        //     type={checkboxType}
+        //     flag={false}
+        //     index={lastIndex}
+        //   />
+        // )}
         renderItem={props => (
           <ListItem
             iconSize={checkBoxSize}
             type={checkboxType}
-            inputTxt={props.item.description}
-            flag={props.item.flag}
+            // flag={state[props.index].flag}
+            state={state}
+            dispatch={dispatch}
             {...props}
           />
         )}
+        extraData={state}
         style={styles.listContainerContent}
       />
       <View style={styles.listContainerFooter}>

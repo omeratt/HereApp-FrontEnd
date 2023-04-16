@@ -34,6 +34,18 @@ export const listsApi = userApi.injectEndpoints({
         return response.data;
       },
     }),
+    addListItem: builder.mutation({
+      query: item => ({
+        url: 'list/items',
+        method: 'POST',
+        body: item,
+        credentials: 'include',
+      }),
+      invalidatesTags: ['Lists'],
+      transformResponse: (response: any, meta, arg) => {
+        return response.data;
+      },
+    }),
   }),
 });
 
@@ -41,4 +53,5 @@ export const {
   useGetListsQuery,
   useAddCategoryMutation,
   useAddListTitleMutation,
+  useAddListItemMutation,
 } = listsApi;

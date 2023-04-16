@@ -1,7 +1,6 @@
 import {
   FlatList,
   ListRenderItem,
-  ListRenderItemInfo,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -14,15 +13,14 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import constants, {ListsType} from '../../assets/constants';
+import constants from '../../assets/constants';
 import SVG from '../../assets/svg';
 import MyListsWrapper from './MyListsWrapper';
 import ListItem from './ListItem';
 import {RouteProp, useRoute} from '@react-navigation/native';
-import {useGetListsQuery} from '../../app/api/listApi';
+import {useAddListItemMutation, useGetListsQuery} from '../../app/api/listApi';
 import {InputHandle} from '../../components/TextInput';
 import uuid from 'react-native-uuid';
-// import { v4 as uuidv4 } from 'uuid';
 export type CheckBoxListType = 'NUMBERS' | 'DOTS' | 'V' | 'NONE';
 
 type RootStackParamList = {
@@ -41,17 +39,7 @@ export interface Action {
   index: number;
   payload: any;
 }
-function generateID(): string {
-  const characters =
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const idLength = 18;
-  let id = '';
-  for (let i = 0; i < idLength; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    id += characters.charAt(randomIndex);
-  }
-  return id;
-}
+
 type CreateOrEditListProp = RouteProp<RootStackParamList, 'CreateOrEditList'>;
 const newItem: ListItemType = {
   description: '',
@@ -64,7 +52,6 @@ const reducer = (state: ListItemType[], action: Action) => {
   switch (action.type) {
     case 'CHECK':
       state[action.index].done = !state[action.index].done;
-      // state[action.index].done = action.payload;
       return [...state];
     case 'POP':
       console.log(action.index, 'in pop');
@@ -85,7 +72,6 @@ const reducer = (state: ListItemType[], action: Action) => {
       state[action.index].flag = !state[action.index].flag;
       return [...state];
     default:
-      // console.log({action: action.type});
       return state;
   }
 };
@@ -100,6 +86,8 @@ const CreateOrEditList = () => {
     error: listsFetchError,
     isLoading: listsLoading,
   } = useGetListsQuery(undefined);
+  const [addItemSubmit, {isLoading, isError, isSuccess}] =
+    useAddListItemMutation(undefined);
   const categoryIndex: number =
     useRoute<CreateOrEditListProp>().params.categoryIndex;
   const listIndex: number = useRoute<CreateOrEditListProp>().params.listIndex;
@@ -121,6 +109,19 @@ const CreateOrEditList = () => {
   );
   const [checkboxType, setCheckboxType] = useState<CheckBoxListType>('V');
 
+  const handleSubmit = useCallback(async () => {
+    const items = {
+      listId: lists![categoryIndex].lists[listIndex]._id,
+      items: state,
+    };
+    addItemSubmit(items)
+      .then(data => {
+        console.log('on submit, result', data, items);
+      })
+      .catch(error => {
+        console.log('error on handleSubmit add items, error', state);
+      });
+  }, [addItemSubmit, state]);
   const onListItemTypePress = useCallback((type: CheckBoxListType) => {
     setCheckboxType(type);
   }, []);
@@ -150,7 +151,6 @@ const CreateOrEditList = () => {
   //   ),
   //   [checkboxType, lastIndex, dispatch],
   // );
-  console.log({state});
   const keyExtractor: (item: ListItemType, index: number) => string =
     useCallback((item: ListItemType) => item._id!, [state]);
   const RenderItem: ListRenderItem<ListItemType> = useCallback(
@@ -171,7 +171,7 @@ const CreateOrEditList = () => {
     [state, checkboxType, checkBoxSize],
   );
   return (
-    <MyListsWrapper title={title}>
+    <MyListsWrapper title={title} onDonePress={handleSubmit}>
       <FlatList
         // data={lists![categoryIndex].lists[listIndex].listItems}
         data={state}

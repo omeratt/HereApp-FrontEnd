@@ -2,7 +2,22 @@ import {Dimensions} from 'react-native';
 
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
-
+export interface ListsType {
+  _id: string;
+  name: string;
+  lists: {
+    _id: string;
+    title: string;
+    flag: boolean;
+    checkBoxListType: 'NUMBERS' | 'DOTS' | 'V' | 'NONE';
+    listItems: {
+      _id: string;
+      description: string;
+      done: boolean;
+      flag: boolean;
+    }[];
+  }[];
+}
 const constants = {
   BASE_URL: 'https://here.cyclic.app/',
   // BASE_URL: 'https://here-app.onrender.com/',

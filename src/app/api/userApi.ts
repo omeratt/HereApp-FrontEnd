@@ -9,7 +9,7 @@ export const userApi = createApi({
   reducerPath: 'userApi',
   baseQuery: fetchBaseQuery({baseUrl: constants.BASE_URL}),
 
-  tagTypes: ['Users', 'Tasks', 'TasksByDate'],
+  tagTypes: ['Users', 'Tasks', 'TasksByDate', 'Lists'],
   endpoints: builder => ({
     home: builder.query({
       query: () => '/',

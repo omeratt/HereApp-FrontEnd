@@ -1,7 +1,7 @@
 import {StyleSheet, Text, TouchableOpacity} from 'react-native';
 import React from 'react';
 import constants from '../assets/constants';
-import {CheckBoxListType} from '../screens/list/MyLists';
+import {CheckBoxListType} from '../screens/list/CreateOrEditList';
 import SVG from '../assets/svg';
 
 interface props {
@@ -24,7 +24,7 @@ export default function CheckBox({size, type, index}: props) {
         {
           width: size,
           height: size,
-          borderColor: isNumber ? 'transparent' : constants.colors.GREY,
+          borderColor: isNumber ? 'transparent' : constants.colors.BGC,
           backgroundColor:
             type === 'DOTS'
               ? constants.colors.BLACK
@@ -33,14 +33,14 @@ export default function CheckBox({size, type, index}: props) {
         },
       ]}>
       {type === 'V' && isFilled && (
-        <SVG.VIcon height={size / 1.2} width={size / 1.2} />
+        <SVG.VIcon height={size / 1.4} width={size / 1.4} />
       )}
       {isNumber && (
         <Text
           style={{
             fontFamily: constants.Fonts.text,
             color: constants.colors.BLACK,
-            fontSize: size / 1.2,
+            fontSize: size / 1.4,
           }}>
           {`${index}.`}
         </Text>
@@ -52,10 +52,10 @@ export default function CheckBox({size, type, index}: props) {
 const styles = StyleSheet.create({
   circle: {
     // borderRadius: 9999,
-    borderWidth: 1,
-    borderColor: constants.colors.GREY,
+    borderWidth: 1.2,
+    borderColor: constants.colors.BGC,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: '1.5%',
+    // marginBottom: '1.5%',
   },
 });

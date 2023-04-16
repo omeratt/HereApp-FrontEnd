@@ -18,6 +18,7 @@ import Line from '../components/Line';
 import {FlashList} from '@shopify/flash-list';
 import DatesFlatList from '../components/DatesFlatList';
 import moment from 'moment';
+import {useGetListsQuery} from '../app/api/listApi';
 
 const CURRENT_DATE = new Date();
 const allDates = getDatesForYear(CURRENT_DATE);
@@ -73,9 +74,18 @@ const Home = () => {
     error: tasksError,
     isFetching: taskFetch,
   } = useGetTasksByDateQuery(CURRENT_DATE);
+  const {
+    data: lists,
+    error: listsFetchError,
+    isLoading: listsLoading,
+  } = useGetListsQuery(null);
+
+  useEffect(() => {
+    console.log(listsFetchError);
+  }, [listsFetchError]);
   const FetchTasks = useCallback((date: Date) => {
     const result = dispatch(tasksApi.endpoints.getTasksByDate.initiate(date))
-      .then(res => {
+      .then((res: any) => {
         setTasks(res.data);
       })
       .catch(err => {
@@ -131,7 +141,13 @@ const Home = () => {
     navigation.dispatch(DrawerActions.openDrawer());
   };
   const handleListPlusIcon = useCallback(() => {
-    navigation.navigate('ListAndNotesStack' as never);
+    navigation.navigate(
+      'ListAndNotesStack' as never,
+      {
+        screen: 'ListAndNotes' as never,
+        // params: {lists, listsLoading},
+      } as never,
+    );
   }, [navigation]);
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 

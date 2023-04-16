@@ -1,15 +1,21 @@
 // CreateProfileNavigator.tsx
 
 import React from 'react';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {
+  NativeStackNavigationOptions,
+  createNativeStackNavigator,
+} from '@react-navigation/native-stack';
 import ListAndNotes from '../screens/list/ListAndNotes';
-import Lists from '../screens/list/Lists';
 import MyLists from '../screens/list/MyLists';
-import NewList from '../screens/list/NewList';
+import CreateOrEditList from '../screens/list/CreateOrEditList';
+import NewListCategory from '../screens/list/NewListCategory';
+import NewListTitle from '../screens/list/NewListTitle';
+
 const Stack = createNativeStackNavigator();
 
 const ListAndNotesNavigator = () => {
-  const options = {headerShown: false};
+  const options: NativeStackNavigationOptions = {headerShown: false};
+
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -17,9 +23,22 @@ const ListAndNotesNavigator = () => {
         component={ListAndNotes}
         options={options}
       />
-      <Stack.Screen name="Lists" component={Lists} options={options} />
       <Stack.Screen name="MyLists" component={MyLists} options={options} />
-      <Stack.Screen name="NewList" component={NewList} options={options} />
+      <Stack.Screen
+        name="CreateOrEditList"
+        component={CreateOrEditList}
+        options={options}
+      />
+      <Stack.Screen
+        name="NewListTitle"
+        component={NewListTitle}
+        options={options}
+      />
+      <Stack.Screen
+        name="NewListCategory"
+        component={NewListCategory}
+        options={options}
+      />
     </Stack.Navigator>
   );
 };

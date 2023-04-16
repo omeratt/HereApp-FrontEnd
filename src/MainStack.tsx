@@ -14,6 +14,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import OnBoarding from './screens/OnBoarding';
 import ListAndNotesNavigator from './Navigation/ListNavigation';
+import {useGetListsQuery} from './app/api/listApi';
 const ICON_SIZE = 20;
 // const Stack = createNativeStackNavigator();
 const Stack = createDrawerNavigator();
@@ -38,6 +39,7 @@ export default function MainStack() {
   return (
     <NavigationContainer>
       <Stack.Navigator
+        id="MainStack"
         initialRouteName="Auth"
         screenOptions={{
           drawerPosition: 'left',
@@ -97,6 +99,8 @@ export default function MainStack() {
               options={{
                 swipeEnabled: false,
                 headerShown: false,
+
+                unmountOnBlur: true,
                 drawerIcon: ({color, focused}) => (
                   <Ionicons
                     name={focused ? 'list' : 'ios-list-outline'}

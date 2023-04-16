@@ -1,7 +1,13 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React, {FC, ReactNode, memo, useCallback} from 'react';
-import constants from '../assets/constants';
-import SVG from '../assets/svg';
+import constants from '../../assets/constants';
+import SVG from '../../assets/svg';
 
 export const PADDING_HORIZONTAL = constants.WIDTH * 0.0848;
 
@@ -13,14 +19,16 @@ interface Props {
   title?: string;
   numberOfLines?: number;
   rightBtn?: boolean;
+  isLoading?: boolean;
 }
-const MyListAndNotes: FC<Props> = ({
+const MyListsWrapper: FC<Props> = ({
   children,
   onDonePress,
   title,
   numberOfLines = 2,
   rightBtn,
   onRightBtnPress,
+  isLoading = false,
 }) => {
   const onPress = useCallback(() => {
     console.log('click on done');
@@ -48,12 +56,17 @@ const MyListAndNotes: FC<Props> = ({
               />
             </TouchableOpacity>
           )}
+          {isLoading && (
+            <View style={{height: '100%'}}>
+              <ActivityIndicator size={32} color={constants.colors.GREEN} />
+            </View>
+          )}
         </View>
       )}
       <View style={styles.listContainer}>{children}</View>
       <View style={styles.footer}>
         <TouchableOpacity
-          onPress={onDonePress || onPress}
+          onPress={onDonePress && onDonePress}
           style={[styles.footerBtn]}>
           <Text style={styles.textFooterBtn}>Done</Text>
         </TouchableOpacity>
@@ -62,7 +75,7 @@ const MyListAndNotes: FC<Props> = ({
   );
 };
 
-export default memo(MyListAndNotes);
+export default memo(MyListsWrapper);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -88,6 +101,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     // backgroundColor: 'cyan',
+    overflow: 'hidden',
     flex: 4.5,
     borderWidth: 1.2,
     borderColor: constants.colors.UNDER_LINE,

@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   FlatList,
   Keyboard,
   StyleSheet,
@@ -6,60 +7,84 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import React, {memo, useCallback, useEffect, useRef} from 'react';
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import constants from '../../assets/constants';
-import MyListAndNotes from '../../components/MyListAndNotes';
-import BallonTxt from '../../components/BallonTxt';
-import {useNavigation} from '@react-navigation/native';
+import MyListsWrapper from './MyListsWrapper';
+import BallonTxt, {gap} from '../../components/BallonTxt';
+import {
+  RouteProp,
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {useGetListsQuery} from '../../app/api/listApi';
+
+type RootStackParamList = {
+  ListAndNotes: {
+    lists: any[];
+    listsLoading: boolean;
+  };
+};
+
+type Props = NativeStackScreenProps<RootStackParamList, 'ListAndNotes'>;
+type ProfileScreenRouteProp = RouteProp<RootStackParamList, 'ListAndNotes'>;
 
 const NewCategory = () => {
   const navigation = useNavigation();
-  let categories = [
-    {txt: 'brow'},
-    {txt: 'To-Do Lists'},
-    {txt: 'Wish Lists'},
-    {txt: 'Bucaaaew'},
-    {txt: 'TraLists'},
-    {txt: 'gsa'},
-    {txt: 'Reading'},
-    {txt: 'Lists'},
-    {txt: 'Recipe Lists'},
-    {txt: 'Goal Lists'},
-    {txt: 'Goal Lists'},
-    {txt: 'Goal Lists'},
-    {txt: 'Goal Lists'},
-    {txt: 'Goal Lists'},
-    {txt: 'Goal Lists'},
-  ];
-  // let categories = [
-  //   {txt: 'Grocery Lists'},
-  //   {txt: 'To-Do Lists'},
-  //   {txt: 'Wish Lists'},
-  //   {txt: 'Bucket Lists'},
-  //   {txt: 'Travel Lists'},
-  //   {txt: 'Shopping Lists'},
-  //   {txt: 'Reading Lists'},
-  //   {txt: 'Movie Lists'},
-  //   {txt: 'Recipe Lists'},
-  //   {txt: 'Goal Lists'},
-  // ];
+  const {
+    data: lists,
+    error: listsFetchError,
+    isLoading: listsLoading,
+  } = useGetListsQuery(undefined);
   const navigateToAddCategory = useCallback(() => {
-    navigation.navigate('NewList' as never);
+    navigation.navigate('NewListCategory' as never);
   }, []);
+  const navigateToList = useCallback((index: number) => {
+    navigation.navigate('MyLists' as never, {index} as never);
+  }, []);
+  const listSize = useMemo(() => {
+    return lists?.length;
+  }, [lists?.length]);
+
   return (
-    <MyListAndNotes
+    <MyListsWrapper
       rightBtn
       title="All my lists and notes"
       onRightBtnPress={navigateToAddCategory}>
       <FlatList
-        data={categories}
-        renderItem={props => <BallonTxt txt={props.item.txt} {...props} />}
+        data={lists}
+        renderItem={props => (
+          <BallonTxt
+            txt={props.item.name}
+            listSize={listSize || 0}
+            onPress={navigateToList}
+            {...props}
+          />
+        )}
         style={styles.wordsContainer}
-        contentContainerStyle={{width: '100%'}}
+        contentContainerStyle={{width: '100%', paddingBottom: gap}}
         numColumns={2}
+        columnWrapperStyle={{marginBottom: -21 + gap}}
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={() => {
+          return listsLoading ? (
+            <ActivityIndicator size={32} color={constants.colors.GREEN} />
+          ) : (
+            <Text style={styles.newTaskTitleInput}>
+              No Lists yet, Create One By Clicking On Plus Icon
+            </Text>
+          );
+        }}
       />
-    </MyListAndNotes>
+    </MyListsWrapper>
   );
 };
 
@@ -71,6 +96,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     width: '100%',
+    // overflow: 'visible',
+    // height: '95%',
   },
   textHeader: {
     fontFamily: constants.Fonts.text,

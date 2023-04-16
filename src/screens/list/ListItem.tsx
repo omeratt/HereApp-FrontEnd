@@ -1,12 +1,18 @@
-import {StyleSheet, Text, View} from 'react-native';
-import React from 'react';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  TextInput as InputText,
+} from 'react-native';
+import React, {useRef} from 'react';
 import CheckBox from '../../components/CheckBox';
 import Line from '../../components/Line';
 import constants from '../../assets/constants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import TextInput from '../../components/TextInput';
-import {PADDING_HORIZONTAL} from '../../components/MyListAndNotes';
-import {CheckBoxListType} from './MyLists';
+import TextInput, {InputHandle} from '../../components/TextInput';
+import {PADDING_HORIZONTAL} from './MyListsWrapper';
+import {CheckBoxListType} from './CreateOrEditList';
 
 interface ListItemProps {
   iconSize?: number;
@@ -16,6 +22,8 @@ interface ListItemProps {
   index: number;
   flag?: boolean;
   description?: string;
+  textPress?: (index: number) => void;
+  inputTxt?: string;
 }
 const ListItem: React.FC<ListItemProps> = ({
   index,
@@ -25,44 +33,62 @@ const ListItem: React.FC<ListItemProps> = ({
   showLine = true,
   flag,
   description,
+  textPress,
+  inputTxt = '',
 }) => {
   const width = constants.WIDTH - PADDING_HORIZONTAL * 2 - iconSize * 2 - 20;
+  const textInputRef = useRef<InputHandle>(null);
+  const InputRef = useRef<string>(inputTxt);
   return (
-    <View style={{paddingBottom: '4%'}}>
+    <View
+      style={{
+        marginBottom: '4%',
+        // height: 45,
+        // backgroundColor: 'red',
+        // borderWidth: 1,
+        // justifyContent: 'center',
+      }}>
       <View style={styles.topContainer}>
         {isCheckBox && (
-          <CheckBox size={iconSize} type={type} index={index + 1} />
+          <CheckBox size={iconSize / 1.05} type={type} index={index + 1} />
         )}
         {!description ? (
           <TextInput
+            ref={textInputRef}
+            selectionColor={constants.colors.GREEN}
+            cursorColor={constants.colors.GREEN}
             containerStyle={styles.inputContentStyle}
+            value={InputRef.current}
             style={[
               styles.input,
               {
                 width,
-                fontSize: iconSize,
-                height: iconSize,
+                fontSize: iconSize / 1.1,
+                height: iconSize + 12,
+                color: constants.colors.GREY,
               },
             ]}
-            placeholder="Please add your task...."
+            placeholder="Finish with ..."
           />
         ) : (
-          <Text
-            style={[
-              styles.input,
-              {
-                width,
-                fontSize: iconSize,
-                height: iconSize,
-              },
-            ]}>
-            {description}
-          </Text>
+          <TouchableOpacity onPress={textPress && (() => textPress(index))}>
+            <Text
+              style={[
+                styles.input,
+                {
+                  width,
+                  fontSize: iconSize,
+                  height: iconSize + 12,
+                },
+              ]}>
+              {description}
+            </Text>
+          </TouchableOpacity>
         )}
         <Ionicons
           name={flag ? 'flag' : 'flag-outline'}
           size={iconSize}
-          color={constants.colors.BLACK}
+          color={constants.colors.BGC}
         />
       </View>
       {showLine && (
@@ -82,15 +108,22 @@ const styles = StyleSheet.create({
   topContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
   },
   input: {
     marginTop: 0,
     padding: 0,
     borderBottomWidth: 0,
-    textAlignVertical: 'bottom',
+    textAlignVertical: 'top',
+    textAlign: 'left',
+    height: '100%',
     fontFamily: constants.Fonts.text,
-    color: constants.colors.BLACK,
+    color: constants.colors.BGC,
   },
-  inputContentStyle: {justifyContent: 'flex-start'},
+  inputContentStyle: {
+    // justifyContent: 'flex-start'
+    // height: '100%',
+    // backgroundColor: 'red',
+    marginLeft: 15,
+  },
 });

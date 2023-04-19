@@ -173,6 +173,7 @@ const CreateOrEditList = () => {
       onDonePress={handleSubmit}>
       <View style={{height: '82%'}}>
         <FlatList
+          showsVerticalScrollIndicator={false}
           ref={flatListRef}
           // data={lists![categoryIndex].lists[listIndex].listItems}
           data={state}

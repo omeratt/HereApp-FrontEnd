@@ -71,7 +71,6 @@ const NewTask: React.FC<props> = ({
         ...(endDate && {endDate}),
         ...(isSetTime.current && {isSetTime: true}),
       }).unwrap();
-      console.log(data);
       setDescription('');
       setTaskName('');
     } catch (err) {

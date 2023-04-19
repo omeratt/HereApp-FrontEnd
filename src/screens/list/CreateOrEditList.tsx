@@ -17,7 +17,7 @@ import constants from '../../assets/constants';
 import SVG from '../../assets/svg';
 import MyListsWrapper from './MyListsWrapper';
 import ListItem from './ListItem';
-import {RouteProp, useRoute} from '@react-navigation/native';
+import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
 import {useAddListItemMutation, useGetListsQuery} from '../../app/api/listApi';
 import {InputHandle} from '../../components/TextInput';
 import uuid from 'react-native-uuid';
@@ -35,7 +35,7 @@ export interface ListItemType {
 }
 
 export interface Action {
-  type: 'INPUT' | 'FLAG' | 'CHECK' | 'POP';
+  type: 'INPUT' | 'FLAG' | 'CHECK' | 'POP' | 'PUSH';
   index: number;
   payload: any;
 }
@@ -55,6 +55,9 @@ const reducer = (state: ListItemType[], action: Action) => {
       return [...state];
     case 'POP':
       state.splice(action.index, 1);
+      return [...state];
+    case 'PUSH':
+      state.splice(action.index + 1, 0, {...newItem, _id: uuid.v4() + ''});
       return [...state];
     case 'INPUT':
       if (action.index === state.length - 1) {
@@ -85,13 +88,16 @@ const CreateOrEditList = () => {
     error: listsFetchError,
     isLoading: listsLoading,
   } = useGetListsQuery(undefined);
+
   const [addItemSubmit, {isLoading, isError, isSuccess}] =
     useAddListItemMutation(undefined);
+
   const categoryIndex: number =
     useRoute<CreateOrEditListProp>().params.categoryIndex;
   const listIndex: number = useRoute<CreateOrEditListProp>().params.listIndex;
-  const [deleted, setDeleted] = React.useState<ListItemType[]>([]);
 
+  const [deleted, setDeleted] = React.useState<ListItemType[]>([]);
+  const flatListRef = useRef<FlatList>(null);
   const [state, dispatch] = useReducer(
     reducer,
     lists
@@ -103,12 +109,10 @@ const CreateOrEditList = () => {
     lists![categoryIndex].name +
     ' ' +
     lists![categoryIndex].lists[listIndex].title;
-  const lastIndex = useMemo(
-    () => lists![categoryIndex].lists[listIndex].listItems.length,
-    [lists![categoryIndex].lists[listIndex].listItems.length],
-  );
-  const [checkboxType, setCheckboxType] = useState<CheckBoxListType>('V');
 
+  const [checkboxType, setCheckboxType] = useState<CheckBoxListType>('V');
+  const [currentFocusIndex, setCurrentFocusIndex] = useState(-1);
+  const nav = useNavigation();
   const handleSubmit = useCallback(async () => {
     const items = {
       listId: lists![categoryIndex].lists[listIndex]._id,
@@ -117,7 +121,8 @@ const CreateOrEditList = () => {
     };
     addItemSubmit(items)
       .then(data => {
-        console.log('on submit, result', data, items);
+        // console.log('on submit, result', data, items);
+        nav.goBack();
       })
       .catch(error => {
         console.log('error on handleSubmit add items, error', state);
@@ -140,18 +145,6 @@ const CreateOrEditList = () => {
     [onListItemTypePress],
   );
 
-  // const FooterComponent = useCallback(
-  //   () => (
-  //     <ListItem
-  //       iconSize={checkBoxSize}
-  //       type={checkboxType}
-  //       flag={false}
-  //       index={lastIndex}
-  //       dispatch={dispatch}
-  //     />
-  //   ),
-  //   [checkboxType, lastIndex, dispatch],
-  // );
   const keyExtractor: (item: ListItemType, index: number) => string =
     useCallback((item: ListItemType) => item._id!, [state]);
   const RenderItem: ListRenderItem<ListItemType> = useCallback(
@@ -163,26 +156,43 @@ const CreateOrEditList = () => {
         done={state[props.index].done}
         inputTxt={state[props.index].description}
         dispatch={dispatch}
-        // isLast={props.index === state.length - 1}
         listLength={state.length}
         setDeleted={setDeleted}
-        // {...(props.index === state.length - 1 && {textInputRef})}
+        currentFocusIndex={currentFocusIndex}
+        setCurrentFocusIndex={setCurrentFocusIndex}
+        flatListRef={flatListRef.current}
         {...props}
       />
     ),
-    [state, checkboxType, checkBoxSize],
+    [state, checkboxType, checkBoxSize, currentFocusIndex],
   );
   return (
-    <MyListsWrapper title={title} onDonePress={handleSubmit}>
-      <FlatList
-        // data={lists![categoryIndex].lists[listIndex].listItems}
-        data={state}
-        // ListFooterComponent={FooterComponent}
-        keyExtractor={keyExtractor}
-        renderItem={RenderItem}
-        // extraData={state}
-        style={styles.listContainerContent}
-      />
+    <MyListsWrapper
+      title={title}
+      isLoading={isLoading}
+      onDonePress={handleSubmit}>
+      <View style={{height: '82%'}}>
+        <FlatList
+          ref={flatListRef}
+          // data={lists![categoryIndex].lists[listIndex].listItems}
+          data={state}
+          // ListFooterComponent={FooterComponent}
+          keyExtractor={keyExtractor}
+          renderItem={RenderItem}
+          // extraData={state}
+          // contentContainerStyle={{flex: 1}}
+          style={styles.listContainerContent}
+        />
+      </View>
+      <View
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '3%',
+          // backgroundColor: 'red',
+        }}>
+        <SVG.ArrowDown />
+      </View>
       <View style={styles.listContainerFooter}>
         <TouchableOpacity
           style={[styles.containerFooterBtn, {height, width}]}
@@ -223,6 +233,7 @@ const styles = StyleSheet.create({
   },
   listContainerContent: {
     // marginTop: '10%',
+    // height: '91%',
   },
   newTaskTitleInput: {
     borderWidth: 0,

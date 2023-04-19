@@ -19,7 +19,6 @@ export default function CheckBox({
   isFilled,
 }: props) {
   const isNumber = type === 'NUMBERS';
-  console.log({isFilled});
 
   return (
     <TouchableOpacity

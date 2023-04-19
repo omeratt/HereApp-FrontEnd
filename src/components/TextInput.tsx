@@ -16,6 +16,8 @@ import constants from '../assets/constants';
 export interface InputHandle {
   getValue: () => string;
   onFocus: () => void;
+  blur: () => void;
+  setNativeProps: (obj: object) => void;
   setText: (value: string) => void;
 }
 interface MyTextInputProps extends TextInputProps {
@@ -33,6 +35,8 @@ const TextInput = forwardRef<InputHandle, MyTextInputProps>((props, ref) => {
   useImperativeHandle(ref, () => ({
     getValue: () => value,
     onFocus: () => textInputRef.current?.focus(),
+    setNativeProps: (obj: object) => textInputRef.current?.setNativeProps(obj),
+    blur: () => () => textInputRef.current?.blur(),
     setText: (value: string) => {
       textInputRef.current?.setNativeProps({text: value});
     },

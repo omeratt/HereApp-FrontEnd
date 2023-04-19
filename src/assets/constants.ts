@@ -19,13 +19,14 @@ export interface ListsType {
   }[];
 }
 const constants = {
-  // BASE_URL: 'https://here.cyclic.app/',
+  BASE_URL: 'https://here.cyclic.app/',
+  DOMAIN: 'here.cyclic.app',
   // BASE_URL: 'https://here-app.onrender.com/',
   /***************** Eliran ***************/
-  BASE_URL: 'http://192.168.1.30:3000/',
+  // BASE_URL: 'http://192.168.1.30:3000/',
 
   /***************** Omer ***************/
-  // BASE_URL: 'http://192.168.1.58:3000/',
+  // BASE_URL: 'http://192.168.1.27:3000/',
   colors: {
     GREEN: '#D0FD0C',
     BLACK: '#000000',

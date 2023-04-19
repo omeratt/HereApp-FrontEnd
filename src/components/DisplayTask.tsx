@@ -16,7 +16,7 @@ import Animated, {
 import constants from '../assets/constants';
 import CircleCheckBox from './CircleCheckBox';
 import {CheckBox} from '@rneui/themed';
-import {useDeleteTaskMutation} from '../app/api/taskApi';
+import {tasksApi, useDeleteTaskMutation} from '../app/api/taskApi';
 import {BottomSheetModal} from '@gorhom/bottom-sheet';
 import SVG from '../assets/svg';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
@@ -49,7 +49,7 @@ const TASK_CONTAINER_HEIGHT =
   constants.WIDTH * 0.025;
 const height = TASK_CONTAINER_HEIGHT;
 
-export default function DisplayTask({
+const DisplayTask = ({
   data,
   isTaskLoading,
   sharedX,
@@ -58,14 +58,14 @@ export default function DisplayTask({
   datePress,
   flatListData,
   snapToOffsets,
-}: props) {
+}: props) => {
   const [
     DeleteTask,
     {isLoading, data: responseDelete, isSuccess, isError, error},
   ] = useDeleteTaskMutation();
-  const onPressDelete = (_id: string) => {
+  const onPressDelete = async (_id: string) => {
     try {
-      DeleteTask(_id).unwrap();
+      await DeleteTask(_id).unwrap();
       closeDeleteModal();
     } catch (err: any) {
       console.log('err in delete', err);
@@ -74,7 +74,6 @@ export default function DisplayTask({
   let timer: any;
   useEffect(() => {
     return () => {
-      console.log({timer});
       clearTimeout(timer);
     };
   }, []);
@@ -83,7 +82,6 @@ export default function DisplayTask({
 
   // variables
   const snapPoints = useMemo(() => ['15%', '15%'], []);
-
   // callbacks
   const closeDeleteModal = useCallback(() => {
     bottomSheetModalRef.current?.dismiss();
@@ -175,9 +173,13 @@ export default function DisplayTask({
                   id: item._id as string,
                 })
               }>
-              <Text style={styles.taskContentTitle}>{itemHours}</Text>
-              <Text style={styles.taskContentTitle}>{item.name}</Text>
-              <Text style={styles.taskContentBody}>{item.details}</Text>
+              <View style={{alignSelf: 'flex-start'}}>
+                <Text style={styles.taskContentHour}>{itemHours}</Text>
+              </View>
+              <Text style={styles.taskContentName}>{item.name}</Text>
+              <Text style={styles.taskContentDetails} numberOfLines={1}>
+                {item.details}
+              </Text>
             </TouchableOpacity>
             <CheckBox
               checked={item.done}
@@ -305,8 +307,8 @@ export default function DisplayTask({
       </View>
     </View>
   );
-}
-
+};
+export default React.memo(DisplayTask);
 const styles = StyleSheet.create({
   taskListContainer: {
     marginTop: '2.2%',
@@ -356,24 +358,36 @@ const styles = StyleSheet.create({
   taskListContent: {
     // height: constants.HEIGHT * 0.1,
     borderRadius: 20,
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderColor: constants.colors.UNDER_LINE,
     width: '100%',
     padding: '3%',
     elevation: 2,
-    backgroundColor: constants.colors.OFF_WHITE,
+    backgroundColor: '#ffffff',
     justifyContent: 'center',
     // backgroundColor: 'red',
     // zIndex: 9999,
   },
-  taskContentTitle: {
+  taskContentHour: {
     fontFamily: constants.Fonts.text,
+    borderBottomColor: constants.colors.UNDER_LINE,
+    borderBottomWidth: 1,
+    // backgroundColor: 'red',
+    textAlign: 'left',
     fontWeight: 'bold',
     fontSize: 14,
     color: constants.colors.BLACK,
   },
-  taskContentBody: {
+  taskContentName: {
     fontFamily: constants.Fonts.text,
+    textAlign: 'left',
+    fontWeight: 'bold',
+    fontSize: 14,
+    color: constants.colors.BLACK,
+  },
+  taskContentDetails: {
+    fontFamily: constants.Fonts.text,
+    textAlign: 'left',
     fontSize: 12.5,
     color: constants.colors.UNDER_LINE,
   },

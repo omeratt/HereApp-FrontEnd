@@ -4,8 +4,11 @@ import {
   TouchableOpacity,
   View,
   TextInput as InputText,
+  NativeSyntheticEvent,
+  TextInputKeyPressEventData,
+  FlatList,
 } from 'react-native';
-import React, {useCallback, useRef} from 'react';
+import React, {useCallback, useEffect, useRef} from 'react';
 import CheckBox from '../../components/CheckBox';
 import Line from '../../components/Line';
 import constants from '../../assets/constants';
@@ -13,6 +16,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import TextInput, {InputHandle} from '../../components/TextInput';
 import {PADDING_HORIZONTAL} from './MyListsWrapper';
 import {Action, CheckBoxListType, ListItemType} from './CreateOrEditList';
+
 
 interface ListItemProps {
   iconSize?: number;
@@ -30,6 +34,9 @@ interface ListItemProps {
   done?: boolean;
   listLength?: number;
   setDeleted?: React.Dispatch<React.SetStateAction<ListItemType[]>>;
+  currentFocusIndex?: number;
+  setCurrentFocusIndex?: React.Dispatch<React.SetStateAction<number>>;
+  flatListRef?: FlatList<ListItemType> | null;
 }
 const ListItem: React.FC<ListItemProps> = ({
   item,
@@ -47,6 +54,9 @@ const ListItem: React.FC<ListItemProps> = ({
   done,
   listLength,
   setDeleted,
+  currentFocusIndex,
+  setCurrentFocusIndex,
+  flatListRef,
 }) => {
   const width = constants.WIDTH - PADDING_HORIZONTAL * 2 - iconSize * 2 - 20;
   const isLast = React.useMemo(
@@ -55,10 +65,16 @@ const ListItem: React.FC<ListItemProps> = ({
   );
   const textInputRef = useRef<InputHandle>(null);
   const focus = useCallback(() => {
+    console.log('focus');
     if (!isLast) return;
+    // textInputRef?.current?.setNativeProps({
+    //   selection: {start: inputTxt.length, end: inputTxt.length},
+    // });
     dispatch?.({type: 'INPUT', index, payload: ''});
-  }, [isLast]);
+  }, [isLast, index]);
+
   const blur = useCallback(() => {
+    console.log('blur');
     if (isLast || inputTxt.length > 0) return;
     if (!item.new) setDeleted?.(prev => [...prev, item]);
     dispatch?.({type: 'POP', index, payload: ''});
@@ -70,12 +86,46 @@ const ListItem: React.FC<ListItemProps> = ({
     },
     [dispatch, index],
   );
+
+  const onEnter = useCallback(() => {
+    if (!inputTxt) return;
+    dispatch?.({type: 'PUSH', index, payload: ''});
+    flatListRef?.scrollToIndex({index: index + 1});
+    setCurrentFocusIndex?.(index + 1);
+  }, [index, isLast, inputTxt]);
+
+  useEffect(() => {
+    if (currentFocusIndex === undefined) return;
+    if (currentFocusIndex >= 0 && currentFocusIndex === index) {
+      flatListRef?.scrollToIndex({index});
+      setTimeout(() => {
+        textInputRef.current?.onFocus();
+      }, 250);
+      setCurrentFocusIndex?.(-1);
+    }
+  }, [currentFocusIndex]);
   const onFlagPress = useCallback(() => {
     dispatch?.({type: 'FLAG', index, payload: 'change flag'});
   }, [dispatch, index]);
   const onCheckboxPress = useCallback(() => {
     dispatch?.({type: 'CHECK', index, payload: 'change checkbox'});
   }, [dispatch, index]);
+
+  const handleKeyPress = useCallback(
+    (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
+      if (index === 0 || isLast) return;
+      if (e.nativeEvent.key === 'Backspace' && inputTxt === '') {
+        // console.log('User tried to delete an empty value');
+        textInputRef.current?.blur();
+        // blur();
+        dispatch?.({type: 'POP', index, payload: ''});
+        // setTimeout(() => {
+        setCurrentFocusIndex?.(index - 1);
+        // }, 0);
+      }
+    },
+    [inputTxt, index, isLast],
+  );
   return (
     <View
       style={{
@@ -108,9 +158,11 @@ const ListItem: React.FC<ListItemProps> = ({
               },
             ]}
             onFocus={focus}
-            placeholder="Finish with ..."
+            placeholder=""
             onBlur={blur}
             onChangeText={onChangeText}
+            onSubmitEditing={onEnter}
+            onKeyPress={handleKeyPress}
           />
         ) : (
           <TouchableOpacity onPress={textPress && (() => textPress(index))}>

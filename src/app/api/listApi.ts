@@ -1,7 +1,7 @@
 import {ListsType} from '../../assets/constants';
-import {userApi} from './userApi';
+import {apiSlice} from './baseApi';
 
-export const listsApi = userApi.injectEndpoints({
+export const listsApi = apiSlice.injectEndpoints({
   endpoints: builder => ({
     getLists: builder.query({
       query: () => 'list/categories',

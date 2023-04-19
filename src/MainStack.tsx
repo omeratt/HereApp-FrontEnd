@@ -21,17 +21,6 @@ const Stack = createDrawerNavigator();
 
 export default function MainStack() {
   const isSignIn = useAppSelector(selectIsSignIn);
-  const {isError, isSuccess, isLoading, data, error, isFetching} =
-    useMyProfileQuery(null);
-
-  // useEffect(() => {
-  //   if (isSuccess) {
-  //     console.log('get profile success', data, isSignIn);
-  //   }
-  //   if (isError) {
-  //     console.log('get profile error', error, isSignIn);
-  //   }
-  // }, [error, data]);
   const drawerScreenOptions = {
     gestureEnabled: true,
     swipeEnabled: false,

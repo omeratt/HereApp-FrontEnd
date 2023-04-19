@@ -14,6 +14,9 @@ import userSlice from './Reducers/User/userSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {userApi} from './api/userApi';
 import {setupListeners} from '@reduxjs/toolkit/dist/query';
+import {apiSlice} from './api/baseApi';
+import {tasksApi} from './api/taskApi';
+import {listsApi} from './api/listApi';
 // ...
 
 const persistConfig = {
@@ -27,20 +30,14 @@ const userReducer = persistReducer(persistConfig, userSlice);
 const rootReducer = combineReducers({user: userReducer});
 export const store = configureStore({
   reducer: {
-    [userApi.reducerPath]: userApi.reducer,
+    [apiSlice.reducerPath]: apiSlice.reducer,
     reducer: rootReducer,
-
-    // comments: commentsReducer,
-    // users: usersReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       serializableCheck: false,
-      // serializableCheck: {
-      //   ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-      // },
       immutableCheck: false,
-    }).concat(userApi.middleware),
+    }).concat(apiSlice.middleware),
 });
 setupListeners(store.dispatch);
 export let persistor = persistStore(store);

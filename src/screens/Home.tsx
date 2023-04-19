@@ -44,10 +44,10 @@ const Home = () => {
     const index = getIndexByKey(allDates, key);
     return index;
   }, []);
-  const [tasks, setTasks] = useState<any[]>([]);
+  // const [tasks, setTasks] = useState<any[]>([]);
   const [selectedFinalDate, setSelectedFinalDate] =
     useState<Date>(CURRENT_DATE);
-  const [isTaskLoading, setIsTaskLoading] = useState<boolean>(false);
+  // const [isTaskLoading, setIsTaskLoading] = useState<boolean>(false);
   const flashListRef = useRef<FlashList<DateObject> | null>(null);
   const [selectedScrollDate, setSelectedScrollDate] =
     useState<Date>(CURRENT_DATE);
@@ -66,76 +66,55 @@ const Home = () => {
     setSelectedDate(date);
   }, []);
   const sharedX = useSharedValue(0);
-  const {
-    isLoading: taskLoading,
-    data: tasks1,
-    isSuccess: taskSuccess,
-    isError: taskIsError,
-    error: tasksError,
-    isFetching: taskFetch,
-  } = useGetTasksByDateQuery(CURRENT_DATE);
+
   const {
     data: lists,
     error: listsFetchError,
     isLoading: listsLoading,
   } = useGetListsQuery(null);
-
-  useEffect(() => {
-    console.log(listsFetchError);
-  }, [listsFetchError]);
+  const {
+    isLoading: tasksLoading,
+    data: tasks,
+    isSuccess: taskSuccess,
+    isError: taskIsError,
+    error: tasksError,
+    isFetching: taskFetch,
+  } = useGetTasksByDateQuery(selectedDate);
   const FetchTasks = useCallback((date: Date) => {
+    // setIsTaskLoading(true);
     const result = dispatch(tasksApi.endpoints.getTasksByDate.initiate(date))
-      .then((res: any) => {
-        setTasks(res.data);
-      })
+      .then((res: any) => {})
       .catch(err => {
         console.log('error getting tasks', err);
-      })
-      .finally(() => setIsTaskLoading(false));
+      });
+    // .finally(() => setIsTaskLoading(false));
   }, []);
-  const datePress = useCallback(
-    (dateItem: DateObject) => {
-      const date = dateItem.fullDate;
-      findDateAndScroll(date);
-      setIsTaskLoading(true);
-      SetSelectedFinalDate(date);
-      SetSelectedDate(date);
-      // runOnJS(FetchTasks)(date);
-      SetDateHeader(dateItem);
-      FetchTasks(date);
-    },
-    [selectedFinalDate],
-  );
+
+  const datePress = useCallback((dateItem: DateObject) => {
+    const realDate = new Date(
+      dateItem.fullDate.getTime() -
+        dateItem.fullDate.getTimezoneOffset() * 60000,
+    );
+    findDateAndScroll(realDate);
+    // setIsTaskLoading(true);
+    SetSelectedFinalDate(realDate);
+    SetSelectedDate(realDate);
+    SetDateHeader(dateItem);
+    FetchTasks(realDate);
+  }, []);
 
   // TODO: find a way to handle scroll to index
 
   const findDateAndScroll = useCallback((DateToCheck: Date) => {
     const key = DateToCheck.toLocaleDateString();
+    // console.log({key, local: DateToCheck.toLocaleDateString()});
     const index = getIndexByKey(allDates, key);
     scrollToIndex(index);
   }, []);
 
   useEffect(() => {
-    // if (!selectedDate.current) findDateAndScroll(CURRENT_DATE);
-    // else
-    // console.log('first render', selectedDate);
-    findDateAndScroll(selectedDate);
+    findDateAndScroll(CURRENT_DATE);
   }, []);
-
-  useEffect(() => {
-    if (taskFetch) {
-      setIsTaskLoading(true);
-    } else {
-      setIsTaskLoading(false);
-    }
-    if (tasks1) {
-      // console.log('getting tasks', tasks);
-      setTasks(tasks1);
-    }
-    if (tasksError) {
-      // console.log('error getting tasks', tasksError);
-    }
-  }, [tasks1, tasksError]);
 
   const openDrawer = () => {
     navigation.dispatch(DrawerActions.openDrawer());
@@ -159,7 +138,6 @@ const Home = () => {
     bottomSheetModalRef.current?.present();
   }, []);
   const handleSheetChanges = useCallback((index: number) => {
-    console.log('handleSheetChanges', index);
   }, []);
 
   const tempGetMonthFromStringDate = useMemo(() => {
@@ -250,18 +228,17 @@ const Home = () => {
             />
           </View>
           <View style={styles.taskListColumnContainer}>
-            {
-              <DisplayTask
-                data={tasks}
-                isTaskLoading={isTaskLoading}
-                sharedX={sharedX}
-                flashListRef={flashListRef}
-                sharedDatesIndex={sharedDatesIndex}
-                datePress={datePress}
-                flatListData={flatListData}
-                snapToOffsets={snapToOffsets}
-              />
-            }
+            <DisplayTask
+              data={tasks}
+              isTaskLoading={tasksLoading}
+              sharedX={sharedX}
+              flashListRef={flashListRef}
+              sharedDatesIndex={sharedDatesIndex}
+              datePress={datePress}
+              flatListData={flatListData}
+              snapToOffsets={snapToOffsets}
+            />
+
             {/* {tasks?.length > 0 ? (
               <DisplayTask data={tasks} isTaskLoading={isTaskLoading} />
             ) : (
@@ -387,7 +364,7 @@ const styles = StyleSheet.create({
     height: '64%',
     width: '100%',
     alignItems: 'center',
-    borderRadius: 40,
+    borderRadius: 32,
     borderWidth: 1,
     borderColor: constants.colors.UNDER_LINE,
     backgroundColor: constants.colors.OFF_WHITE,

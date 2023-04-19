@@ -1,10 +1,10 @@
-import {userApi} from './userApi';
+import {apiSlice} from './baseApi';
 
-export const tasksApi = userApi.injectEndpoints({
+export const tasksApi = apiSlice.injectEndpoints({
   endpoints: builder => ({
     getTasks: builder.query({
       query: () => 'tasks',
-      providesTags: ['Tasks'],
+      // providesTags: ['Tasks'],
       transformResponse: (response: any, meta, arg) => {
         return response.data;
       },
@@ -22,11 +22,10 @@ export const tasksApi = userApi.injectEndpoints({
         return response.data;
       },
     }),
-    addTask: builder.mutation({
-      query: task => ({
-        url: 'task',
-        method: 'POST',
-        body: task,
+    deleteTask: builder.mutation({
+      query: id => ({
+        url: `task/${id}`,
+        method: 'DELETE',
         credentials: 'include',
       }),
       invalidatesTags: ['TasksByDate'],
@@ -34,10 +33,11 @@ export const tasksApi = userApi.injectEndpoints({
         return response.data;
       },
     }),
-    deleteTask: builder.mutation({
-      query: id => ({
-        url: `task/${id}`,
-        method: 'DELETE',
+    addTask: builder.mutation({
+      query: task => ({
+        url: 'task',
+        method: 'POST',
+        body: task,
         credentials: 'include',
       }),
       invalidatesTags: ['TasksByDate'],

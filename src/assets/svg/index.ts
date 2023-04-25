@@ -9,7 +9,11 @@ import BoxIcon from './BoxIcon.svg';
 import ArrowDown from './ArrowDown.svg';
 import NumCheckbox from './NumCheckBox.svg';
 import VIcon from './vIcon.svg';
+import PlayHere from './PlayHere.svg';
+import PlayGroundX from './playGroundX.svg';
 const SVG = {
+  PlayGroundX,
+  PlayHere,
   HereLogo,
   DoneButton,
   StartButton,

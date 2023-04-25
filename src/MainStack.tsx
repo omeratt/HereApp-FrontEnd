@@ -15,6 +15,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import OnBoarding from './screens/OnBoarding';
 import ListAndNotesNavigator from './Navigation/ListNavigation';
 import {useGetListsQuery} from './app/api/listApi';
+import PlayGround from './screens/PlayGround';
 const ICON_SIZE = 20;
 // const Stack = createNativeStackNavigator();
 const Stack = createDrawerNavigator();
@@ -67,6 +68,21 @@ export default function MainStack() {
               component={OnBoarding}
               options={{headerShown: false}}
             /> */}
+            <Stack.Screen
+              name="PlayGround"
+              component={PlayGround}
+              options={{
+                swipeEnabled: false,
+                headerShown: false,
+                drawerIcon: ({color, focused}) => (
+                  <Ionicons
+                    name={focused ? 'home' : 'home-outline'}
+                    size={ICON_SIZE}
+                    style={[styles.icon, {color}]}
+                  />
+                ),
+              }}
+            />
             <Stack.Screen
               name="HomePage"
               component={Home}

@@ -19,6 +19,7 @@ import {FlashList} from '@shopify/flash-list';
 import DatesFlatList from '../components/DatesFlatList';
 import moment from 'moment';
 import {useGetListsQuery} from '../app/api/listApi';
+import CalendarModal from '../components/CalendarModal';
 
 const CURRENT_DATE = new Date();
 const allDates = getDatesForYear(CURRENT_DATE);
@@ -45,8 +46,6 @@ const Home = () => {
     return index;
   }, []);
   // const [tasks, setTasks] = useState<any[]>([]);
-  const [selectedFinalDate, setSelectedFinalDate] =
-    useState<Date>(CURRENT_DATE);
   // const [isTaskLoading, setIsTaskLoading] = useState<boolean>(false);
   const flashListRef = useRef<FlashList<DateObject> | null>(null);
   const [selectedScrollDate, setSelectedScrollDate] =
@@ -59,14 +58,10 @@ const Home = () => {
   const SetDateHeader = useCallback((header: any) => {
     setDateHeader(header);
   }, []);
-  const SetSelectedFinalDate = useCallback((date: any) => {
-    setSelectedFinalDate(date);
-  }, []);
   const SetSelectedDate = useCallback((date: Date) => {
     setSelectedDate(date);
   }, []);
   const sharedX = useSharedValue(0);
-
   const {
     data: lists,
     error: listsFetchError,
@@ -80,14 +75,13 @@ const Home = () => {
     error: tasksError,
     isFetching: taskFetch,
   } = useGetTasksByDateQuery(selectedDate);
+  const [calendarVisible, setCalendarVisible] = useState(false);
   const FetchTasks = useCallback((date: Date) => {
-    // setIsTaskLoading(true);
     const result = dispatch(tasksApi.endpoints.getTasksByDate.initiate(date))
       .then((res: any) => {})
       .catch(err => {
         console.log('error getting tasks', err);
       });
-    // .finally(() => setIsTaskLoading(false));
   }, []);
 
   const datePress = useCallback((dateItem: DateObject) => {
@@ -96,19 +90,14 @@ const Home = () => {
         dateItem.fullDate.getTimezoneOffset() * 60000,
     );
     findDateAndScroll(realDate);
-    // setIsTaskLoading(true);
-    SetSelectedFinalDate(realDate);
-    SetSelectedDate(realDate);
-    SetDateHeader(dateItem);
     FetchTasks(realDate);
   }, []);
 
-  // TODO: find a way to handle scroll to index
-
   const findDateAndScroll = useCallback((DateToCheck: Date) => {
     const key = DateToCheck.toLocaleDateString();
-    // console.log({key, local: DateToCheck.toLocaleDateString()});
     const index = getIndexByKey(allDates, key);
+    SetSelectedDate(DateToCheck);
+    SetDateHeader(flatListData[index]);
     scrollToIndex(index);
   }, []);
 
@@ -124,7 +113,6 @@ const Home = () => {
       'ListAndNotesStack' as never,
       {
         screen: 'ListAndNotes' as never,
-        // params: {lists, listsLoading},
       } as never,
     );
   }, [navigation]);
@@ -137,11 +125,9 @@ const Home = () => {
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
   }, []);
-  const handleSheetChanges = useCallback((index: number) => {
-  }, []);
+  const handleSheetChanges = useCallback((index: number) => {}, []);
 
   const tempGetMonthFromStringDate = useMemo(() => {
-    // consnole.log({selec})
     if (!dateHeader) return 'Today';
     const monthName = dateHeader?.fullDate.toLocaleString('eng', {
       month: 'long',
@@ -172,27 +158,37 @@ const Home = () => {
     [snapToOffsets],
   );
   //  -------------------------------------------------------- flat list callbacks --------------------------------------------------------
+
+  const toggleCalendar = useCallback(() => {
+    setCalendarVisible(!calendarVisible);
+  }, [calendarVisible]);
   return (
     <Animated.View
       entering={FadeIn}
       exiting={FadeOutUp}
       style={styles.container}>
+      <CalendarModal
+        visible={calendarVisible}
+        toggleCalendar={toggleCalendar}
+        FetchTasks={FetchTasks}
+        findDateAndScroll={findDateAndScroll}
+      />
       <View style={styles.topView}>
         <View style={styles.task}>
           <View style={styles.today}>
-            <TouchableOpacity
-              onPress={handlePresentModalPress}
-              style={[
-                {
-                  zIndex: 1,
-                },
-              ]}>
-              <SVG.plusIconOutlined
-                style={[styles.plusIcon]}
-                fill={constants.colors.BGC}
-              />
-            </TouchableOpacity>
             <Text style={styles.taskTitle}>{tempGetMonthFromStringDate}</Text>
+
+            <TouchableOpacity
+              style={{
+                // backgroundColor: 'black',
+                width: 15,
+                height: 15,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              onPress={toggleCalendar}>
+              <SVG.ArrowDown />
+            </TouchableOpacity>
           </View>
           <View>
             <Line
@@ -209,7 +205,7 @@ const Home = () => {
               flashListRef={flashListRef}
               datePress={datePress}
               // FetchTasks={FetchTasks}
-              selectedFinalDate={selectedFinalDate}
+              selectedFinalDate={selectedDate}
               // setSelectedFinalDate={SetSelectedFinalDate}
               selectedScrollDate={selectedScrollDate}
               flatListData={flatListData}
@@ -237,6 +233,7 @@ const Home = () => {
               datePress={datePress}
               flatListData={flatListData}
               snapToOffsets={snapToOffsets}
+              handlePresentModalPress={handlePresentModalPress}
             />
 
             {/* {tasks?.length > 0 ? (
@@ -342,6 +339,7 @@ const Home = () => {
             setTargetDate={SetSelectedDate}
             maximumDate={flatListData[initialNumToRender - 1]?.fullDate}
             minimumDate={flatListData[0]?.fullDate}
+            findDateAndScroll={findDateAndScroll}
           />
         </BottomSheetModal>
       </BottomSheetModalProvider>
@@ -349,7 +347,7 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default React.memo(Home);
 
 const styles = StyleSheet.create({
   container: {
@@ -406,6 +404,8 @@ const styles = StyleSheet.create({
   today: {
     // backgroundColor: 'blue',
     // marginBottom: 5,
+    alignItems: 'center',
+    flexDirection: 'row',
     padding: '5%',
     height: '20%',
   },
@@ -414,6 +414,7 @@ const styles = StyleSheet.create({
     color: constants.colors.BLACK,
     fontSize: 30,
     zIndex: 0,
+    marginRight: '4%',
   },
   plusIcon: {
     position: 'absolute',

@@ -1,9 +1,20 @@
-import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Pressable,
+} from 'react-native';
 import React, {useCallback, useMemo, useRef} from 'react';
 import DatePicker from 'react-native-date-picker';
-import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import {
+  BottomSheetBackdrop,
+  BottomSheetModal,
+  BottomSheetModalProvider,
+} from '@gorhom/bottom-sheet';
 import constants from '../assets/constants';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 
 interface DatePickerProps {
   date: Date;
@@ -13,7 +24,9 @@ interface DatePickerProps {
   minimumDate: Date;
   maximumDate: Date;
   isSetTimeRef: React.MutableRefObject<boolean>;
+  setIsOpen?: (state: boolean) => void;
   targetDateHoursRef?: React.MutableRefObject<string>;
+  bottomSheetModalRef?: React.RefObject<BottomSheetModalMethods>;
 }
 
 const currDate = new Date();
@@ -26,21 +39,26 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
   maximumDate,
   isSetTimeRef,
   targetDateHoursRef,
+  bottomSheetModalRef,
+  setIsOpen,
 }) => {
-  const [currentDate, setCurrentDate] = React.useState<Date>(currDate);
+  const [currentDate, setCurrentDate] = React.useState<Date>(date);
   const [hours, setHours] = React.useState<string>('');
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+
   const handleConfirm = () => {
-    setDate(currentDate);
+    const realDate = new Date(
+      currentDate.getTime() - currentDate.getTimezoneOffset() * 60000,
+    );
+    setDate(realDate);
     if (dateFormat !== 'time') return close();
     const [_hours, minutes] = hours.split(':');
-    const fixedDate = new Date(date.setUTCHours(+_hours, +minutes));
+    const fixedDate = new Date(currentDate.setUTCHours(+_hours, +minutes));
     setDate(fixedDate);
     isSetTimeRef.current = true;
     close();
   };
-  const handleChange = (date: Date) => {
-    dateFormat === 'time' ? handleHoursChange(date) : setCurrentDate(date);
+  const handleChange = (date1: Date) => {
+    dateFormat === 'time' ? handleHoursChange(date1) : setCurrentDate(date1);
   };
 
   const handleHoursChange = (date: Date) => {
@@ -55,20 +73,14 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
     setCurrentDate(fixedDate);
   };
   const cancelConfirm = () => {
-    setCurrentDate(currentDate);
+    setCurrentDate(date);
     close();
   };
 
-  React.useEffect(() => {
-    isOpen ? open() : close();
-  }, [isOpen]);
-
-  const open = () => {
-    bottomSheetModalRef.current?.present();
-  };
   const close = () => {
-    setCurrentDate(currDate);
-    bottomSheetModalRef.current?.dismiss();
+    // setCurrentDate(date);
+    setIsOpen?.(false);
+    bottomSheetModalRef?.current?.dismiss();
   };
 
   // variables
@@ -87,8 +99,23 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
   };
 
   const handleSheetChanges = useCallback((index: number) => {
-    console.log('handleSheetChanges', index);
+    // console.log('handleSheetChanges', index);
   }, []);
+  const renderBackdrop = useCallback(
+    (props: any) => (
+      <Pressable
+        onPress={cancelConfirm}
+        {...props}
+        style={{
+          backgroundColor: 'transparent',
+          position: 'absolute',
+          height: constants.HEIGHT,
+          width: constants.WIDTH,
+        }}
+      />
+    ),
+    [],
+  );
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal
@@ -101,8 +128,10 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
           backgroundColor: constants.colors.BGC,
         }}
         handleComponent={ModalHeader}
+        backdropComponent={renderBackdrop}
         backgroundStyle={{backgroundColor: constants.colors.BGC}}
         style={{paddingHorizontal: '8%'}}
+        enablePanDownToClose={false}
         onChange={handleSheetChanges}>
         <View>
           <DatePicker

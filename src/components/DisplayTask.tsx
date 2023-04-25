@@ -30,6 +30,7 @@ interface RenderItemProps {
   expires?: string;
   done: false;
   targetDate?: string;
+  isSetTime?: boolean;
 }
 interface props {
   data: any[];
@@ -40,6 +41,7 @@ interface props {
   datePress: (dateItem: DateObject) => void;
   flatListData: DateObject[];
   snapToOffsets: number[];
+  handlePresentModalPress: () => void;
 }
 const TASK_CONTAINER_HEIGHT =
   constants.HEIGHT * 0.64 * 0.84 - //topView till lists
@@ -58,6 +60,7 @@ const DisplayTask = ({
   datePress,
   flatListData,
   snapToOffsets,
+  handlePresentModalPress,
 }: props) => {
   const [
     DeleteTask,
@@ -159,11 +162,16 @@ const DisplayTask = ({
     ({item, index}) => {
       const itemHours = getTimeFromDateString(item.targetDate);
       useEffect(() => {
-        sharedX.value = sharedX.value < 0 ? -TASK_WIDTH : TASK_WIDTH;
+        // if (sharedX.value !== 0) {
+        sharedX.value = sharedX.value < 0 ? TASK_WIDTH * 2 : -TASK_WIDTH * 2;
         sharedX.value = withSpring(0, springConfig);
+        // sharedX.value = 0;
+        // }
       }, []);
       return (
         <Animated.View
+          // entering={ZoomIn.duration(500)}
+          // {...(sharedX.value === 0 && {exiting: SlideOutRight})}
           style={[styles.taskListContainer, {...(!index && {marginTop: 0})}]}>
           <View style={styles.taskListContent}>
             <TouchableOpacity
@@ -173,9 +181,11 @@ const DisplayTask = ({
                   id: item._id as string,
                 })
               }>
-              <View style={{alignSelf: 'flex-start'}}>
-                <Text style={styles.taskContentHour}>{itemHours}</Text>
-              </View>
+              {item.isSetTime && (
+                <View style={{alignSelf: 'flex-start'}}>
+                  <Text style={styles.taskContentHour}>{itemHours}</Text>
+                </View>
+              )}
               <Text style={styles.taskContentName}>{item.name}</Text>
               <Text style={styles.taskContentDetails} numberOfLines={1}>
                 {item.details}
@@ -227,7 +237,6 @@ const DisplayTask = ({
   const press: () => void = useCallback(() => {
     datePress(flatListData[sharedDatesIndex.value]);
   }, []);
-
   const endScroll: () => void = useCallback(() => {
     flashListRef?.current?.scrollToOffset({
       offset: snapToOffsets[sharedDatesIndex.value],
@@ -262,6 +271,9 @@ const DisplayTask = ({
         }),
     [],
   );
+  const renderItem = useCallback((props: any) => <RenderItem {...props} />, []);
+  const keyExtractor: (item: RenderItemProps, index: number) => string =
+    useCallback((item: RenderItemProps) => item._id!, []);
   return (
     <View
       style={{
@@ -270,10 +282,11 @@ const DisplayTask = ({
         height: height,
       }}>
       <View style={styles.header}>
-        <SVG.plusIconOutlined
-          style={styles.PlusIcon}
-          fill={constants.colors.BGC}
-        />
+        <TouchableOpacity
+          onPress={handlePresentModalPress}
+          style={[styles.PlusIcon, {zIndex: 1}]}>
+          <SVG.plusIconOutlined fill={constants.colors.BGC} />
+        </TouchableOpacity>
         <Text style={styles.taskHeaderTitle}>Tasks</Text>
       </View>
       <View
@@ -286,8 +299,8 @@ const DisplayTask = ({
             style={{transform: [{translateX: sharedX}]}}
             data={data}
             ListEmptyComponent={emptyList}
-            renderItem={props => <RenderItem {...props} />}
-            keyExtractor={item => item._id as string}
+            renderItem={renderItem}
+            keyExtractor={keyExtractor}
             contentContainerStyle={{paddingBottom: height * 0.01}}
           />
         </GestureDetector>
@@ -317,6 +330,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     width: '90.36%',
     height: height * 0.3663,
+    backgroundColor: constants.colors.OFF_WHITE,
     // height
     // backgroundColor: 'red',
   },
@@ -362,8 +376,10 @@ const styles = StyleSheet.create({
     borderColor: constants.colors.UNDER_LINE,
     width: '100%',
     padding: '3%',
-    elevation: 2,
-    backgroundColor: '#ffffff',
+    // elevation: 1,
+    // shadowRadius: 20,
+    // shadowColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     justifyContent: 'center',
     // backgroundColor: 'red',
     // zIndex: 9999,

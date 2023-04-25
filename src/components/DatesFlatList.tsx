@@ -33,7 +33,6 @@ const DatesFlatList: React.FC<Props> = ({
   const isCanExecuteOnMomentumEnd = React.useRef<boolean>(false);
   const scrollX = useSharedValue(0);
   const lastScrollX = useSharedValue(0);
-
   const canExecuteOnMomentumEnd = useCallback(() => {
     lastScrollX.value = scrollX.value;
 

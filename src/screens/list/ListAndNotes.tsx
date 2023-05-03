@@ -53,7 +53,6 @@ const NewCategory = () => {
   const listSize = useMemo(() => {
     return lists?.length;
   }, [lists?.length]);
-
   return (
     <MyListsWrapper
       rightBtn

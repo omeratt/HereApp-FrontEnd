@@ -311,7 +311,7 @@ const DisplayTask = ({
             height: height * 0.03,
             // backgroundColor: 'red',
           }}>
-          <SVG.ArrowDown />
+          {data?.length > 2 && <SVG.ArrowDown />}
         </View>
         <DeleteModal
           _id={deleteProps.id as string}
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
   },
   taskHeaderTitle: {
     fontFamily: constants.Fonts.paragraph,
-    color: constants.colors.BLACK,
+    color: constants.colors.BGC,
     fontSize: 20,
     // fontWeight: '600',
   },

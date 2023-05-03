@@ -10,9 +10,15 @@ import ArrowDown from './ArrowDown.svg';
 import NumCheckbox from './NumCheckBox.svg';
 import VIcon from './vIcon.svg';
 import PlayHere from './PlayHere.svg';
-import PlayGroundX from './playGroundX.svg';
+import XBtn from './XBtn.svg';
+import HamburgerBtn from './HamburgerBtn.svg';
+import SearchBtn from './SearchBtn.svg';
+import Continue from './Continue.svg';
 const SVG = {
-  PlayGroundX,
+  Continue,
+  XBtn,
+  SearchBtn,
+  HamburgerBtn,
   PlayHere,
   HereLogo,
   DoneButton,

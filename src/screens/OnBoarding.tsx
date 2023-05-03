@@ -11,6 +11,9 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import Line from '../components/Line';
+import SVG from '../assets/svg';
+import {useNavigation} from '@react-navigation/native';
 const styles1 = StyleSheet.create({
   container: {
     maxWidth: '61%',
@@ -22,7 +25,7 @@ const styles1 = StyleSheet.create({
     backgroundColor: constants.colors.BGC,
     justifyContent: 'center',
     alignItems: 'center',
-    height: '10%',
+    height: constants.HEIGHT * 0.078125,
     marginVertical: '2%',
     marginRight: '3.0%',
     paddingHorizontal: '5.8%',
@@ -49,6 +52,7 @@ interface BallonProps {
 }
 export default function OnBoarding() {
   const list = constants.OnBoardingList;
+  const nav = useNavigation();
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const SetSelectedItems = useCallback((item: string) => {
     setSelectedItems(prev => {
@@ -60,6 +64,9 @@ export default function OnBoarding() {
     console.log(selectedItems);
     return () => {};
   }, [selectedItems]);
+  const goHome = useCallback(() => {
+    nav.navigate('HomePage' as never);
+  }, []);
   const BallonTxt = useCallback(
     ({txt, index, selectedItems, SetSelectedItems}: BallonProps) => {
       const isTimeManagement = txt === 'Time management';
@@ -106,11 +113,32 @@ export default function OnBoarding() {
       <Animated.View
         entering={FadeInLeft.duration(700).delay(500)}
         style={styles.topContainer}>
-        <Text numberOfLines={4} style={styles.paragraphTxt}>
+        <Text
+          numberOfLines={2}
+          textBreakStrategy="balanced"
+          style={styles.paragraphTxt}>
           Please select the words that
-          <Text style={styles.highLightTxt}> indicate a difficulty </Text>
-          you have.
         </Text>
+        <Text style={[styles.paragraphTxt, styles.highLightTxt]}>
+          indicate a difficulty
+        </Text>
+        <View
+          style={{
+            alignSelf: 'flex-start',
+          }}>
+          <Text
+            numberOfLines={4}
+            style={[styles.paragraphTxt, {marginBottom: '5%'}]}>
+            you have.
+          </Text>
+          <View>
+            <Line
+              lengthPercentage={100}
+              strength={0.7}
+              lineColor={constants.colors.OFF_WHITE}
+            />
+          </View>
+        </View>
       </Animated.View>
       <View style={styles.bottomContainer}>
         <View style={styles.wordsContainer}>
@@ -124,6 +152,9 @@ export default function OnBoarding() {
             />
           ))}
         </View>
+        <View style={{alignItems: 'center', justifyContent: 'center'}}>
+          <SVG.Continue onPress={goHome} />
+        </View>
       </View>
     </View>
   );
@@ -134,17 +165,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: constants.colors.BGC,
     paddingHorizontal: constants.WIDTH * 0.071449,
-    paddingVertical: constants.HEIGHT * 0.0591,
+    paddingVertical: constants.HEIGHT * 0.05915178571428571428571428571429,
   },
   topContainer: {
     height: '23.7723%',
     width: '89%',
-    marginBottom: '5%',
+    marginBottom: '7%',
   },
   paragraphTxt: {
     fontFamily: constants.Fonts.paragraph,
     fontSize: 32,
-    lineHeight: 32,
+    lineHeight: 28,
     color: constants.colors.OFF_WHITE,
   },
   highLightTxt: {
@@ -152,6 +183,7 @@ const styles = StyleSheet.create({
   },
   bottomContainer: {
     height: '76.2277%',
+    // backgroundColor: 'red',
   },
   wordsContainer: {
     flex: 1,

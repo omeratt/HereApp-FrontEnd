@@ -3,7 +3,11 @@ import {Vibration} from 'react-native';
 import Svg, {Path} from 'react-native-svg';
 import constants from '../../assets/constants';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
-import Animated, {runOnJS, useSharedValue} from 'react-native-reanimated';
+import Animated, {
+  ZoomIn,
+  runOnJS,
+  useSharedValue,
+} from 'react-native-reanimated';
 
 interface circleSegmentProps {
   radius: number;
@@ -114,6 +118,7 @@ export default function Pizza({size}: {size: number}) {
   return (
     <GestureDetector gesture={gesture}>
       <Animated.View
+        entering={ZoomIn.duration(500)}
         style={{
           borderRadius: size / 2,
           borderColor: constants.colors.OFF_WHITE,

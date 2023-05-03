@@ -10,11 +10,17 @@ import MyLists from '../screens/list/MyLists';
 import CreateOrEditList from '../screens/list/CreateOrEditList';
 import NewListCategory from '../screens/list/NewListCategory';
 import NewListTitle from '../screens/list/NewListTitle';
+import {
+  DrawerNavigationOptions,
+  createDrawerNavigator,
+} from '@react-navigation/drawer';
 
 const Stack = createNativeStackNavigator();
+// const Stack = createDrawerNavigator();
 
 const ListAndNotesNavigator = () => {
   const options: NativeStackNavigationOptions = {headerShown: false};
+  // const options: DrawerNavigationOptions = {headerShown: false};
 
   return (
     <Stack.Navigator>

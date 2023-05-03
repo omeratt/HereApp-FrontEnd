@@ -1,4 +1,4 @@
-import {StyleSheet} from 'react-native';
+import {StyleSheet, Text} from 'react-native';
 import React, {useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import Auth from './screens/Auth';
@@ -26,23 +26,44 @@ export default function MainStack() {
     gestureEnabled: true,
     swipeEnabled: false,
   };
+  const Label = React.useCallback(
+    ({isFocused, label}: {label: string; isFocused: boolean}) => {
+      return (
+        <Text
+          style={[
+            styles.label,
+            {
+              color: isFocused
+                ? constants.colors.GREEN
+                : constants.colors.OFF_WHITE,
+            },
+          ]}>
+          {label}
+        </Text>
+      );
+    },
+    [],
+  );
   return (
     <NavigationContainer>
       <Stack.Navigator
         id="MainStack"
         initialRouteName="Auth"
         screenOptions={{
+          // swipeEnabled: true,
+
+          unmountOnBlur: true,
           drawerPosition: 'left',
           drawerStyle: {
-            backgroundColor: constants.colors.OFF_WHITE,
-            width: '55%',
-            height: '100%',
-            borderBottomLeftRadius: 10,
-            borderTopLeftRadius: 50,
+            backgroundColor: constants.colors.BGC,
+            width: constants.WIDTH,
+            height: constants.HEIGHT,
           },
-          drawerActiveBackgroundColor: constants.colors.GREEN,
-          drawerActiveTintColor: constants.colors.BGC,
-          drawerLabelStyle: styles.label,
+
+          drawerActiveBackgroundColor: 'transparent',
+          drawerActiveTintColor: constants.colors.GREEN,
+
+          // drawerLabelStyle: styles.label,
         }}
         drawerContent={props => (
           <CustomDrawer {...props} isSignIn={isSignIn} />
@@ -54,19 +75,16 @@ export default function MainStack() {
               component={Welcome}
               options={{
                 headerShown: false,
-                drawerIcon: ({color, focused}) => (
-                  <MaterialCommunityIcons
-                    name={focused ? 'hand-wave' : 'hand-wave-outline'}
-                    size={ICON_SIZE}
-                    style={[styles.icon, {color}]}
-                  />
-                ),
+                drawerItemStyle: {display: 'none'},
               }}
-            /> */}
-            {/* <Stack.Screen
+            />
+            <Stack.Screen
               name="OnBoarding"
               component={OnBoarding}
-              options={{headerShown: false}}
+              options={{
+                headerShown: false,
+                drawerItemStyle: {display: 'none'},
+              }}
             /> */}
             <Stack.Screen
               name="PlayGround"
@@ -74,13 +92,11 @@ export default function MainStack() {
               options={{
                 swipeEnabled: false,
                 headerShown: false,
-                drawerIcon: ({color, focused}) => (
-                  <Ionicons
-                    name={focused ? 'home' : 'home-outline'}
-                    size={ICON_SIZE}
-                    style={[styles.icon, {color}]}
-                  />
-                ),
+                drawerLabel(props) {
+                  return (
+                    <Label label={'PlayGround'} isFocused={props.focused} />
+                  );
+                },
               }}
             />
             <Stack.Screen
@@ -89,13 +105,9 @@ export default function MainStack() {
               options={{
                 swipeEnabled: false,
                 headerShown: false,
-                drawerIcon: ({color, focused}) => (
-                  <Ionicons
-                    name={focused ? 'home' : 'home-outline'}
-                    size={ICON_SIZE}
-                    style={[styles.icon, {color}]}
-                  />
-                ),
+                drawerLabel(props) {
+                  return <Label label={'HomePage'} isFocused={props.focused} />;
+                },
               }}
             />
             <Stack.Screen
@@ -104,15 +116,10 @@ export default function MainStack() {
               options={{
                 swipeEnabled: false,
                 headerShown: false,
-
+                drawerLabel(props) {
+                  return <Label label={'Lists'} isFocused={props.focused} />;
+                },
                 unmountOnBlur: true,
-                drawerIcon: ({color, focused}) => (
-                  <Ionicons
-                    name={focused ? 'list' : 'ios-list-outline'}
-                    size={ICON_SIZE}
-                    style={[styles.icon, {color}]}
-                  />
-                ),
               }}
             />
           </>
@@ -123,13 +130,13 @@ export default function MainStack() {
               component={Auth}
               options={{
                 headerShown: false,
-                drawerIcon: ({color, focused}) => (
-                  <Ionicons
-                    name={focused ? 'key-sharp' : 'key-outline'}
-                    size={ICON_SIZE}
-                    style={[styles.icon, {color}]}
-                  />
-                ),
+                // drawerIcon: ({color, focused}) => (
+                //   <Ionicons
+                //     name={focused ? 'key-sharp' : 'key-outline'}
+                //     size={ICON_SIZE}
+                //     style={[styles.icon, {color}]}
+                //   />
+                // ),
               }}
             />
           </>
@@ -143,7 +150,9 @@ const styles = StyleSheet.create({
   icon: {position: 'absolute', right: '5%'},
   label: {
     fontFamily: constants.Fonts.text,
-    fontSize: 15,
-    fontWeight: 'bold',
+    fontSize: 20,
+    marginTop: -constants.HEIGHT * 0.015 - constants.HEIGHT * 0.015 * 0.2,
+    color: constants.colors.OFF_WHITE,
+    // fontWeight: 'bold',
   },
 });

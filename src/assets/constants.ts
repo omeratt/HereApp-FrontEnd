@@ -36,8 +36,8 @@ const constants = {
     UNDER_LINE: '#B9AB85',
   },
   Fonts: {
-    // paragraph: 'Report-Regular',
-    paragraph: 'SansSerifFLF',
+    paragraph: 'Report-Regular',
+    // paragraph: 'SansSerifFLF',
     text: 'Montserrat-Regular',
     button: 'Montserrat-Thin',
     italic: 'Montserrat-MediumItalic',
@@ -69,7 +69,7 @@ const constants = {
     'Every year',
   ],
   OnBoardingList: [
-    {txt: 'Reading Comprehension'},
+    {txt: 'Postponement of tasks'},
     {txt: 'Frustration'},
     {txt: 'Distractions'},
     {txt: 'Lack of focus'},
@@ -81,8 +81,6 @@ const constants = {
     {txt: 'Unorganized'},
     {txt: 'Anxiety'},
     {txt: 'Feeling abnormal'},
-    {txt: 'Postponement of tasks'},
-    {txt: 'confusion'},
   ],
 };
 export default constants;

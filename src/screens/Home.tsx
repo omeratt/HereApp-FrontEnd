@@ -105,9 +105,12 @@ const Home = () => {
     findDateAndScroll(CURRENT_DATE);
   }, []);
 
-  const openDrawer = () => {
+  const openDrawer = useCallback(() => {
     navigation.dispatch(DrawerActions.openDrawer());
-  };
+  }, []);
+  const goToPlayGround = useCallback(() => {
+    navigation.navigate('PlayGround' as never);
+  }, []);
   const handleListPlusIcon = useCallback(() => {
     navigation.navigate(
       'ListAndNotesStack' as never,
@@ -135,7 +138,7 @@ const Home = () => {
 
     const isToday =
       dateHeader?.fullDate.toDateString() === CURRENT_DATE.toDateString();
-    const formattedDate = `${isToday ? 'Today' : dateHeader.dayName},${
+    const formattedDate = `${isToday ? 'Today' : dateHeader.dayName}, ${
       dateHeader.day
     } ${monthName}`;
     return formattedDate;
@@ -165,7 +168,7 @@ const Home = () => {
   return (
     <Animated.View
       entering={FadeIn}
-      exiting={FadeOutUp}
+      // exiting={FadeOutUp}
       style={styles.container}>
       <CalendarModal
         visible={calendarVisible}
@@ -304,6 +307,18 @@ const Home = () => {
         <View style={styles.box}></View>
       </View>
       <View style={styles.bottomView}>
+        <View style={{width: '35.33%'}}>
+          <SVG.Search height="100%" width="100%" />
+        </View>
+        <View style={{width: '35.33%'}}>
+          <SVG.BoxIcon
+            onPress={goToPlayGround}
+            fill={constants.colors.BLACK}
+            height="100%"
+            width="100%"
+          />
+        </View>
+
         <TouchableOpacity onPress={openDrawer} style={{width: '35.33%'}}>
           <SVG.MenuIcon
             fill={constants.colors.BLACK}
@@ -311,16 +326,6 @@ const Home = () => {
             width="100%"
           />
         </TouchableOpacity>
-        <View style={{width: '35.33%'}}>
-          <SVG.BoxIcon
-            fill={constants.colors.BLACK}
-            height="100%"
-            width="100%"
-          />
-        </View>
-        <View style={{width: '35.33%'}}>
-          <SVG.Search height="100%" width="100%" />
-        </View>
       </View>
       <BottomSheetModalProvider>
         <BottomSheetModal
@@ -411,7 +416,7 @@ const styles = StyleSheet.create({
   },
   taskTitle: {
     fontFamily: constants.Fonts.paragraph,
-    color: constants.colors.BLACK,
+    color: constants.colors.BGC,
     fontSize: 30,
     zIndex: 0,
     marginRight: '4%',
@@ -472,7 +477,7 @@ const styles = StyleSheet.create({
   },
   myListTitle: {
     fontFamily: constants.Fonts.paragraph,
-    color: constants.colors.BLACK,
+    color: constants.colors.BGC,
     fontSize: 20,
     // fontWeight: '600',
   },

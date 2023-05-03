@@ -13,11 +13,11 @@ const AaTxt = () => {
   }, [color]);
   return (
     <View style={[styles.fullSizeAndCenter]}>
-      <Pressable android_disableSound style={[styles.center]} onPress={toggle}>
+      {/* <Pressable android_disableSound style={[styles.center]} onPress={toggle}>
         <Text style={[styles.topATxt, {color: color ? offWhite : green}]}>
           a
         </Text>
-      </Pressable>
+      </Pressable> */}
       <Pressable android_disableSound onPress={toggle} style={[styles.center]}>
         <Text style={[styles.bottomATxt, {color: !color ? offWhite : green}]}>
           a

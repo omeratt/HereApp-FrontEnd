@@ -1,4 +1,4 @@
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, View, Text} from 'react-native';
 import React from 'react';
 import {
   DrawerContentScrollView,
@@ -10,14 +10,31 @@ import SVG from '../assets/svg';
 import constants from '../assets/constants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useLogoutMutation} from '../app/api/userApi';
+import Line from '../components/Line';
+import {DrawerActions, useNavigation} from '@react-navigation/native';
+import TextInput from '../components/TextInput';
 interface ICustomerDrawer extends DrawerContentComponentProps {
   isSignIn?: boolean;
 }
 
+const paddingHorizontal = constants.WIDTH * 0.09903381642512077294685990338164;
+const paddingTop = constants.HEIGHT * 0.1171875;
+const marginBottomFromMenuTxtToLine =
+  constants.HEIGHT * 0.01450892857142857142857142857143;
+const marginBottomFromLineToItems =
+  constants.HEIGHT * 0.06808035714285714285714285714286;
+const marginBottomToXBtnFromBottom =
+  constants.HEIGHT * 0.07254464285714285714285714285714;
+const bottomContainerHeight =
+  constants.HEIGHT * 0.39133928571428571428571428571429;
+const middleContainerHeight = constants.HEIGHT * 0.3;
 const CustomDrawer: React.FC<ICustomerDrawer> = props => {
   const [Logout, {isLoading, data, isSuccess, isError, error}] =
     useLogoutMutation();
-
+  const nav = useNavigation();
+  const closeDrawer = React.useCallback(() => {
+    nav.dispatch(DrawerActions.closeDrawer());
+  }, []);
   const handleLogout = async () => {
     try {
       await Logout(null).unwrap();
@@ -28,26 +45,61 @@ const CustomDrawer: React.FC<ICustomerDrawer> = props => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <SVG.HereLogo height="100%" width="70%" />
-      </View>
-      <DrawerContentScrollView {...props}>
+      <Text style={styles.header}>Menu</Text>
+      <Line
+        lineColor={constants.colors.OFF_WHITE}
+        strength={1}
+        style={{marginBottom: marginBottomFromLineToItems}}
+      />
+      <DrawerContentScrollView style={styles.lists} {...props}>
         <DrawerItemList {...props} />
         {props.isSignIn && (
           <DrawerItem
-            label="logout"
-            labelStyle={styles.label}
+            label="Logout"
+            labelStyle={[
+              styles.label,
+              {
+                color: constants.colors.OFF_WHITE,
+              },
+            ]}
             onPress={handleLogout}
-            icon={({color, focused}) => (
-              <Ionicons
-                name={focused ? 'md-exit' : 'md-exit-outline'}
-                size={20}
-                style={[styles.icon, {color}]}
-              />
-            )}
           />
         )}
       </DrawerContentScrollView>
+      <View
+        style={{
+          // backgroundColor: 'red',
+          height: bottomContainerHeight,
+        }}>
+        <View
+          style={{
+            height: bottomContainerHeight * 0.6,
+            alignItems: 'flex-end',
+            // backgroundColor: 'blue',
+          }}>
+          <SVG.SearchBtn width={25} style={{position: 'relative', top: 30}} />
+          <TextInput
+            style={{
+              borderBottomColor: constants.colors.OFF_WHITE,
+              // backgroundColor: 'blue',
+              width: '100%',
+              top: 0,
+              // bottom: 0,
+              marginTop: 0,
+              marginBottom: 0,
+            }}
+          />
+          <Text style={styles.bottomSearchTxt}>
+            You can search for anything you want
+          </Text>
+        </View>
+        <SVG.XBtn
+          onPress={closeDrawer}
+          style={{
+            alignSelf: 'center',
+          }}
+        />
+      </View>
     </View>
   );
 };
@@ -56,18 +108,39 @@ export default CustomDrawer;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    width: constants.WIDTH,
+    height: constants.HEIGHT,
+    paddingTop,
+    paddingHorizontal,
   },
   header: {
-    backgroundColor: constants.colors.BGC,
-    height: '20%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    // marginLeft: constants.WIDTH * 0.055,
+    fontFamily: constants.Fonts.paragraph,
+    color: constants.colors.OFF_WHITE,
+    marginBottom: marginBottomFromMenuTxtToLine,
+    fontSize: 35,
   },
-  icon: {position: 'absolute', right: '5%'},
+  lists: {
+    height: middleContainerHeight,
+    width: constants.WIDTH,
+    marginTop: -constants.HEIGHT * 0.03,
+    // height: constants.HEIGHT,
+    // backgroundColor: 'blue',
+    marginLeft: -constants.WIDTH * 0.055,
+  },
   label: {
     fontFamily: constants.Fonts.text,
-    fontSize: 15,
-    fontWeight: 'bold',
+    color: constants.colors.OFF_WHITE,
+    fontSize: 20,
+    marginTop: -constants.HEIGHT * 0.015 - constants.HEIGHT * 0.015 * 0.2,
+    // fontWeight: 'bold',
+  },
+  bottomSearchTxt: {
+    fontFamily: constants.Fonts.text,
+    color: constants.colors.GREY,
+    fontSize: constants.WIDTH * 0.033,
+    alignSelf: 'center',
+    marginTop: 5,
+    // backgroundColor: 'red',
   },
 });

@@ -9,12 +9,12 @@
  */
 
 // import {NavigationContainer} from '@react-navigation/native';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import React from 'react';
 import {StyleSheet, Text} from 'react-native';
 
 // import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import MainStack from './src/MainStack';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {Provider} from 'react-redux';
 import {persistor, store} from './src/app/store';
 import {PersistGate} from 'redux-persist/integration/react';

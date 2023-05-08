@@ -1,29 +1,21 @@
-import {StyleSheet, Text, View} from 'react-native';
-import React, {Ref, Suspense} from 'react';
-import {Canvas, useFrame, useLoader} from '@react-three/fiber/native';
-import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader';
-import {RoundedBoxGeometry} from 'three/examples/jsm/geometries/RoundedBoxGeometry';
-import Scene from '../../assets/3d/Scene';
-import {BufferGeometry, Material, Mesh, Vector3} from 'three';
-import constants from '../../assets/constants';
-import {RoundedBox} from '@react-three/drei/native';
+import {runOnJS, useSharedValue} from 'react-native-reanimated';
+import {Canvas, useFrame} from '@react-three/fiber/native';
+import {Mesh, Vector3} from 'three';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
-import Animated, {
-  RotateInDownRight,
-  ZoomIn,
-  ZoomInRotate,
-  runOnJS,
-  useSharedValue,
-  withSpring,
-} from 'react-native-reanimated';
-import {extend} from '@react-three/fiber/native';
-import * as THREE from 'three';
+import {StyleSheet, View} from 'react-native';
+import React from 'react';
+import constants from '../../assets/constants';
 const Cube = (props: any) => {
   const startX = useSharedValue(100);
   const startY = useSharedValue(100);
   const sharedX = useSharedValue(100);
   const sharedY = useSharedValue(100);
   const touchDown = useSharedValue(false);
+  // const startX = React.useRef(100);
+  // const startY = React.useRef(100);
+  // const sharedX = React.useRef(100);
+  // const sharedY = React.useRef(100);
+  // const touchDown = React.useRef(false);
   const setThreeRender = props.setThreeRender;
   const spin = React.useCallback(() => {
     setTimeout(() => {
@@ -58,7 +50,7 @@ const Cube = (props: any) => {
           myMesh.current.rotation.x = sharedX.value;
           myMesh.current.rotation.y = sharedY.value;
         }
-        // myMesh.current.rotation.z = sharedX.value;
+        // myMesh.current.rotation.z = sharedX.current;
         // myMesh.current.scale()
         sharedX.value = myMesh.current.rotation.x;
         sharedY.value = myMesh.current.rotation.y;
@@ -71,7 +63,7 @@ const Cube = (props: any) => {
           myMesh.current.rotation.z += clock.elapsedTime / 35;
         }
         if (clock.elapsedTime > 0.9 && clock.elapsedTime < 1) {
-          setThreeRender(true);
+          // setThreeRender(true);
         }
         // sharedX.value = myMesh.current.rotation.x;
         // sharedY.value = myMesh.current.rotation.y;
@@ -96,12 +88,12 @@ const Cube = (props: any) => {
       </mesh>
     );
   };
-  // const [active, setActive] = React.useState(false);
-  // React.useEffect(() => {
-  //   setTimeout(() => {
-  //     setActive(true);
-  //   }, 100);
-  // }, []);
+  const [active, setActive] = React.useState(false);
+  React.useEffect(() => {
+    setTimeout(() => {
+      setActive(true);
+    }, 1700);
+  }, []);
 
   return (
     <GestureDetector gesture={gesture}>
@@ -111,17 +103,17 @@ const Cube = (props: any) => {
           width: '100%',
           backgroundColor: constants.colors.BGC,
         }}>
-        {/* {active && ( */}
-        <Canvas>
-          <ambientLight intensity={1} color={constants.colors.OFF_WHITE} />
-          <directionalLight
-            color={constants.colors.OFF_WHITE}
-            // position={[0, 0, 0]}
-          />
-          <pointLight position={[10, 0, 10]} />
-          <MyCube size={1.9} />
-        </Canvas>
-        {/* )} */}
+        {active && (
+          <Canvas>
+            <ambientLight intensity={1} color={constants.colors.OFF_WHITE} />
+            <directionalLight
+              color={constants.colors.OFF_WHITE}
+              position={[0, 0, 0]}
+            />
+            <pointLight position={[10, 0, 10]} />
+            <MyCube size={1.9} />
+          </Canvas>
+        )}
       </View>
     </GestureDetector>
   );

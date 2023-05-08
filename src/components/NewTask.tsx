@@ -1,4 +1,5 @@
 import {
+  BackHandler,
   Keyboard,
   StyleSheet,
   Text,
@@ -18,6 +19,7 @@ import Notes from './Notes';
 import SetTimeContent from './SetTimeContent';
 import FrequencyPickerModal from './FrequencyPickerModal';
 import {BottomSheetModal} from '@gorhom/bottom-sheet';
+import {useFocusEffect} from '@react-navigation/native';
 
 interface props {
   closeModal: any;
@@ -101,6 +103,20 @@ const NewTask: React.FC<props> = ({
    * @param type which format to use in date picker
    * @param _isDateEnd should date picker use setTargetDate or setEndDate
    */
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        closeModal();
+        return true;
+      };
+      const subscription = BackHandler.addEventListener(
+        'hardwareBackPress',
+        onBackPress,
+      );
+
+      return () => subscription.remove();
+    }, []),
+  );
   const openCloseDatePicker = useCallback(
     (dateType: DateFormat = 'date', _isEndDate: boolean = false) => {
       if (datePickerOpen) bottomSheetModalRef.current?.dismiss();

@@ -8,7 +8,12 @@ import Cube from '../components/playGround/Cube';
 import TenCircles from '../components/playGround/TenCircles';
 import SliderPlay from '../components/playGround/SliderPlay';
 import ToggleButton from '../components/playGround/ToggleButton';
-import {DrawerActions, useNavigation} from '@react-navigation/native';
+import {
+  DrawerActions,
+  useFocusEffect,
+  useNavigation,
+} from '@react-navigation/native';
+import {BackHandler} from 'react-native';
 
 const topViewHeight = constants.HEIGHT * 0.15625;
 const middleViewHeight = constants.HEIGHT * 0.63996651785714285714285714285714;
@@ -30,6 +35,26 @@ const PlayGround = () => {
     nav.navigate('HomePage' as never);
   }, []);
   const [threeRender, setThreeRender] = React.useState(false);
+  // const [isActive, setIsActive] = React.useState(false);
+  // React.useEffect(() => {
+  //   setTimeout(() => {
+  //     setIsActive(true);
+  //   }, 400);
+  // });
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        goHome();
+        return true;
+      };
+      const subscription = BackHandler.addEventListener(
+        'hardwareBackPress',
+        onBackPress,
+      );
+
+      return () => subscription.remove();
+    }, []),
+  );
   return (
     <View style={styles.container}>
       <View style={styles.realContainer}>
@@ -53,13 +78,15 @@ const PlayGround = () => {
         <View style={styles.middleContainer}>
           <View style={styles.middleLeftContainer}>
             <View style={styles.pizzaAndCubeContainer}>
-              {threeRender && <Pizza size={pizzaAndCubeSize} />}
+              {!threeRender && <Pizza size={pizzaAndCubeSize} />}
             </View>
             <View style={styles.pizzaAndCubeContainer}>
+              {/* {isActive &&  */}
               <Cube setThreeRender={setThreeRender} />
+              {/* } */}
             </View>
             <View style={styles.middleLeftBottomContainer}>
-              {threeRender && (
+              {!threeRender && (
                 <SliderPlay
                   sliderHeight={sliderHeight}
                   sliderWidth={sliderWidth}
@@ -68,15 +95,15 @@ const PlayGround = () => {
             </View>
           </View>
           <View style={styles.middleRightContainer}>
-            {threeRender && <TenCircles viewHeight={middleViewHeight} />}
+            {!threeRender && <TenCircles viewHeight={middleViewHeight} />}
           </View>
         </View>
         <View style={styles.bottomContainer}>
           <View style={styles.bottomLeftContainer}>
-            {threeRender && <ToggleButton />}
+            {!threeRender && <ToggleButton />}
           </View>
           <View style={styles.bottomRightContainer}>
-            {threeRender && <AaTxt />}
+            {!threeRender && <AaTxt />}
           </View>
         </View>
       </View>

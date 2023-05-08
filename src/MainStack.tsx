@@ -70,7 +70,7 @@ export default function MainStack() {
         )}>
         {isSignIn ? (
           <>
-            {/* <Stack.Screen
+            <Stack.Screen
               name="Welcome"
               component={Welcome}
               options={{
@@ -85,7 +85,7 @@ export default function MainStack() {
                 headerShown: false,
                 drawerItemStyle: {display: 'none'},
               }}
-            /> */}
+            />
             <Stack.Screen
               name="PlayGround"
               component={PlayGround}
@@ -106,7 +106,7 @@ export default function MainStack() {
                 swipeEnabled: false,
                 headerShown: false,
                 drawerLabel(props) {
-                  return <Label label={'HomePage'} isFocused={props.focused} />;
+                  return <Label label={'Home'} isFocused={props.focused} />;
                 },
               }}
             />

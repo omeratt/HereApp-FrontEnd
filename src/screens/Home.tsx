@@ -5,7 +5,9 @@ import SVG from '../assets/svg';
 import NewTask from '../components/NewTask';
 import Animated, {
   FadeIn,
+  FadeInRight,
   FadeOutUp,
+  FlipInEasyY,
   useSharedValue,
 } from 'react-native-reanimated';
 import {tasksApi, useGetTasksByDateQuery} from '../app/api/taskApi';
@@ -167,7 +169,7 @@ const Home = () => {
   }, [calendarVisible]);
   return (
     <Animated.View
-      entering={FadeIn}
+      entering={FlipInEasyY}
       // exiting={FadeOutUp}
       style={styles.container}>
       <CalendarModal

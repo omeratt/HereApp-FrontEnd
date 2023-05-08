@@ -1,5 +1,6 @@
 import {
   ActivityIndicator,
+  BackHandler,
   FlatList,
   Keyboard,
   StyleSheet,
@@ -53,6 +54,20 @@ const NewCategory = () => {
   const listSize = useMemo(() => {
     return lists?.length;
   }, [lists?.length]);
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        navigation.navigate('HomePage' as never);
+        return true;
+      };
+      const subscription = BackHandler.addEventListener(
+        'hardwareBackPress',
+        onBackPress,
+      );
+
+      return () => subscription.remove();
+    }, []),
+  );
   return (
     <MyListsWrapper
       rightBtn

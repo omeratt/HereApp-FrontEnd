@@ -20,7 +20,11 @@ interface Props {
   numberOfLines?: number;
   rightBtn?: boolean;
   isLoading?: boolean;
+  isSelected?: boolean;
+  onSelectPress?: () => void;
 }
+const selectHeight = 0.04464285714285714285714285714286 * constants.HEIGHT;
+const selectWidth = selectHeight / 0.57746478873239436619718309859155;
 const MyListsWrapper: FC<Props> = ({
   children,
   onDonePress,
@@ -29,6 +33,8 @@ const MyListsWrapper: FC<Props> = ({
   rightBtn,
   onRightBtnPress,
   isLoading = false,
+  isSelected = undefined,
+  onSelectPress,
 }) => {
   const onPress = useCallback(() => {
     console.log('click on done');
@@ -46,15 +52,41 @@ const MyListsWrapper: FC<Props> = ({
             </Text>
           </View>
           {rightBtn && (
-            <TouchableOpacity
-              style={[{height: '100%'}]}
-              onPress={onRightBtnPress}>
-              <SVG.plusIconOutlined
-                width={25}
-                height={25}
-                fill={constants.colors.BLACK}
-              />
-            </TouchableOpacity>
+            <View
+              style={{
+                flexDirection: 'row',
+                height: '100%',
+              }}>
+              {isSelected !== undefined && (
+                <TouchableOpacity
+                  style={[{height: selectHeight}]}
+                  onPress={onSelectPress}>
+                  {isSelected ? (
+                    <SVG.GreenSelect
+                      height={'100%'}
+                      width={selectWidth}
+                      style={[styles.svg, styles.marginRight]}
+                    />
+                  ) : (
+                    <SVG.Select
+                      height={'100%'}
+                      width={selectWidth}
+                      style={[styles.svg, styles.marginRight]}
+                    />
+                  )}
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity
+                style={[{height: selectHeight}]}
+                onPress={onRightBtnPress}>
+                <SVG.NotePlus
+                  height={'100%'}
+                  stroke={'red'}
+                  width={selectHeight}
+                  style={styles.svg}
+                />
+              </TouchableOpacity>
+            </View>
           )}
           {isLoading && (
             <View style={{height: '100%'}}>
@@ -83,15 +115,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: constants.colors.OFF_WHITE,
   },
+  svg: {
+    elevation: 3.5,
+    borderRadius: 21,
+    backgroundColor: constants.colors.OFF_WHITE,
+  },
+  marginRight: {
+    marginRight: constants.WIDTH * 0.02,
+  },
   topContainer: {
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingTop: '10%',
+    paddingTop: '11%',
     width: '100%',
+    alignItems: 'center',
     paddingHorizontal: PADDING_HORIZONTAL,
   },
-  titleContainer: {width: '55%'},
+  titleContainer: {width: '55%', height: '100%'},
   title: {
     fontFamily: constants.Fonts.paragraph,
     color: constants.colors.BLACK,

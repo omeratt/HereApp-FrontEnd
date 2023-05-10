@@ -10,16 +10,27 @@ interface props {
   isFilled?: boolean;
   onPress?: () => void;
   type?: CheckBoxListType;
+  colorFill?: string;
 }
-export default function CheckBox({
+const CheckBox = ({
   size,
   type,
   index,
   onPress,
   isFilled,
-}: props) {
+  colorFill = constants.colors.BGC,
+}: props) => {
   const isNumber = type === 'NUMBERS';
 
+  const backgroundColor = React.useMemo(() => {
+    if (type === 'DOTS') {
+      return constants.colors.BLACK;
+    } else if (!type && isFilled !== undefined) {
+      //normal checkBox
+
+      return isFilled ? colorFill : constants.colors.OFF_WHITE;
+    } else return constants.colors.OFF_WHITE;
+  }, [isFilled]);
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -28,11 +39,8 @@ export default function CheckBox({
         {
           width: size,
           height: size,
-          borderColor: isNumber ? 'transparent' : constants.colors.BGC,
-          backgroundColor:
-            type === 'DOTS'
-              ? constants.colors.BLACK
-              : constants.colors.OFF_WHITE,
+          borderColor: isNumber ? 'transparent' : constants.colors.BLACK,
+          backgroundColor,
           borderRadius: size / 2,
         },
       ]}>
@@ -51,8 +59,8 @@ export default function CheckBox({
       )}
     </TouchableOpacity>
   );
-}
-
+};
+export default React.memo(CheckBox);
 const styles = StyleSheet.create({
   circle: {
     // borderRadius: 9999,

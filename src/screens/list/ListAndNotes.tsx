@@ -3,9 +3,11 @@ import {
   BackHandler,
   FlatList,
   Keyboard,
+  ListRenderItem,
   StyleSheet,
   Text,
   TextInput,
+  Vibration,
   View,
 } from 'react-native';
 import React, {
@@ -16,8 +18,8 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import constants from '../../assets/constants';
-import MyListsWrapper from './MyListsWrapper';
+import constants, {ListsType} from '../../assets/constants';
+import MyListsWrapper, {PADDING_HORIZONTAL} from './MyListsWrapper';
 import BallonTxt, {gap} from '../../components/BallonTxt';
 import {
   RouteProp,
@@ -27,6 +29,10 @@ import {
 } from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useGetListsQuery} from '../../app/api/listApi';
+import {ListRenderItemInfo} from 'react-native';
+import {TouchableOpacity} from 'react-native';
+import SVG from '../../assets/svg';
+import Animated, {ZoomIn, ZoomOut} from 'react-native-reanimated';
 
 type RootStackParamList = {
   ListAndNotes: {
@@ -37,7 +43,8 @@ type RootStackParamList = {
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ListAndNotes'>;
 type ProfileScreenRouteProp = RouteProp<RootStackParamList, 'ListAndNotes'>;
-
+const height = constants.HEIGHT * (71 / 896);
+const width = constants.WIDTH * (71 / 414);
 const NewCategory = () => {
   const navigation = useNavigation();
   const {
@@ -45,6 +52,19 @@ const NewCategory = () => {
     error: listsFetchError,
     isLoading: listsLoading,
   } = useGetListsQuery(undefined);
+  const [isSelect, setIsSelect] = React.useState(false);
+  const [selected, setSelected] = React.useState<string[]>([]);
+  const handleSelected = React.useCallback((id: string) => {
+    setSelected(prev => {
+      if (prev.includes(id)) return prev.filter(_id => _id !== id);
+      return [...prev, id];
+    });
+  }, []);
+  const toggleSelect = React.useCallback(() => {
+    setIsSelect(!isSelect);
+    Vibration.vibrate(1);
+    setSelected([]);
+  }, [isSelect]);
   const navigateToAddCategory = useCallback(() => {
     navigation.navigate('NewListCategory' as never);
   }, []);
@@ -68,36 +88,86 @@ const NewCategory = () => {
       return () => subscription.remove();
     }, []),
   );
+  const renderItem: ListRenderItem<ListsType> | null | undefined =
+    React.useCallback(
+      (props: ListRenderItemInfo<ListsType>) => {
+        return (
+          <BallonTxt
+            txt={props.item.name}
+            isSelectOn={isSelect}
+            listSize={listSize || 0}
+            onPress={navigateToList}
+            id={props.item._id}
+            selected={selected}
+            handleSelect={handleSelected}
+            toggleSelectOnOff={toggleSelect}
+            {...props}
+          />
+        );
+      },
+      [isSelect, listSize, selected],
+    );
   return (
     <MyListsWrapper
       rightBtn
       title="All my lists and notes"
+      onSelectPress={toggleSelect}
+      isSelected={isSelect}
       onRightBtnPress={navigateToAddCategory}>
-      <FlatList
-        data={lists}
-        renderItem={props => (
-          <BallonTxt
-            txt={props.item.name}
-            listSize={listSize || 0}
-            onPress={navigateToList}
-            {...props}
-          />
-        )}
-        style={styles.wordsContainer}
-        contentContainerStyle={{width: '100%', paddingBottom: gap}}
-        numColumns={2}
-        columnWrapperStyle={{marginBottom: -21 + gap}}
-        showsVerticalScrollIndicator={false}
-        ListEmptyComponent={() => {
-          return listsLoading ? (
-            <ActivityIndicator size={32} color={constants.colors.GREEN} />
-          ) : (
-            <Text style={styles.newTaskTitleInput}>
-              No Lists yet, Create One By Clicking On Plus Icon
-            </Text>
-          );
-        }}
-      />
+      <View
+        style={{
+          height: '85%',
+          // width: constants.WIDTH,
+          // alignSelf: 'center',
+          // borderWidth: 1.2,
+          // borderTopWidth: 0,
+          // borderColor: constants.colors.UNDER_LINE,
+          // paddingHorizontal: PADDING_HORIZONTAL,
+          // borderBottomLeftRadius: 50,
+          // borderBottomRightRadius: 50,
+          // overflow: 'hidden',
+        }}>
+        <FlatList
+          data={lists}
+          renderItem={renderItem}
+          keyExtractor={item => item._id}
+          style={styles.wordsContainer}
+          contentContainerStyle={{width: '100%', paddingBottom: gap}}
+          numColumns={2}
+          columnWrapperStyle={{marginBottom: -21 + gap}}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={() => {
+            return listsLoading ? (
+              <ActivityIndicator size={32} color={constants.colors.GREEN} />
+            ) : (
+              <Text style={styles.newTaskTitleInput}>
+                No Lists yet, Create One By Clicking On Plus Icon
+              </Text>
+            );
+          }}
+        />
+      </View>
+      {isSelect && (
+        <Animated.View
+          entering={ZoomIn.duration(150)}
+          exiting={ZoomOut.duration(150)}
+          style={styles.listContainerFooter}>
+          <TouchableOpacity
+            style={[styles.containerFooterBtn, {height, width}]}
+            // onPress={onVCheckboxPress}
+          >
+            {selected.length > 0 ? <SVG.TrashBlack /> : <SVG.Trash />}
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.containerFooterBtn, {height, width}]}
+            // onPress={onDotsCheckboxPress}
+          ></TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.containerFooterBtn, {height, width}]}
+            // onPress={onNumbersCheckboxPress}
+          ></TouchableOpacity>
+        </Animated.View>
+      )}
     </MyListsWrapper>
   );
 };
@@ -107,6 +177,7 @@ export default memo(NewCategory);
 const styles = StyleSheet.create({
   wordsContainer: {
     // backgroundColor: 'cyan',
+
     flexDirection: 'row',
     flexWrap: 'wrap',
     width: '100%',
@@ -130,4 +201,36 @@ const styles = StyleSheet.create({
     fontFamily: constants.Fonts.text,
     marginLeft: '2%',
   },
+  listContainerFooter: {
+    position: 'absolute',
+    bottom: '5%',
+    alignSelf: 'center',
+    width: '80%',
+    height: '9%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    // backgroundColor: 'cyan',
+  },
+  containerFooterBtn: {
+    borderWidth: 0.5,
+    borderRadius: 20,
+    backgroundColor: constants.colors.OFF_WHITE,
+    borderColor: constants.colors.UNDER_LINE,
+    elevation: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  innerBtnCircleCheckbox: {
+    borderColor: constants.colors.BLACK,
+    height: '15%',
+    width: '15%',
+    borderWidth: 1,
+    borderRadius: 99,
+    marginBottom: '4%',
+    marginLeft: '13%',
+  },
 });
+const innerBtnFillCircleCheckbox = StyleSheet.flatten([
+  styles.innerBtnCircleCheckbox,
+  {backgroundColor: constants.colors.BLACK},
+]);

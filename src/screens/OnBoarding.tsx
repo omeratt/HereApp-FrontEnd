@@ -172,6 +172,14 @@ export default function OnBoarding() {
         </View>
       </View> */}
       <FlatList
+        onLayout={e => {
+          console.log(
+            '-------------',
+            e.nativeEvent.layout.height / constants.HEIGHT,
+            e.nativeEvent.layout.height,
+            constants.HEIGHT,
+          );
+        }}
         data={list}
         renderItem={item => {
           return (
@@ -187,20 +195,23 @@ export default function OnBoarding() {
         style={styles.wordsContainer}
         contentContainerStyle={{
           width: '100%',
+          // height: constants.HEIGHT * 0.5654822412481163,
           // height: constants.HEIGHT * 0.554,
           // backgroundColor: 'blue',
         }}
         // contentContainerStyle={{width: '100%', paddingBottom: gap}}
         numColumns={2}
-        // columnWrapperStyle={{marginBottom: gap}}
+        columnWrapperStyle={{marginBottom: -14 + gap}}
         showsVerticalScrollIndicator={false}
       />
       <View
         style={{
+          flex: 1, //wtf
           alignItems: 'center',
           justifyContent: 'center',
           // backgroundColor: 'red',
-          height: '13%',
+          // height: constants.HEIGHT * 0.12,
+          // marginTop: 12,
         }}>
         <SVG.Continue onPress={goHome} />
       </View>
@@ -243,8 +254,9 @@ const styles = StyleSheet.create({
   // },
   wordsContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    // flexWrap: 'wrap',
     width: '100%',
+    height: constants.HEIGHT * 0.4654822412481163,
     // backgroundColor: 'cyan',
   },
 });

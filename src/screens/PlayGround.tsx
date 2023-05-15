@@ -1,4 +1,4 @@
-import {StyleSheet, View} from 'react-native';
+import {SafeAreaView, StyleSheet, View} from 'react-native';
 import React from 'react';
 import constants from '../assets/constants';
 import SVG from '../assets/svg';
@@ -56,58 +56,60 @@ const PlayGround = () => {
     }, []),
   );
   return (
-    <View style={styles.container}>
-      <View style={styles.realContainer}>
-        <View style={styles.topContainer}>
-          <View style={styles.topTopContainer}>
-            <SVG.XBtn
-              onPress={goHome}
-              width={constants.WIDTH * 0.115}
-              height={constants.WIDTH * 0.115}
-            />
-            <SVG.HamburgerBtn
-              onPress={openDrawer}
-              width={constants.WIDTH * 0.115}
-              height={constants.WIDTH * 0.115}
-            />
-          </View>
-          <View style={styles.topBottomContainer}>
-            <SVG.PlayHere width={'62.56%'} />
-          </View>
-        </View>
-        <View style={styles.middleContainer}>
-          <View style={styles.middleLeftContainer}>
-            <View style={styles.pizzaAndCubeContainer}>
-              {!threeRender && <Pizza size={pizzaAndCubeSize} />}
+    <SafeAreaView style={{flex: 1, justifyContent: 'center'}}>
+      <View style={styles.container}>
+        <View style={styles.realContainer}>
+          <View style={styles.topContainer}>
+            <View style={styles.topTopContainer}>
+              <SVG.XBtn
+                onPress={goHome}
+                width={constants.WIDTH * 0.115}
+                height={constants.WIDTH * 0.115}
+              />
+              <SVG.HamburgerBtn
+                onPress={openDrawer}
+                width={constants.WIDTH * 0.115}
+                height={constants.WIDTH * 0.115}
+              />
             </View>
-            <View style={styles.pizzaAndCubeContainer}>
-              {/* {isActive &&  */}
-              <Cube setThreeRender={setThreeRender} />
-              {/* } */}
-            </View>
-            <View style={styles.middleLeftBottomContainer}>
-              {!threeRender && (
-                <SliderPlay
-                  sliderHeight={sliderHeight}
-                  sliderWidth={sliderWidth}
-                />
-              )}
+            <View style={styles.topBottomContainer}>
+              <SVG.PlayHere width={'62.56%'} />
             </View>
           </View>
-          <View style={styles.middleRightContainer}>
-            {!threeRender && <TenCircles viewHeight={middleViewHeight} />}
+          <View style={styles.middleContainer}>
+            <View style={styles.middleLeftContainer}>
+              <View style={styles.pizzaAndCubeContainer}>
+                {!threeRender && <Pizza size={pizzaAndCubeSize} />}
+              </View>
+              <View style={styles.pizzaAndCubeContainer}>
+                {/* {isActive &&  */}
+                <Cube setThreeRender={setThreeRender} />
+                {/* } */}
+              </View>
+              <View style={styles.middleLeftBottomContainer}>
+                {!threeRender && (
+                  <SliderPlay
+                    sliderHeight={sliderHeight}
+                    sliderWidth={sliderWidth}
+                  />
+                )}
+              </View>
+            </View>
+            <View style={styles.middleRightContainer}>
+              {!threeRender && <TenCircles viewHeight={middleViewHeight} />}
+            </View>
           </View>
-        </View>
-        <View style={styles.bottomContainer}>
-          <View style={styles.bottomLeftContainer}>
-            {!threeRender && <ToggleButton />}
-          </View>
-          <View style={styles.bottomRightContainer}>
-            {!threeRender && <AaTxt />}
+          <View style={styles.bottomContainer}>
+            <View style={styles.bottomLeftContainer}>
+              {!threeRender && <ToggleButton />}
+            </View>
+            <View style={styles.bottomRightContainer}>
+              {!threeRender && <AaTxt />}
+            </View>
           </View>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -115,16 +117,18 @@ export default PlayGround;
 
 const styles = StyleSheet.create({
   realContainer: {
-    height: constants.HEIGHT * 0.95,
+    height: constants.HEIGHT * 0.93,
     width: constants.WIDTH * 0.95,
     borderRadius: 30,
     borderWidth: 1,
     borderColor: constants.colors.OFF_WHITE,
   },
   container: {
+    // paddingVertical: '5%',
     height: constants.HEIGHT,
     width: constants.WIDTH,
     backgroundColor: constants.colors.BGC,
+    // backgroundColor: 'red',
     justifyContent: 'center',
     alignItems: 'center',
   },

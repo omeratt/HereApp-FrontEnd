@@ -1,4 +1,11 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  FlatList,
+  FlatListProps,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React, {useCallback, useEffect, useState} from 'react';
 import constants from '../assets/constants';
 import Animated, {
@@ -14,6 +21,7 @@ import Animated, {
 import Line from '../components/Line';
 import SVG from '../assets/svg';
 import {useNavigation} from '@react-navigation/native';
+import {gap} from '../components/BallonTxt';
 const styles1 = StyleSheet.create({
   container: {
     maxWidth: '61%',
@@ -89,9 +97,10 @@ export default function OnBoarding() {
           style={[
             animatedStyle,
             styles1.container,
-            {paddingHorizontal: isTimeManagement ? 6 : '5.0%'},
+            {paddingHorizontal: isTimeManagement ? 6 : '6.0%'},
           ]}>
           <TouchableOpacity
+            // style={{width: '90%', height: '100%'}}
             onPress={() => {
               SetSelectedItems(txt);
               progress.value = withTiming(1 - progress.value, {duration: 450});
@@ -99,6 +108,7 @@ export default function OnBoarding() {
             <Text
               numberOfLines={2}
               textBreakStrategy="balanced"
+              // lineBreakMode="head"
               style={styles1.txt}>
               {txt}
             </Text>
@@ -108,6 +118,11 @@ export default function OnBoarding() {
     },
     [],
   );
+
+  // const RenderItem = (item:FlatListProps<{ txt: string; }>)=>{
+  //   return <BallonTxt txt={item.}/>
+  // }
+
   return (
     <View style={styles.container}>
       <Animated.View
@@ -140,7 +155,7 @@ export default function OnBoarding() {
           </View>
         </View>
       </Animated.View>
-      <View style={styles.bottomContainer}>
+      {/* <View style={styles.bottomContainer}>
         <View style={styles.wordsContainer}>
           {list.map((item, index) => (
             <BallonTxt
@@ -155,6 +170,39 @@ export default function OnBoarding() {
         <View style={{alignItems: 'center', justifyContent: 'center'}}>
           <SVG.Continue onPress={goHome} />
         </View>
+      </View> */}
+      <FlatList
+        data={list}
+        renderItem={item => {
+          return (
+            <BallonTxt
+              txt={item.item.txt}
+              SetSelectedItems={SetSelectedItems}
+              index={item.index}
+              selectedItems={selectedItems}
+            />
+          );
+        }}
+        keyExtractor={item => item.txt}
+        style={styles.wordsContainer}
+        contentContainerStyle={{
+          width: '100%',
+          // height: constants.HEIGHT * 0.554,
+          // backgroundColor: 'blue',
+        }}
+        // contentContainerStyle={{width: '100%', paddingBottom: gap}}
+        numColumns={2}
+        // columnWrapperStyle={{marginBottom: gap}}
+        showsVerticalScrollIndicator={false}
+      />
+      <View
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          // backgroundColor: 'red',
+          height: '13%',
+        }}>
+        <SVG.Continue onPress={goHome} />
       </View>
     </View>
   );
@@ -165,12 +213,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: constants.colors.BGC,
     paddingHorizontal: constants.WIDTH * 0.071449,
-    paddingVertical: constants.HEIGHT * 0.05915178571428571428571428571429,
+
+    paddingTop: constants.HEIGHT * 0.05915178571428571428571428571429,
+    // paddingVertical: constants.HEIGHT * 0.05915178571428571428571428571429,
   },
   topContainer: {
     height: '23.7723%',
     width: '89%',
-    marginBottom: '7%',
+    // marginBottom: '7%',
   },
   paragraphTxt: {
     fontFamily: constants.Fonts.paragraph,
@@ -185,10 +235,16 @@ const styles = StyleSheet.create({
     height: '76.2277%',
     // backgroundColor: 'red',
   },
+  // wordsContainer: {
+  //   flex: 1,
+  //   flexDirection: 'row',
+  //   flexWrap: 'wrap',
+  //   // justifyContent: 'space-between',
+  // },
   wordsContainer: {
-    flex: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    width: '100%',
+    // backgroundColor: 'cyan',
   },
 });

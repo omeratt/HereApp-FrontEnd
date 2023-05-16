@@ -22,6 +22,7 @@ import DatesFlatList from '../components/DatesFlatList';
 import moment from 'moment';
 import {useGetListsQuery} from '../app/api/listApi';
 import CalendarModal from '../components/CalendarModal';
+import RenderListCategoryHome from '../components/RenderListCategoryHome';
 
 const CURRENT_DATE = new Date();
 const allDates = getDatesForYear(CURRENT_DATE);
@@ -34,6 +35,8 @@ export const TASK_CONTAINER_HEIGHT =
   constants.HEIGHT * 0.64 * 0.84 * 0.2 - //dates list
   8.7 - //triangle
   constants.WIDTH * 0.025; //container padding
+
+export const ListCategoryWidth = constants.WIDTH * 0.2925925996568468;
 const Home = () => {
   const getIndexByKey = useCallback(
     (obj: Record<string, any>, key: string): number => {
@@ -250,13 +253,6 @@ const Home = () => {
         </View>
         <View style={styles.myListContainer}>
           <View style={styles.myList}>
-            {/* <SVG.plusIconOutlined
-              style={styles.myListPlusIcon}
-              fill={constants.colors.BGC}
-              onPress={() => {
-                console.log('asf');
-              }}
-            /> */}
             <TouchableOpacity
               onPress={handleListPlusIcon}
               style={[
@@ -269,19 +265,20 @@ const Home = () => {
                 fill={constants.colors.BGC}
               />
             </TouchableOpacity>
-            <Text style={styles.myListTitle}>My lists</Text>
+            <Text style={styles.myListTitle}>Lists</Text>
           </View>
-          <View style={styles.categoryContainer}>
-            <View style={styles.myListCategory}>
-              {/* maximum of char = 19 in formik and backend*/}
-              <Text style={styles.listTxt}>House to do's</Text>
-            </View>
-            <View style={styles.myListCategory}>
-              <Text style={styles.listTxt}>House to do's</Text>
-            </View>
-            <View style={styles.myListCategory}>
-              <Text style={styles.listTxt}>Shopping list</Text>
-            </View>
+          <View
+            // onLayout={e => {
+            //   console.log(e.nativeEvent.layout.width / constants.WIDTH);
+            // }}
+            style={styles.categoryContainer}>
+            <FlashList
+              data={lists}
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+              renderItem={RenderListCategoryHome}
+              estimatedItemSize={ListCategoryWidth}
+            />
           </View>
         </View>
       </View>
@@ -485,7 +482,8 @@ const styles = StyleSheet.create({
   },
   categoryContainer: {
     flexDirection: 'row',
-    width: '100%',
+    width: constants.WIDTH * 0.9444444444444444,
+    height: '20%',
     alignContent: 'center',
     justifyContent: 'space-evenly',
     alignItems: 'center',

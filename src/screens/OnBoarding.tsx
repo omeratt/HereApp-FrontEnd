@@ -24,8 +24,10 @@ import {useNavigation} from '@react-navigation/native';
 import {gap} from '../components/BallonTxt';
 const styles1 = StyleSheet.create({
   container: {
-    maxWidth: '61%',
-    minWidth: '25%',
+    // maxWidth: '61%',
+    // minWidth: '25%',
+    minWidth: '30%',
+    maxWidth: '60%',
     flexGrow: 1,
     borderRadius: 18,
     borderWidth: 1,
@@ -35,7 +37,7 @@ const styles1 = StyleSheet.create({
     alignItems: 'center',
     height: constants.HEIGHT * 0.078125,
     marginVertical: '2%',
-    marginRight: '3.0%',
+    // marginRight: '3.0%',
     paddingHorizontal: '5.8%',
     shadowColor: constants.colors.GREEN,
     elevation: 2.5,
@@ -68,10 +70,7 @@ export default function OnBoarding() {
       return [...prev, item];
     });
   }, []);
-  useEffect(() => {
-    console.log(selectedItems);
-    return () => {};
-  }, [selectedItems]);
+
   const goHome = useCallback(() => {
     nav.navigate('HomePage' as never);
   }, []);
@@ -79,6 +78,7 @@ export default function OnBoarding() {
     ({txt, index, selectedItems, SetSelectedItems}: BallonProps) => {
       const isTimeManagement = txt === 'Time management';
       const progress = useSharedValue(0);
+      const isIndexEven = index !== undefined && index % 2 === 0;
       const animatedStyle = useAnimatedStyle(() => {
         return {
           borderColor: interpolateColor(
@@ -97,6 +97,7 @@ export default function OnBoarding() {
           style={[
             animatedStyle,
             styles1.container,
+            {...(isIndexEven && {marginRight: '3%'})},
             {paddingHorizontal: isTimeManagement ? 6 : '6.0%'},
           ]}>
           <TouchableOpacity
@@ -155,55 +156,38 @@ export default function OnBoarding() {
           </View>
         </View>
       </Animated.View>
-      {/* <View style={styles.bottomContainer}>
-        <View style={styles.wordsContainer}>
-          {list.map((item, index) => (
-            <BallonTxt
-              key={item.txt}
-              index={index}
-              txt={item?.txt}
-              selectedItems={selectedItems}
-              SetSelectedItems={SetSelectedItems}
-            />
-          ))}
-        </View>
-        <View style={{alignItems: 'center', justifyContent: 'center'}}>
-          <SVG.Continue onPress={goHome} />
-        </View>
-      </View> */}
-      <FlatList
-        onLayout={e => {
-          console.log(
-            '-------------',
-            e.nativeEvent.layout.height / constants.HEIGHT,
-            e.nativeEvent.layout.height,
-            constants.HEIGHT,
-          );
-        }}
-        data={list}
-        renderItem={item => {
-          return (
-            <BallonTxt
-              txt={item.item.txt}
-              SetSelectedItems={SetSelectedItems}
-              index={item.index}
-              selectedItems={selectedItems}
-            />
-          );
-        }}
-        keyExtractor={item => item.txt}
-        style={styles.wordsContainer}
-        contentContainerStyle={{
-          width: '100%',
-          // height: constants.HEIGHT * 0.5654822412481163,
-          // height: constants.HEIGHT * 0.554,
-          // backgroundColor: 'blue',
-        }}
-        // contentContainerStyle={{width: '100%', paddingBottom: gap}}
-        numColumns={2}
-        columnWrapperStyle={{marginBottom: -14 + gap}}
-        showsVerticalScrollIndicator={false}
-      />
+
+      <View
+        style={{
+          height: constants.HEIGHT * 0.5654822412481163,
+          justifyContent: 'center',
+        }}>
+        <FlatList
+          data={list}
+          renderItem={item => {
+            return (
+              <BallonTxt
+                txt={item.item.txt}
+                SetSelectedItems={SetSelectedItems}
+                index={item.index}
+                selectedItems={selectedItems}
+              />
+            );
+          }}
+          keyExtractor={item => item.txt}
+          style={styles.wordsContainer}
+          contentContainerStyle={{
+            width: '100%',
+            // height: constants.HEIGHT * 0.5654822412481163,
+            // height: constants.HEIGHT * 0.554,
+            // backgroundColor: 'blue',
+          }}
+          // contentContainerStyle={{width: '100%', paddingBottom: gap}}
+          numColumns={2}
+          // columnWrapperStyle={{marginBottom: -14 + gap}}
+          showsVerticalScrollIndicator={false}
+        />
+      </View>
       <View
         style={{
           flex: 1, //wtf
@@ -255,8 +239,9 @@ const styles = StyleSheet.create({
   wordsContainer: {
     flexDirection: 'row',
     // flexWrap: 'wrap',
+
     width: '100%',
-    height: constants.HEIGHT * 0.4654822412481163,
+    // height: constants.HEIGHT * 0.4654822412481163,
     // backgroundColor: 'cyan',
   },
 });

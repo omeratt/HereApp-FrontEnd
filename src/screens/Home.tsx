@@ -14,7 +14,10 @@ import Line from '../components/Line';
 import {FlashList} from '@shopify/flash-list';
 import DatesFlatList from '../components/DatesFlatList';
 import moment from 'moment';
-import {useGetListsQuery} from '../app/api/listApi';
+import {
+  useGetListsQuery,
+  useGetPrioritizedListsQuery,
+} from '../app/api/listApi';
 import CalendarModal from '../components/CalendarModal';
 import RenderListCategoryHome from '../components/RenderListCategoryHome';
 
@@ -66,6 +69,12 @@ const Home = () => {
     error: listsFetchError,
     isLoading: listsLoading,
   } = useGetListsQuery(null);
+  const {
+    data: prioritizedLists,
+    error: prioritizedListsFetchError,
+    isLoading: prioritizedListsLoading,
+  } = useGetPrioritizedListsQuery(null);
+
   const {
     isLoading: tasksLoading,
     data: tasks,
@@ -266,16 +275,17 @@ const Home = () => {
             //   console.log(e.nativeEvent.layout.height / constants.HEIGHT);
             // }}
             style={styles.categoryContainer}>
-            {lists && (
+            {prioritizedLists && lists && (
               <FlashList
                 contentContainerStyle={{
                   paddingHorizontal: constants.WIDTH * 0.0444,
                 }}
-                data={lists}
+                data={prioritizedLists}
                 horizontal={true}
                 showsHorizontalScrollIndicator={false}
                 renderItem={props => <RenderListCategoryHome {...props} />}
                 estimatedItemSize={ListCategoryWidth}
+                extraData={{lists}}
               />
             )}
           </View>

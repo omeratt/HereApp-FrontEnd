@@ -1,4 +1,4 @@
-import {ListsType} from '../../assets/constants';
+import {CategoryListType, ListType} from '../../assets/constants';
 import {apiSlice} from './baseApi';
 
 export const listsApi = apiSlice.injectEndpoints({
@@ -7,7 +7,14 @@ export const listsApi = apiSlice.injectEndpoints({
       query: () => 'list/categories',
       providesTags: ['Lists'],
       transformResponse: (response: any, meta, arg) => {
-        return response.data as ListsType[];
+        return response.data as CategoryListType[];
+      },
+    }),
+    getPrioritizedLists: builder.query({
+      query: () => 'list/prioritize',
+      providesTags: ['PrioritizedLists'],
+      transformResponse: (response: any, meta, arg) => {
+        return response.data as ListType[];
       },
     }),
     addCategory: builder.mutation({
@@ -46,12 +53,26 @@ export const listsApi = apiSlice.injectEndpoints({
         return response.data;
       },
     }),
+    editListFlag: builder.mutation({
+      query: item => ({
+        url: 'list/flag',
+        method: 'PUT',
+        body: item,
+        credentials: 'include',
+      }),
+      invalidatesTags: ['Lists'],
+      transformResponse: (response: any, meta, arg) => {
+        return response.data;
+      },
+    }),
   }),
 });
 
 export const {
   useGetListsQuery,
+  useGetPrioritizedListsQuery,
   useAddCategoryMutation,
   useAddListTitleMutation,
   useAddListItemMutation,
+  useEditListFlagMutation,
 } = listsApi;

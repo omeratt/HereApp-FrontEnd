@@ -18,7 +18,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import constants, {ListsType} from '../../assets/constants';
+import constants, {CategoryListType} from '../../assets/constants';
 import MyListsWrapper, {PADDING_HORIZONTAL} from './MyListsWrapper';
 import BallonTxt, {gap} from '../../components/BallonTxt';
 import {
@@ -88,9 +88,9 @@ const NewCategory = () => {
       return () => subscription.remove();
     }, []),
   );
-  const renderItem: ListRenderItem<ListsType> | null | undefined =
+  const renderItem: ListRenderItem<CategoryListType> | null | undefined =
     React.useCallback(
-      (props: ListRenderItemInfo<ListsType>) => {
+      (props: ListRenderItemInfo<CategoryListType>) => {
         return (
           <BallonTxt
             txt={props.item.name}

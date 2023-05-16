@@ -87,7 +87,7 @@ export const apiSlice = createApi({
   baseQuery: baseQueryWithReAuth,
   reducerPath: 'apiSlice',
 
-  tagTypes: ['Users', 'Tasks', 'TasksByDate', 'Lists'],
+  tagTypes: ['Users', 'Tasks', 'TasksByDate', 'Lists', 'PrioritizedLists'],
   endpoints: builder => ({}),
 });
 

@@ -2,28 +2,33 @@ import {Dimensions} from 'react-native';
 
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
-export interface ListsType {
+export interface CategoryListType {
   _id: string;
   name: string;
-  lists: {
-    _id: string;
-    title: string;
-    flag: boolean;
-    checkBoxListType: 'NUMBERS' | 'DOTS' | 'V' | 'NONE';
-    listItems: {
-      _id: string;
-      description: string;
-      done: boolean;
-      flag: boolean;
-    }[];
-  }[];
+  lists: ListType[];
 }
+export interface ListType {
+  _id: string;
+  title: string;
+  flag: boolean;
+  checkBoxListType: 'NUMBERS' | 'DOTS' | 'V' | 'NONE';
+  listItems: ListItemType[];
+  categoryId?: string;
+}
+
+export interface ListItemType {
+  _id: string;
+  description: string;
+  done: boolean;
+  flag: boolean;
+}
+
 const constants = {
-  BASE_URL: 'https://here.cyclic.app/',
+  // BASE_URL: 'https://here.cyclic.app/',
   DOMAIN: 'here.cyclic.app',
   // BASE_URL: 'https://here-app.onrender.com/',
   /***************** Eliran ***************/
-  // BASE_URL: 'http://192.168.1.30:3000/',
+  BASE_URL: 'http://192.168.1.30:3000/',
 
   /***************** Omer ***************/
   // BASE_URL: 'http://192.168.1.27:3000/',

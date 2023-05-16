@@ -1,28 +1,42 @@
 import {Pressable, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import {ListRenderItem} from '@shopify/flash-list';
-import constants, {ListsType} from '../assets/constants';
+import constants, {CategoryListType, ListType} from '../assets/constants';
 import {useNavigation} from '@react-navigation/native';
 // import {ListCategoryWidth} from '../screens/Home';
 const ListCategoryWidth = constants.WIDTH * 0.2925925996568468;
 
 const RenderListCategoryHome:
-  | ListRenderItem<ListsType>
+  | ListRenderItem<ListType>
   | null
   | undefined = props => {
   const navigation = useNavigation();
+  const findCategoryIndex = () => {
+    const listIndex = (props.extraData.lists as CategoryListType[]).findIndex(
+      list => list._id === props.item.categoryId,
+    );
+    return listIndex;
+  };
+  const findListIndexInCategory = (categoryIndex: number) => {
+    const listIndex = (props.extraData.lists as CategoryListType[])[
+      categoryIndex
+    ]?.lists?.findIndex(list => list._id === props.item._id);
+    return listIndex;
+  };
   const navigateToList = React.useCallback(() => {
+    const categoryIndex = findCategoryIndex();
+    const listIndex = findListIndexInCategory(categoryIndex);
     navigation.navigate(
       'ListAndNotesStack' as never,
       {
-        screen: 'MyLists' as never,
-        params: {index: props.index, navFromHome: true},
+        screen: 'CreateOrEditList' as never,
+        params: {categoryIndex, listIndex} as never,
       } as never,
     );
   }, [props.index]);
   return (
     <Pressable onPress={navigateToList} style={styles.myListCategory}>
-      <Text style={styles.listTxt}>{props.item.name}</Text>
+      <Text style={styles.listTxt}>{props.item.title}</Text>
     </Pressable>
   );
 };

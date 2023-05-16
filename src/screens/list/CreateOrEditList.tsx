@@ -4,6 +4,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from 'react-native';
 import React, {
   memo,
@@ -12,6 +13,7 @@ import React, {
   useReducer,
   useRef,
   useState,
+  useEffect,
 } from 'react';
 import constants from '../../assets/constants';
 import SVG from '../../assets/svg';
@@ -35,8 +37,8 @@ export interface ListItemType {
 }
 
 export interface Action {
-  type: 'INPUT' | 'FLAG' | 'CHECK' | 'POP' | 'PUSH';
-  index: number;
+  type: 'INPUT' | 'FLAG' | 'CHECK' | 'POP' | 'PUSH' | 'SET';
+  index?: number;
   payload: any;
 }
 
@@ -50,14 +52,21 @@ const newItem: ListItemType = {
 };
 const reducer = (state: ListItemType[], action: Action) => {
   switch (action.type) {
+    case 'SET':
+      state =
+        action.payload?.length > 0
+          ? action.payload
+          : [{...newItem, _id: uuid.v4() + ''}];
+      return [...state];
     case 'CHECK':
-      state[action.index].done = !state[action.index].done;
+      action.index && (state[action.index].done = !state[action.index].done);
       return [...state];
     case 'POP':
-      state.splice(action.index, 1);
+      action.index && state.splice(action.index, 1);
       return [...state];
     case 'PUSH':
-      state.splice(action.index + 1, 0, {...newItem, _id: uuid.v4() + ''});
+      action.index &&
+        state.splice(action.index + 1, 0, {...newItem, _id: uuid.v4() + ''});
       return [...state];
     case 'INPUT':
       if (action.index === state.length - 1) {
@@ -71,7 +80,7 @@ const reducer = (state: ListItemType[], action: Action) => {
         return item;
       });
     case 'FLAG':
-      state[action.index].flag = !state[action.index].flag;
+      action.index && (state[action.index].flag = !state[action.index].flag);
       return [...state];
     default:
       return state;
@@ -88,7 +97,6 @@ const CreateOrEditList = () => {
     error: listsFetchError,
     isLoading: listsLoading,
   } = useGetListsQuery(undefined);
-
   const [addItemSubmit, {isLoading, isError, isSuccess}] =
     useAddListItemMutation(undefined);
 
@@ -104,11 +112,12 @@ const CreateOrEditList = () => {
       ? [...lists[categoryIndex].lists[listIndex].listItems, {...newItem}]
       : [],
   );
-  const title =
-    '' +
-    lists![categoryIndex].name +
-    ' ' +
-    lists![categoryIndex].lists[listIndex].title;
+  const title = lists?.[categoryIndex].name
+    ? '' +
+      lists![categoryIndex].name +
+      ' ' +
+      lists![categoryIndex].lists[listIndex].title
+    : 'loading...';
 
   const [checkboxType, setCheckboxType] = useState<CheckBoxListType>('V');
   const [currentFocusIndex, setCurrentFocusIndex] = useState(-1);
@@ -121,7 +130,6 @@ const CreateOrEditList = () => {
     };
     addItemSubmit(items)
       .then(data => {
-        // console.log('on submit, result', data, items);
         nav.goBack();
       })
       .catch(error => {
@@ -131,6 +139,14 @@ const CreateOrEditList = () => {
   const onListItemTypePress = useCallback((type: CheckBoxListType) => {
     setCheckboxType(type);
   }, []);
+
+  useEffect(() => {
+    if (state.length > 0) return;
+    const items = lists
+      ? lists[categoryIndex]?.lists[listIndex]?.listItems
+      : [];
+    dispatch({type: 'SET', index: listIndex, payload: items});
+  }, [lists]);
 
   const onVCheckboxPress = useCallback(
     () => onListItemTypePress('V'),
@@ -172,18 +188,22 @@ const CreateOrEditList = () => {
       isLoading={isLoading}
       onDonePress={handleSubmit}>
       <View style={{height: '82%'}}>
-        <FlatList
-          showsVerticalScrollIndicator={false}
-          ref={flatListRef}
-          // data={lists![categoryIndex].lists[listIndex].listItems}
-          data={state}
-          // ListFooterComponent={FooterComponent}
-          keyExtractor={keyExtractor}
-          renderItem={RenderItem}
-          // extraData={state}
-          // contentContainerStyle={{flex: 1}}
-          style={styles.listContainerContent}
-        />
+        {state ? (
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            ref={flatListRef}
+            // data={lists![categoryIndex].lists[listIndex].listItems}
+            data={state}
+            // ListFooterComponent={FooterComponent}
+            keyExtractor={keyExtractor}
+            renderItem={RenderItem}
+            // extraData={state}
+            // contentContainerStyle={{flex: 1}}
+            style={styles.listContainerContent}
+          />
+        ) : (
+          <ActivityIndicator color={'black'} size={'large'} />
+        )}
       </View>
       <View
         style={{

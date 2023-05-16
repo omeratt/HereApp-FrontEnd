@@ -3,12 +3,13 @@ import {
   BackHandler,
   FlatList,
   StyleSheet,
+  ListRenderItemInfo,
 } from 'react-native';
 import React, {memo, useCallback, useEffect} from 'react';
-import constants from '../../assets/constants';
+import constants, {ListType} from '../../assets/constants';
 import MyListsWrapper from './MyListsWrapper';
 import ListItem from './ListItem';
-import {useGetListsQuery} from '../../app/api/listApi';
+import {useEditListFlagMutation, useGetListsQuery} from '../../app/api/listApi';
 import {
   RouteProp,
   useFocusEffect,
@@ -64,27 +65,48 @@ const MyLists = () => {
     isLoading: listsLoading,
   } = useGetListsQuery(undefined);
 
+  const [toggleFlag] = useEditListFlagMutation();
+  const handleFlagPress = useCallback(
+    async (itemIndex: number) => {
+      if (!lists?.[index]?.lists?.[itemIndex]) return;
+      const flags = lists[index].lists?.[itemIndex].flag;
+      const item = lists[index].lists?.[itemIndex];
+      await toggleFlag({
+        id: lists[index].lists?.[itemIndex]._id,
+        flag: !lists[index].lists?.[itemIndex].flag,
+      });
+    },
+    [lists, index, toggleFlag],
+  );
+  const RenderItem = useCallback(
+    (props: ListRenderItemInfo<ListType>) => (
+      <ListItem
+        isCheckBox={false}
+        showLine={false}
+        flag={lists?.[index].lists?.[props.index]?.flag}
+        onFlagPress={handleFlagPress}
+        iconSize={checkBoxSize}
+        type="NUMBERS"
+        description={props.item.title}
+        textPress={navigateToEditList}
+        {...props}
+      />
+    ),
+    [lists, index, handleFlagPress, checkBoxSize, navigateToEditList],
+  );
   return (
     <MyListsWrapper
       title={lists?.[index]?.name || 'loading...'}
       rightBtn
-      onRightBtnPress={navigateToList}>
+      onRightBtnPress={navigateToList}
+      onDonePress={() => {
+        navigation.goBack();
+      }}>
       {listsLoading && <ActivityIndicator />}
       {lists && (
         <FlatList
           data={lists![index].lists}
-          renderItem={props => (
-            <ListItem
-              isCheckBox={false}
-              showLine={false}
-              flag={false}
-              iconSize={checkBoxSize}
-              type="NUMBERS"
-              description={props.item.title}
-              textPress={navigateToEditList}
-              {...props}
-            />
-          )}
+          renderItem={props => <RenderItem {...props} />}
           style={styles.listContainerContent}
         />
       )}

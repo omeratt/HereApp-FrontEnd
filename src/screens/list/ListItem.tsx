@@ -17,7 +17,6 @@ import TextInput, {InputHandle} from '../../components/TextInput';
 import {PADDING_HORIZONTAL} from './MyListsWrapper';
 import {Action, CheckBoxListType, ListItemType} from './CreateOrEditList';
 
-
 interface ListItemProps {
   iconSize?: number;
   isCheckBox?: boolean;
@@ -37,6 +36,7 @@ interface ListItemProps {
   currentFocusIndex?: number;
   setCurrentFocusIndex?: React.Dispatch<React.SetStateAction<number>>;
   flatListRef?: FlatList<ListItemType> | null;
+  onFlagPress?: (itemIndex: number) => void;
 }
 const ListItem: React.FC<ListItemProps> = ({
   item,
@@ -57,6 +57,7 @@ const ListItem: React.FC<ListItemProps> = ({
   currentFocusIndex,
   setCurrentFocusIndex,
   flatListRef,
+  onFlagPress,
 }) => {
   const width = constants.WIDTH - PADDING_HORIZONTAL * 2 - iconSize * 2 - 20;
   const isLast = React.useMemo(
@@ -65,16 +66,12 @@ const ListItem: React.FC<ListItemProps> = ({
   );
   const textInputRef = useRef<InputHandle>(null);
   const focus = useCallback(() => {
-    console.log('focus');
     if (!isLast) return;
-    // textInputRef?.current?.setNativeProps({
-    //   selection: {start: inputTxt.length, end: inputTxt.length},
-    // });
+
     dispatch?.({type: 'INPUT', index, payload: ''});
   }, [isLast, index]);
 
   const blur = useCallback(() => {
-    console.log('blur');
     if (isLast || inputTxt.length > 0) return;
     if (!item.new) setDeleted?.(prev => [...prev, item]);
     dispatch?.({type: 'POP', index, payload: ''});
@@ -104,8 +101,8 @@ const ListItem: React.FC<ListItemProps> = ({
       setCurrentFocusIndex?.(-1);
     }
   }, [currentFocusIndex]);
-  const onFlagPress = useCallback(() => {
-    dispatch?.({type: 'FLAG', index, payload: 'change flag'});
+  const handleFlagPress = useCallback(() => {
+    onFlagPress?.(index);
   }, [dispatch, index]);
   const onCheckboxPress = useCallback(() => {
     dispatch?.({type: 'CHECK', index, payload: 'change checkbox'});
@@ -184,7 +181,7 @@ const ListItem: React.FC<ListItemProps> = ({
           // name={state?.[index]?.flag ? 'flag' : 'flag-outline'}
           size={iconSize}
           color={constants.colors.BGC}
-          onPress={onFlagPress}
+          onPress={handleFlagPress}
         />
       </View>
       {showLine && (
@@ -198,7 +195,8 @@ const ListItem: React.FC<ListItemProps> = ({
   );
 };
 
-export default React.memo(ListItem);
+export default ListItem;
+// export default React.memo(ListItem);
 
 const styles = StyleSheet.create({
   topContainer: {

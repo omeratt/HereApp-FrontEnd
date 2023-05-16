@@ -52,7 +52,7 @@ export default function MainStack() {
         screenOptions={{
           // swipeEnabled: true,
 
-          unmountOnBlur: true,
+          // unmountOnBlur: true,
           drawerPosition: 'left',
           drawerStyle: {
             backgroundColor: constants.colors.BGC,

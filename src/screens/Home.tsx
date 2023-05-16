@@ -3,13 +3,7 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import constants from '../assets/constants';
 import SVG from '../assets/svg';
 import NewTask from '../components/NewTask';
-import Animated, {
-  FadeIn,
-  FadeInRight,
-  FadeOutUp,
-  FlipInEasyY,
-  useSharedValue,
-} from 'react-native-reanimated';
+import Animated, {FlipInEasyY, useSharedValue} from 'react-native-reanimated';
 import {tasksApi, useGetTasksByDateQuery} from '../app/api/taskApi';
 import DisplayTask from '../components/DisplayTask';
 import {useAppDispatch} from '../app/hooks';
@@ -269,16 +263,21 @@ const Home = () => {
           </View>
           <View
             // onLayout={e => {
-            //   console.log(e.nativeEvent.layout.width / constants.WIDTH);
+            //   console.log(e.nativeEvent.layout.height / constants.HEIGHT);
             // }}
             style={styles.categoryContainer}>
-            <FlashList
-              data={lists}
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-              renderItem={RenderListCategoryHome}
-              estimatedItemSize={ListCategoryWidth}
-            />
+            {lists && (
+              <FlashList
+                contentContainerStyle={{
+                  paddingHorizontal: constants.WIDTH * 0.0444,
+                }}
+                data={lists}
+                horizontal={true}
+                showsHorizontalScrollIndicator={false}
+                renderItem={props => <RenderListCategoryHome {...props} />}
+                estimatedItemSize={ListCategoryWidth}
+              />
+            )}
           </View>
         </View>
       </View>
@@ -371,6 +370,7 @@ const styles = StyleSheet.create({
     borderColor: constants.colors.UNDER_LINE,
     backgroundColor: constants.colors.OFF_WHITE,
     elevation: 2,
+    overflow: 'hidden',
   },
   middleView: {
     height: '22.5%',
@@ -482,11 +482,13 @@ const styles = StyleSheet.create({
   },
   categoryContainer: {
     flexDirection: 'row',
+    minWidth: 2,
     width: constants.WIDTH * 0.9444444444444444,
-    height: '20%',
+    height: constants.HEIGHT * 0.03201422854602046 + 2,
     alignContent: 'center',
     justifyContent: 'space-evenly',
     alignItems: 'center',
+    overflow: 'hidden',
     // backgroundColor: constants.colors.BLACK,
   },
   myListCategory: {

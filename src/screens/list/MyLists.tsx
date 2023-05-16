@@ -1,28 +1,53 @@
-import {FlatList, StyleSheet} from 'react-native';
+import {
+  ActivityIndicator,
+  BackHandler,
+  FlatList,
+  StyleSheet,
+} from 'react-native';
 import React, {memo, useCallback, useEffect} from 'react';
-import constants, {ListsType} from '../../assets/constants';
+import constants from '../../assets/constants';
 import MyListsWrapper from './MyListsWrapper';
 import ListItem from './ListItem';
 import {useGetListsQuery} from '../../app/api/listApi';
 import {
-  ParamListBase,
   RouteProp,
+  useFocusEffect,
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
 
 type RootStackParamList = {
-  MyLists: {index: number};
+  MyLists: {index: number; navFromHome: boolean | undefined};
 };
 type MyListsRouteProp = RouteProp<RootStackParamList, 'MyLists'>;
 
 const MyLists = () => {
   const index: number = useRoute<MyListsRouteProp>().params.index;
+  const navFromHome: boolean | undefined =
+    useRoute<MyListsRouteProp>().params.navFromHome;
   const navigation = useNavigation();
+
   const navigateToList = useCallback(() => {
     const id = lists![index]._id;
     navigation.navigate('NewListTitle' as never, {id} as never);
   }, [index]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        if (navFromHome) {
+          navigation.navigate('HomePage' as never);
+        }
+        return true;
+      };
+      const subscription = BackHandler.addEventListener(
+        'hardwareBackPress',
+        onBackPress,
+      );
+
+      return () => subscription.remove();
+    }, []),
+  );
   const navigateToEditList = useCallback(
     (listIndex: number) => {
       navigation.navigate(
@@ -41,25 +66,28 @@ const MyLists = () => {
 
   return (
     <MyListsWrapper
-      title={lists![index].name}
+      title={lists?.[index]?.name || 'loading...'}
       rightBtn
       onRightBtnPress={navigateToList}>
-      <FlatList
-        data={lists![index].lists}
-        renderItem={props => (
-          <ListItem
-            isCheckBox={false}
-            showLine={false}
-            flag={false}
-            iconSize={checkBoxSize}
-            type="NUMBERS"
-            description={props.item.title}
-            textPress={navigateToEditList}
-            {...props}
-          />
-        )}
-        style={styles.listContainerContent}
-      />
+      {listsLoading && <ActivityIndicator />}
+      {lists && (
+        <FlatList
+          data={lists![index].lists}
+          renderItem={props => (
+            <ListItem
+              isCheckBox={false}
+              showLine={false}
+              flag={false}
+              iconSize={checkBoxSize}
+              type="NUMBERS"
+              description={props.item.title}
+              textPress={navigateToEditList}
+              {...props}
+            />
+          )}
+          style={styles.listContainerContent}
+        />
+      )}
     </MyListsWrapper>
   );
 };

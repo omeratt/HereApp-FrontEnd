@@ -24,17 +24,16 @@ const baseQueryWithReAuth = async (args: any, api: any, extraOptions: any) => {
     );
     console.log(message);
     // if (urlStr === 'tasks/date') console.log(result.data);
-  }
-  if (status === 401) {
+  } else if (status === 401) {
     console.log(formatError(result?.error, urlStr, 31, method!));
     api.dispatch(logout());
     await CookieManager.clearAll();
     api.dispatch(tasksApi.util.resetApiState());
     api.dispatch(listsApi.util.resetApiState());
-  }
-  if (status === 400) {
+  } else {
     console.log(formatError(result?.error, urlStr, 31, method!));
   }
+
   // if (result.data?.refresh) {
   // const {accessToken, refreshToken, status} = result.data.refresh;
   const responseCookies = result.meta?.response?.headers.get('Set-Cookie');

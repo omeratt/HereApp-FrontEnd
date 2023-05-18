@@ -65,6 +65,18 @@ export const listsApi = apiSlice.injectEndpoints({
         return response.data;
       },
     }),
+    deleteCategories: builder.mutation({
+      query: ids => ({
+        url: 'list/categories',
+        method: 'DELETE',
+        body: {ids},
+        credentials: 'include',
+      }),
+      invalidatesTags: ['Lists'],
+      transformResponse: (response: any, meta, arg) => {
+        return response.data;
+      },
+    }),
   }),
 });
 
@@ -75,4 +87,5 @@ export const {
   useAddListTitleMutation,
   useAddListItemMutation,
   useEditListFlagMutation,
+  useDeleteCategoriesMutation,
 } = listsApi;

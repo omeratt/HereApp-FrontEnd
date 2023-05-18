@@ -82,7 +82,7 @@ const BallonTxt: React.FC<BallonProps> = ({
           onPress={
             isSelectOn ? () => handleSelect?.(id) : () => onPress?.(index)
           }
-          onLongPress={toggleSelectOnOff}>
+          onLongPress={() => (toggleSelectOnOff?.(), handleSelect?.(id))}>
           <Text
             numberOfLines={1}
             // ellipsizeMode="tail"

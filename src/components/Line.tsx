@@ -1,4 +1,4 @@
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, View, ViewStyle} from 'react-native';
 import React from 'react';
 import constants from '../assets/constants';
 import Animated, {
@@ -12,7 +12,7 @@ interface props {
   lengthPercentage?: number;
   vertical?: boolean;
   rotate180?: boolean;
-  style?: {};
+  style?: ViewStyle;
   lineColor?: string;
   strength?: number;
 }

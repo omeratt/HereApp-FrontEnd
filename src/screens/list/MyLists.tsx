@@ -38,6 +38,8 @@ const MyLists = () => {
       const onBackPress = () => {
         if (navFromHome) {
           navigation.navigate('HomePage' as never);
+        } else {
+          navigation.goBack();
         }
         return true;
       };
@@ -47,7 +49,7 @@ const MyLists = () => {
       );
 
       return () => subscription.remove();
-    }, []),
+    }, [navigation]),
   );
   const navigateToEditList = useCallback(
     (listIndex: number) => {

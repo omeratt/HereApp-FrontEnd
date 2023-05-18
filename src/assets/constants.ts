@@ -31,7 +31,7 @@ const constants = {
   // BASE_URL: 'http://192.168.1.30:3000/',
 
   /***************** Omer ***************/
-  // BASE_URL: 'http://192.168.1.27:3000/',
+  // BASE_URL: 'http://192.168.1.26:3000/',
   colors: {
     GREEN: '#D0FD0C',
     BLACK: '#000000',

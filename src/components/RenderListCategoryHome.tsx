@@ -30,7 +30,7 @@ const RenderListCategoryHome:
       'ListAndNotesStack' as never,
       {
         screen: 'CreateOrEditList' as never,
-        params: {categoryIndex, listIndex} as never,
+        params: {categoryIndex, listIndex, navFromHome: true} as never,
       } as never,
     );
   }, [props.index]);

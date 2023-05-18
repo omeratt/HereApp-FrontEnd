@@ -28,11 +28,17 @@ import {
   useRoute,
 } from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {useGetListsQuery} from '../../app/api/listApi';
+import {
+  useDeleteCategoriesMutation,
+  useGetListsQuery,
+} from '../../app/api/listApi';
 import {ListRenderItemInfo} from 'react-native';
 import {TouchableOpacity} from 'react-native';
 import SVG from '../../assets/svg';
 import Animated, {ZoomIn, ZoomOut} from 'react-native-reanimated';
+import BottomSheetDeleteModal, {
+  BottomSheetDeleteModalHandles,
+} from '../../components/BottomSheetDeleteModal';
 
 type RootStackParamList = {
   ListAndNotes: {
@@ -54,26 +60,41 @@ const NewCategory = () => {
   } = useGetListsQuery(undefined);
   const [isSelect, setIsSelect] = React.useState(false);
   const [selected, setSelected] = React.useState<string[]>([]);
+  const bottomSheetRef = useRef<BottomSheetDeleteModalHandles>(null);
+
+  const [deleteCategories, {isLoading}] = useDeleteCategoriesMutation();
+
+  const DeleteCategories = React.useCallback(async () => {
+    bottomSheetRef.current?.closeModal();
+    toggleSelect();
+    await deleteCategories(selected);
+  }, [selected]);
+
   const handleSelected = React.useCallback((id: string) => {
     setSelected(prev => {
       if (prev.includes(id)) return prev.filter(_id => _id !== id);
       return [...prev, id];
     });
   }, []);
+
   const toggleSelect = React.useCallback(() => {
     setIsSelect(!isSelect);
     Vibration.vibrate(1);
     setSelected([]);
   }, [isSelect]);
+
   const navigateToAddCategory = useCallback(() => {
     navigation.navigate('NewListCategory' as never);
   }, []);
+
   const navigateToList = useCallback((index: number) => {
     navigation.navigate('MyLists' as never, {index} as never);
   }, []);
+
   const listSize = useMemo(() => {
     return lists?.length;
   }, [lists?.length]);
+
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
@@ -88,6 +109,11 @@ const NewCategory = () => {
       return () => subscription.remove();
     }, []),
   );
+
+  const openDeleteModal = React.useCallback(() => {
+    bottomSheetRef.current?.openModal();
+  }, []);
+
   const renderItem: ListRenderItem<CategoryListType> | null | undefined =
     React.useCallback(
       (props: ListRenderItemInfo<CategoryListType>) => {
@@ -107,13 +133,18 @@ const NewCategory = () => {
       },
       [isSelect, listSize, selected],
     );
+  const keyExtractor = useCallback(
+    (item: unknown, index: number) => (item as CategoryListType)._id,
+    [],
+  );
   return (
     <MyListsWrapper
-      rightBtn
+      rightBtn={!isLoading}
       title="All my lists and notes"
-      onSelectPress={toggleSelect}
-      isSelected={isSelect}
-      onRightBtnPress={navigateToAddCategory}>
+      onSelectPress={isLoading ? undefined : toggleSelect}
+      isSelected={isLoading ? undefined : isSelect}
+      onRightBtnPress={isLoading ? undefined : navigateToAddCategory}
+      isLoading={isLoading}>
       <View
         style={{
           height: '85%',
@@ -130,7 +161,7 @@ const NewCategory = () => {
         <FlatList
           data={lists}
           renderItem={renderItem}
-          keyExtractor={item => item._id}
+          keyExtractor={keyExtractor}
           style={styles.wordsContainer}
           contentContainerStyle={{width: '100%', paddingBottom: gap}}
           numColumns={2}
@@ -156,7 +187,11 @@ const NewCategory = () => {
             style={[styles.containerFooterBtn, {height, width}]}
             // onPress={onVCheckboxPress}
           >
-            {selected.length > 0 ? <SVG.TrashBlack /> : <SVG.Trash />}
+            {selected.length > 0 ? (
+              <SVG.TrashBlack onPress={openDeleteModal} />
+            ) : (
+              <SVG.Trash />
+            )}
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.containerFooterBtn, {height, width}]}
@@ -168,6 +203,11 @@ const NewCategory = () => {
           ></TouchableOpacity>
         </Animated.View>
       )}
+      <BottomSheetDeleteModal
+        onDelete={DeleteCategories}
+        ids={selected}
+        ref={bottomSheetRef}
+      />
     </MyListsWrapper>
   );
 };

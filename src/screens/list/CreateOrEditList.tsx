@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   View,
   ActivityIndicator,
+  BackHandler,
 } from 'react-native';
 import React, {
   memo,
@@ -19,14 +20,23 @@ import constants from '../../assets/constants';
 import SVG from '../../assets/svg';
 import MyListsWrapper from './MyListsWrapper';
 import ListItem from './ListItem';
-import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
+import {
+  RouteProp,
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import {useAddListItemMutation, useGetListsQuery} from '../../app/api/listApi';
 import {InputHandle} from '../../components/TextInput';
 import uuid from 'react-native-uuid';
 export type CheckBoxListType = 'NUMBERS' | 'DOTS' | 'V' | 'NONE';
 
 type RootStackParamList = {
-  CreateOrEditList: {categoryIndex: number; listIndex: number};
+  CreateOrEditList: {
+    categoryIndex: number;
+    listIndex: number;
+    navFromHome: boolean | undefined;
+  };
 };
 export interface ListItemType {
   _id?: string;
@@ -102,6 +112,8 @@ const CreateOrEditList = () => {
 
   const categoryIndex: number =
     useRoute<CreateOrEditListProp>().params.categoryIndex;
+  const navFromHome: boolean | undefined =
+    useRoute<CreateOrEditListProp>().params.navFromHome;
   const listIndex: number = useRoute<CreateOrEditListProp>().params.listIndex;
 
   const [deleted, setDeleted] = React.useState<ListItemType[]>([]);
@@ -160,7 +172,25 @@ const CreateOrEditList = () => {
     () => onListItemTypePress('NUMBERS'),
     [onListItemTypePress],
   );
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        console.log('first');
+        if (navFromHome) {
+          nav.navigate('HomePage' as never);
+        } else {
+          nav.goBack();
+        }
+        return true;
+      };
+      const subscription = BackHandler.addEventListener(
+        'hardwareBackPress',
+        onBackPress,
+      );
 
+      return () => subscription.remove();
+    }, [nav]),
+  );
   const keyExtractor: (item: ListItemType, index: number) => string =
     useCallback((item: ListItemType) => item._id!, [state]);
   const RenderItem: ListRenderItem<ListItemType> = useCallback(

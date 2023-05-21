@@ -25,11 +25,11 @@ export interface ListItemType {
 }
 
 const constants = {
-  // BASE_URL: 'https://here.cyclic.app/',
+  BASE_URL: 'https://here.cyclic.app/',
   DOMAIN: 'here.cyclic.app',
   // BASE_URL: 'https://here-app.onrender.com/',
   /***************** Eliran ***************/
-  BASE_URL: 'http://192.168.1.41:3000/',
+  // BASE_URL: 'http://192.168.1.41:3000/',
 
   /***************** Omer ***************/
   // BASE_URL: 'http://192.168.1.26:3000/',

@@ -44,14 +44,14 @@ const NextTask: React.FC<NextTaskProps> = ({width, height}) => {
       )}
       <Text style={[styles.font, styles.details]}>{nextTask.name}</Text>
       <Text
-        allowFontScaling
+        adjustsFontSizeToFit
         numberOfLines={1}
         style={[
           styles.font,
           styles.targetDate,
           {
             width: `${(49 / width) * 100}%`,
-            fontSize: (13 / width) * 100,
+            fontSize: (11 / width) * 100,
             paddingBottom: `${(18 / height) * 100}%`,
           },
         ]}>

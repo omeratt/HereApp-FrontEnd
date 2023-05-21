@@ -20,8 +20,12 @@ import SetTimeContent from './SetTimeContent';
 import FrequencyPickerModal from './FrequencyPickerModal';
 import {BottomSheetModal} from '@gorhom/bottom-sheet';
 import {useFocusEffect} from '@react-navigation/native';
-
+import {TaskType} from '../app/Reducers/User/userSlice';
+import {getRealDate, getTimeFromDateString} from './WeeklyCalender';
+const realDate = getRealDate(new Date());
+const hours = getTimeFromDateString(realDate.toISOString(), true);
 interface props {
+  task?: TaskType;
   closeModal: any;
   targetDate: Date;
   setTargetDate: (date: Date) => void;
@@ -33,6 +37,7 @@ type DateFormat = 'datetime' | 'date' | 'time';
 const FreqData = [...constants.FreqList];
 const currFreq = FreqData[0];
 const NewTask: React.FC<props> = ({
+  task,
   closeModal,
   targetDate,
   setTargetDate,
@@ -40,20 +45,23 @@ const NewTask: React.FC<props> = ({
   maximumDate,
   findDateAndScroll,
 }) => {
-  const [pushOn, setPushOn] = useState(false);
+  const [pushOn, setPushOn] = useState(task?.push ? task.push : false);
   const [datePickerOpen, setDatePickerOpen] = useState<boolean>(false);
   const [freqPickerOpen, setFreqPickerOpen] = useState<boolean>(false);
   const [freq, setFreq] = useState<string>(currFreq);
   const dateTypeRef = useRef<DateFormat>('datetime');
-  const [taskName, setTaskName] = useState<string>();
-  const [description, setDescription] = useState<string>();
-  const [startDate, setStartDate] = useState<Date>(targetDate);
+  const [taskName, setTaskName] = useState<string>(task?.name || '');
+  const [description, setDescription] = useState<string>(task?.details || '');
+  const [startDate, setStartDate] = useState<Date>(
+    task?.targetDate || getRealDate(targetDate),
+  );
   const [endDate, setEndDate] = useState<Date>();
   const [AddTask, {isLoading, data, isSuccess, isError, error}] =
     useAddTaskMutation();
+  // useGetTask
   const isEndDate = useRef<boolean>(false);
   const isSetTime = useRef<boolean>(false);
-  const targetDateHoursRef = useRef<string>('00:00');
+  const targetDateHoursRef = useRef<string>(hours || '00:00');
   const taskNameInputRef = React.useRef<TextInput>(null);
   const taskDescriptionInputRef = React.useRef<TextInput>(null);
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -82,7 +90,7 @@ const NewTask: React.FC<props> = ({
         details: description,
         targetDate: startDate,
         frequency: freq,
-        ...(endDate && freq === 'None' && {endDate}),
+        ...(endDate && freq !== 'None' && {endDate}),
         ...(isSetTime.current && {isSetTime: true}),
       }).unwrap();
       setDescription('');
@@ -94,10 +102,12 @@ const NewTask: React.FC<props> = ({
 
   Keyboard.addListener('keyboardDidHide', () => {
     taskNameInputRef?.current?.blur();
-  });
-  Keyboard.addListener('keyboardDidHide', () => {
     taskDescriptionInputRef?.current?.blur();
   });
+
+  React.useEffect(() => {
+    taskNameInputRef?.current?.focus();
+  }, []);
 
   /**
    * @param type which format to use in date picker

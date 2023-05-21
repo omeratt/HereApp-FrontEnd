@@ -9,6 +9,13 @@ export const tasksApi = apiSlice.injectEndpoints({
         return response.data;
       },
     }),
+    // getTaskId: builder.query({
+    //   query: () => 'tasks',
+    //   // providesTags: ['Tasks'],
+    //   transformResponse: (response: any, meta, arg) => {
+    //     return response.data;
+    //   },
+    // }),
     getTasksByDate: builder.query({
       query: (date: Date) => {
         return {

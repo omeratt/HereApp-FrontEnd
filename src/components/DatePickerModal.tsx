@@ -51,6 +51,7 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
     );
     setDate(realDate);
     if (dateFormat !== 'time') return close();
+    if (!hours) return close();
     const [_hours, minutes] = hours.split(':');
     const fixedDate = new Date(currentDate.setUTCHours(+_hours, +minutes));
     setDate(fixedDate);
@@ -135,7 +136,7 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
         onChange={handleSheetChanges}>
         <View>
           <DatePicker
-            date={date}
+            date={new Date(date.getTime() + date.getTimezoneOffset() * 60000)}
             mode={dateFormat}
             onDateChange={handleChange}
             fadeToColor={constants.colors.BGC}

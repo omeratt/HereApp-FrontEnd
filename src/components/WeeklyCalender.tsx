@@ -19,9 +19,9 @@ export const getRealDate = (date: Date): Date => {
 };
 
 export const getTimeFromDateString = (date?: string, isIn24Hours?: boolean) => {
-  console.log({date});
   if (!date) return ' ';
-  const itemTime = date.split('T')[1];
+  const fixedDate = getRealDate(new Date(date)).toISOString();
+  const itemTime = fixedDate.split('T')[1];
   const [hours, minutes] = itemTime.split(':');
   if (isIn24Hours) return `${hours}:${minutes} `;
   const amOrPm = +hours >= 12 ? 'PM' : 'AM';

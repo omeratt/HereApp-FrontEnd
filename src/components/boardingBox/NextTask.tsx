@@ -67,6 +67,7 @@ const styles = StyleSheet.create({
   container: {},
   font: {
     fontFamily: constants.Fonts.text,
+    textAlign: 'left',
   },
   title: {
     fontFamily: constants.Fonts.text_medium,

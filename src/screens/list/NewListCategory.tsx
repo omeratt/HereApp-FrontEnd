@@ -52,11 +52,14 @@ export default memo(NewListCategory);
 
 const styles = StyleSheet.create({
   newTaskTitleInput: {
-    borderWidth: 0,
+    // borderWidth: 1,
+    // borderColor: 'black',
+    height: '100%',
+
     fontSize: 20,
     color: constants.colors.UNDER_LINE,
     alignItems: 'center',
-    textAlignVertical: 'center',
+    textAlignVertical: 'top',
     fontFamily: constants.Fonts.text,
   },
 });

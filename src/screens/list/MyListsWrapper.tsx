@@ -81,7 +81,6 @@ const MyListsWrapper: FC<Props> = ({
                 onPress={onRightBtnPress}>
                 <SVG.NotePlus
                   height={'100%'}
-                  stroke={'red'}
                   width={selectHeight}
                   style={styles.svg}
                 />
@@ -132,13 +131,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: PADDING_HORIZONTAL,
   },
-  titleContainer: {width: '55%', height: '100%'},
+  titleContainer: {width: '65%', height: '100%'},
   title: {
     fontFamily: constants.Fonts.paragraph,
     color: constants.colors.BLACK,
     fontSize: 32,
     width: '100%',
     lineHeight: 32,
+    // borderColor: 'black',
+    // borderWidth: 1,
+    // width:'50%'
   },
   listContainer: {
     // backgroundColor: 'cyan',

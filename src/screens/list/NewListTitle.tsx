@@ -59,9 +59,10 @@ const styles = StyleSheet.create({
   newTaskTitleInput: {
     borderWidth: 0,
     fontSize: 20,
+    height: '100%',
     color: constants.colors.UNDER_LINE,
     alignItems: 'center',
-    textAlignVertical: 'center',
+    textAlignVertical: 'top',
     fontFamily: constants.Fonts.text,
   },
 });

@@ -6,6 +6,7 @@ import {
   View,
   ActivityIndicator,
   BackHandler,
+  ListRenderItemInfo,
 } from 'react-native';
 import React, {
   memo,
@@ -193,8 +194,10 @@ const CreateOrEditList = () => {
   );
   const keyExtractor: (item: ListItemType, index: number) => string =
     useCallback((item: ListItemType) => item._id!, [state]);
-  const RenderItem: ListRenderItem<ListItemType> = useCallback(
-    props => (
+
+  const RenderItem = useCallback(
+    (props: ListRenderItemInfo<ListItemType>) => (
+      //@ts-ignore
       <ListItem
         iconSize={checkBoxSize}
         type={checkboxType}

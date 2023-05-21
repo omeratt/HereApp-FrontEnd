@@ -3,7 +3,8 @@ import {
   BackHandler,
   FlatList,
   Keyboard,
-  ListRenderItem,
+  LayoutAnimation,
+  // ListRenderItem,
   StyleSheet,
   Text,
   TextInput,
@@ -32,13 +33,23 @@ import {
   useDeleteCategoriesMutation,
   useGetListsQuery,
 } from '../../app/api/listApi';
-import {ListRenderItemInfo} from 'react-native';
+// import {ListRenderItemInfo} from 'react-native';
 import {TouchableOpacity} from 'react-native';
 import SVG from '../../assets/svg';
-import Animated, {ZoomIn, ZoomOut} from 'react-native-reanimated';
+import Animated, {
+  ZoomIn,
+  ZoomInEasyDown,
+  ZoomOut,
+  ZoomOutEasyDown,
+} from 'react-native-reanimated';
 import BottomSheetDeleteModal, {
   BottomSheetDeleteModalHandles,
 } from '../../components/BottomSheetDeleteModal';
+import {
+  FlashList,
+  ListRenderItem,
+  ListRenderItemInfo,
+} from '@shopify/flash-list';
 
 type RootStackParamList = {
   ListAndNotes: {
@@ -61,19 +72,28 @@ const NewCategory = () => {
   const [isSelect, setIsSelect] = React.useState(false);
   const [selected, setSelected] = React.useState<string[]>([]);
   const bottomSheetRef = useRef<BottomSheetDeleteModalHandles>(null);
-
+  const flashListRef = useRef<FlashList<CategoryListType> | null>(null);
   const [deleteCategories, {isLoading}] = useDeleteCategoriesMutation();
 
   const DeleteCategories = React.useCallback(async () => {
     bottomSheetRef.current?.closeModal();
     toggleSelect();
     await deleteCategories(selected);
+    flashListRef.current?.prepareForLayoutAnimationRender();
+    // After removing the item, we can start the animation.
+    LayoutAnimation.configureNext({
+      ...LayoutAnimation.Presets.easeInEaseOut,
+      duration: 500,
+    });
   }, [selected]);
 
   const handleSelected = React.useCallback((id: string) => {
     setSelected(prev => {
-      if (prev.includes(id)) return prev.filter(_id => _id !== id);
-      return [...prev, id];
+      if (prev.includes(id)) {
+        return prev.filter(_id => _id !== id);
+      } else {
+        return [...prev, id];
+      }
     });
   }, []);
 
@@ -98,7 +118,8 @@ const NewCategory = () => {
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
-        navigation.navigate('HomePage' as never);
+        if (isSelect) setIsSelect(false);
+        else navigation.navigate('HomePage' as never);
         return true;
       };
       const subscription = BackHandler.addEventListener(
@@ -107,32 +128,38 @@ const NewCategory = () => {
       );
 
       return () => subscription.remove();
-    }, []),
+    }, [isSelect]),
   );
 
   const openDeleteModal = React.useCallback(() => {
     bottomSheetRef.current?.openModal();
   }, []);
 
-  const renderItem: ListRenderItem<CategoryListType> | null | undefined =
-    React.useCallback(
-      (props: ListRenderItemInfo<CategoryListType>) => {
-        return (
-          <BallonTxt
-            txt={props.item.name}
-            isSelectOn={isSelect}
-            listSize={listSize || 0}
-            onPress={navigateToList}
-            id={props.item._id}
-            selected={selected}
-            handleSelect={handleSelected}
-            toggleSelectOnOff={toggleSelect}
-            {...props}
-          />
-        );
-      },
-      [isSelect, listSize, selected],
-    );
+  const renderItem = React.useCallback(
+    (props: ListRenderItemInfo<CategoryListType>) => {
+      return (
+        <BallonTxt
+          txt={props.item.name}
+          isSelectOn={isSelect}
+          listSize={listSize || 0}
+          onPress={navigateToList}
+          id={props.item._id}
+          selected={selected}
+          handleSelect={handleSelected}
+          toggleSelectOnOff={toggleSelect}
+          index={props.index}
+        />
+      );
+    },
+    [
+      isSelect,
+      listSize,
+      selected,
+      handleSelected,
+      toggleSelect,
+      navigateToList,
+    ],
+  );
   const keyExtractor = useCallback(
     (item: unknown, index: number) => (item as CategoryListType)._id,
     [],
@@ -148,6 +175,7 @@ const NewCategory = () => {
       <View
         style={{
           height: '85%',
+          // flexDirection: 'row',
           // width: constants.WIDTH,
           // alignSelf: 'center',
           // borderWidth: 1.2,
@@ -158,14 +186,18 @@ const NewCategory = () => {
           // borderBottomRightRadius: 50,
           // overflow: 'hidden',
         }}>
-        <FlatList
+        <FlashList
+          ref={flashListRef}
           data={lists}
           renderItem={renderItem}
+          estimatedItemSize={constants.HEIGHT * (72 / 896) + 10}
           keyExtractor={keyExtractor}
-          style={styles.wordsContainer}
-          contentContainerStyle={{width: '100%', paddingBottom: gap}}
+          // style={styles.wordsContainer}
+          // contentContainerStyle={{paddingBottom: gap}}
+
           numColumns={2}
-          columnWrapperStyle={{marginBottom: -21 + gap}}
+          extraData={{isSelect, listSize, selected}}
+          // columnWrapperStyl
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={() => {
             return listsLoading ? (
@@ -176,12 +208,22 @@ const NewCategory = () => {
               </Text>
             );
           }}
+          //   getItemLayout={(_, index) => {
+          //     // Calculate the height of each item based on your requirements
+          //     const itemHeight = constants.HEIGHT * (72 / 896) + 10;
+          //     return {
+          //       length: itemHeight,
+          //       offset: itemHeight * index,
+          //       index,
+          //     };
+          //   }}
+          //
         />
       </View>
       {isSelect && (
         <Animated.View
-          entering={ZoomIn.duration(150)}
-          exiting={ZoomOut.duration(150)}
+          entering={ZoomInEasyDown.duration(150)}
+          exiting={ZoomOutEasyDown.duration(150)}
           style={styles.listContainerFooter}>
           <TouchableOpacity
             style={[styles.containerFooterBtn, {height, width}]}

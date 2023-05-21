@@ -7,29 +7,39 @@ import {
   NativeSyntheticEvent,
   TextInputKeyPressEventData,
   FlatList,
+  ListRenderItemInfo as flatListProps,
 } from 'react-native';
 import React, {useCallback, useEffect, useRef} from 'react';
 import CheckBox from '../../components/CheckBox';
 import Line from '../../components/Line';
-import constants from '../../assets/constants';
+import constants, {ListType} from '../../assets/constants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import TextInput, {InputHandle} from '../../components/TextInput';
 import {PADDING_HORIZONTAL} from './MyListsWrapper';
 import {Action, CheckBoxListType, ListItemType} from './CreateOrEditList';
+import Animated, {
+  ZoomIn,
+  ZoomInLeft,
+  ZoomInRight,
+  ZoomOut,
+  ZoomOutLeft,
+} from 'react-native-reanimated';
+import {ListRenderItemInfo} from '@shopify/flash-list';
 
-interface ListItemProps {
+// type x = ListRenderItemInfo<ListType> | flatListProps<ListType>;
+interface ListItemProps extends ListRenderItemInfo<ListType> {
   iconSize?: number;
   isCheckBox?: boolean;
   showLine?: boolean;
-  type: CheckBoxListType;
-  index: number;
+  type?: CheckBoxListType;
+  // index: number;
   flag?: boolean;
   description?: string;
   textPress?: (index: number) => void;
   inputTxt?: string;
   dispatch?: React.Dispatch<Action>;
   state?: ListItemType[];
-  item: ListItemType;
+  // item: ListItemType;
   done?: boolean;
   listLength?: number;
   setDeleted?: React.Dispatch<React.SetStateAction<ListItemType[]>>;
@@ -37,6 +47,8 @@ interface ListItemProps {
   setCurrentFocusIndex?: React.Dispatch<React.SetStateAction<number>>;
   flatListRef?: FlatList<ListItemType> | null;
   onFlagPress?: (itemIndex: number) => void;
+  handleSelect?: (id: string) => void;
+  selected?: string[];
 }
 const ListItem: React.FC<ListItemProps> = ({
   item,
@@ -58,6 +70,9 @@ const ListItem: React.FC<ListItemProps> = ({
   setCurrentFocusIndex,
   flatListRef,
   onFlagPress,
+  handleSelect,
+  selected,
+  extraData,
 }) => {
   const width = constants.WIDTH - PADDING_HORIZONTAL * 2 - iconSize * 2 - 20;
   const isLast = React.useMemo(
@@ -102,11 +117,16 @@ const ListItem: React.FC<ListItemProps> = ({
     }
   }, [currentFocusIndex]);
   const handleFlagPress = useCallback(() => {
-    onFlagPress?.(index);
-  }, [dispatch, index]);
+    if (onFlagPress) onFlagPress?.(index);
+    else dispatch?.({type: 'FLAG', index, payload: 'change flag'});
+  }, [dispatch, index, onFlagPress]);
   const onCheckboxPress = useCallback(() => {
     dispatch?.({type: 'CHECK', index, payload: 'change checkbox'});
   }, [dispatch, index]);
+
+  const isSelected = React.useMemo(() => {
+    return extraData?.selected?.includes(item._id!);
+  }, [extraData?.selected, item._id, index]);
 
   const handleKeyPress = useCallback(
     (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
@@ -127,16 +147,24 @@ const ListItem: React.FC<ListItemProps> = ({
     <View
       style={{
         marginBottom: '4%',
+        height: 40,
       }}>
       <View style={styles.topContainer}>
-        {isCheckBox && (
-          <CheckBox
-            size={iconSize / 1.05}
-            type={type}
-            index={index + 1}
-            isFilled={done}
-            onPress={onCheckboxPress}
-          />
+        {(isCheckBox || extraData?.isSelect) && (
+          <Animated.View
+            entering={ZoomInLeft.duration(250)}
+            exiting={ZoomOutLeft.duration(600)}>
+            <CheckBox
+              size={iconSize / 1.05}
+              type={type}
+              index={index + 1}
+              isFilled={isSelected !== undefined ? isSelected : done}
+              colorFill={constants.colors.GREEN}
+              onPress={
+                handleSelect ? () => handleSelect(item._id!) : onCheckboxPress
+              }
+            />
+          </Animated.View>
         )}
         {!description ? (
           <TextInput
@@ -162,7 +190,12 @@ const ListItem: React.FC<ListItemProps> = ({
             onKeyPress={handleKeyPress}
           />
         ) : (
-          <TouchableOpacity onPress={textPress && (() => textPress(index))}>
+          <TouchableOpacity
+            onPress={
+              extraData?.isSelect
+                ? () => handleSelect?.(item._id)
+                : textPress && (() => textPress(index))
+            }>
             <Text
               style={[
                 styles.input,
@@ -195,7 +228,7 @@ const ListItem: React.FC<ListItemProps> = ({
   );
 };
 
-export default ListItem;
+export default React.memo(ListItem);
 // export default React.memo(ListItem);
 
 const styles = StyleSheet.create({

@@ -37,23 +37,31 @@ const BallonTxt: React.FC<BallonProps> = ({
   const text = 'This is some long text that should be truncated';
   const maxChars = 10;
   const progress = useSharedValue(0);
-  const isIndexEven = index !== undefined && index % 2 === 0;
+  const isIndexEven = useMemo(() => index % 2 === 0, [index]);
   const isLastIndex = useMemo(() => {
     return listSize - 1 === index;
-  }, []);
+  }, [index, listSize]);
   const isSelected = useMemo(() => {
     return selected?.includes(id);
-  }, [selected]);
+  }, [selected, id]);
   return (
     <>
       <Animated.View
-        layout={SequencedTransition}
+        // layout={SequencedTransition.delay(1000)}
         entering={ZoomIn.duration(500).randomDelay()}
+        exiting={ZoomOut.duration(500)}
         style={[
           styles.container,
           {
             ...(isLastIndex &&
-              isIndexEven && {minWidth: '30%', maxWidth: '41%'}),
+              isIndexEven &&
+              {
+                // minWidth: '70%',
+                // maxWidth: '80%',
+                // alignSelf: 'flex-start',
+                // flexGrow: 0,
+                // paddingHorizontal: constants.WIDTH * 0.01,
+              }),
             marginRight: isIndexEven ? gap : 0,
             position: 'relative',
           },
@@ -102,10 +110,11 @@ export default React.memo(BallonTxt);
 
 const styles = StyleSheet.create({
   container: {
+    // minWidth: '70%',
     // maxWidth: '50%',
-    // minWidth: '32%',
+    // alignSelf: 'flex-start',
     flexGrow: 1,
-    borderRadius: 20,
+    borderRadius: (constants.HEIGHT * (72 / 896)) / 2,
     borderWidth: 1,
     borderColor: constants.colors.UNDER_LINE,
     backgroundColor: constants.colors.OFF_WHITE,
@@ -114,12 +123,14 @@ const styles = StyleSheet.create({
     height: constants.HEIGHT * (72 / 896),
     marginVertical: 10,
     paddingHorizontal: '1%',
+    // paddingHorizontal: constants.WIDTH * 0.05,
     elevation: 2,
+    // marginRight: -50,
   },
   txt: {
     flex: 1,
     fontFamily: constants.Fonts.text,
-    fontSize: 20,
+    fontSize: 17,
     color: constants.colors.BLACK,
     textAlign: 'center',
     textAlignVertical: 'center',

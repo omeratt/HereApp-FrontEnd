@@ -14,6 +14,7 @@ export interface ListType {
   checkBoxListType: 'NUMBERS' | 'DOTS' | 'V' | 'NONE';
   listItems: ListItemType[];
   categoryId?: string;
+  new?: boolean;
 }
 
 export interface ListItemType {

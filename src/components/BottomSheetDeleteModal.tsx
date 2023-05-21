@@ -57,12 +57,15 @@ const BottomSheetDeleteModal = forwardRef<BottomSheetDeleteModalHandles, Props>(
         stackBehavior="replace">
         <View style={styles.container}>
           <View style={styles.txtContainer}>
-            <Text
-              adjustsFontSizeToFit={true}
-              numberOfLines={3}
-              style={styles.contentTxt}>
-              Are you sure you want to delete this item?
-            </Text>
+            <View style={{flex: 1}}>
+              <Text
+                adjustsFontSizeToFit={true}
+                numberOfLines={3}
+                ellipsizeMode="tail"
+                style={styles.contentTxt}>
+                Are you sure you want to delete this item?
+              </Text>
+            </View>
             <Line
               strength={1.2}
               lineColor={constants.colors.OFF_WHITE}
@@ -109,12 +112,16 @@ const styles = StyleSheet.create({
   txtContainer: {
     height: txtHeight,
     marginBottom,
+    // flex: 1,
+    // backgroundColor: 'white',
+    // flexDirection: 'row',
   },
   contentTxt: {
     fontFamily: constants.Fonts.text,
     color: constants.colors.OFF_WHITE,
-    fontSize: constants.WIDTH * 0.06,
-    height: txtHeight,
+    fontSize: txtHeight / 4.94,
+    // lineHeight: txtHeight / 3,
+    // height: txtHeight,
   },
   btnContainer: {
     alignItems: 'center',

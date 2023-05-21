@@ -43,20 +43,31 @@ const NextTask: React.FC<NextTaskProps> = ({width, height}) => {
         </View>
       )}
       <Text style={[styles.font, styles.details]}>{nextTask.name}</Text>
-      <Text
-        adjustsFontSizeToFit
-        numberOfLines={1}
-        style={[
-          styles.font,
-          styles.targetDate,
-          {
-            width: `${(49 / width) * 100}%`,
-            fontSize: (11 / width) * 100,
-            paddingBottom: `${(18 / height) * 100}%`,
-          },
-        ]}>
-        {formattedDate}
-      </Text>
+      <View
+        style={{
+          width: `${(49 / width) * 100}%`,
+          flex: 1,
+          justifyContent: 'flex-end',
+          paddingBottom: `${(18 / height) * 100}%`,
+        }}>
+        <Text
+          adjustsFontSizeToFit
+          // allowFontScaling
+          // ellipsizeMode="tail"
+          numberOfLines={1}
+          style={[
+            styles.font,
+            styles.targetDate,
+            {
+              // width: `50%`,
+              fontSize: 12,
+              // paddingBottom: `${(18 / height) * 100}%`,
+              // backgroundColor: 'white',
+            },
+          ]}>
+          {formattedDate}
+        </Text>
+      </View>
     </View>
   );
 };
@@ -82,7 +93,7 @@ const styles = StyleSheet.create({
     color: constants.colors.UNDER_LINE,
   },
   targetDate: {
-    flex: 1,
+    // flex: 1,
     textAlignVertical: 'bottom',
     color: constants.colors.UNDER_LINE,
   },

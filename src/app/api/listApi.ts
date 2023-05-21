@@ -72,7 +72,19 @@ export const listsApi = apiSlice.injectEndpoints({
         body: {ids},
         credentials: 'include',
       }),
-      invalidatesTags: ['Lists'],
+      invalidatesTags: ['Lists', 'PrioritizedLists'],
+      transformResponse: (response: any, meta, arg) => {
+        return response.data;
+      },
+    }),
+    deleteManyListInCategory: builder.mutation({
+      query: ids => ({
+        url: 'list',
+        method: 'DELETE',
+        body: {ids},
+        credentials: 'include',
+      }),
+      invalidatesTags: ['Lists', 'PrioritizedLists'],
       transformResponse: (response: any, meta, arg) => {
         return response.data;
       },
@@ -88,4 +100,5 @@ export const {
   useAddListItemMutation,
   useEditListFlagMutation,
   useDeleteCategoriesMutation,
+  useDeleteManyListInCategoryMutation,
 } = listsApi;

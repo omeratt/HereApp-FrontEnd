@@ -22,6 +22,19 @@ export const tasksApi = apiSlice.injectEndpoints({
         return response.data;
       },
     }),
+    getNextTasksByDate: builder.query({
+      query: (date: Date) => {
+        return {
+          url: 'tasks/nextTask',
+          method: 'POST',
+          body: {date},
+        };
+      },
+      // providesTags: ['TasksByDate'],
+      transformResponse: (response: any, meta, arg) => {
+        return response.data;
+      },
+    }),
     deleteTask: builder.mutation({
       query: id => ({
         url: `task/${id}`,
@@ -53,4 +66,5 @@ export const {
   useAddTaskMutation,
   useDeleteTaskMutation,
   useGetTasksByDateQuery,
+  useGetNextTasksByDateQuery,
 } = tasksApi;

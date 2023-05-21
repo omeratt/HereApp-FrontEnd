@@ -70,13 +70,14 @@ const reducer = (state: ListItemType[], action: Action) => {
           : [{...newItem, _id: uuid.v4() + ''}];
       return [...state];
     case 'CHECK':
-      action.index && (state[action.index].done = !state[action.index].done);
+      action.index !== undefined &&
+        (state[action.index].done = !state[action.index].done);
       return [...state];
     case 'POP':
-      action.index && state.splice(action.index, 1);
+      action.index !== undefined && state.splice(action.index, 1);
       return [...state];
     case 'PUSH':
-      action.index &&
+      action.index !== undefined &&
         state.splice(action.index + 1, 0, {...newItem, _id: uuid.v4() + ''});
       return [...state];
     case 'INPUT':
@@ -91,7 +92,8 @@ const reducer = (state: ListItemType[], action: Action) => {
         return item;
       });
     case 'FLAG':
-      action.index && (state[action.index].flag = !state[action.index].flag);
+      action.index !== undefined &&
+        (state[action.index].flag = !state[action.index].flag);
       return [...state];
     default:
       return state;

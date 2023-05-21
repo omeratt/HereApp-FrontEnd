@@ -20,6 +20,8 @@ import {
 } from '../app/api/listApi';
 import CalendarModal from '../components/CalendarModal';
 import RenderListCategoryHome from '../components/RenderListCategoryHome';
+import BoardingBoxWrapper from '../components/boardingBox/BoardingBoxWrapper';
+import NextTask from '../components/boardingBox/NextTask';
 
 const CURRENT_DATE = new Date();
 const allDates = getDatesForYear(CURRENT_DATE);
@@ -292,7 +294,7 @@ const Home = () => {
         </View>
       </View>
       <View style={styles.middleView}>
-        <View style={styles.box}>
+        {/* <View style={styles.box}>
           <View style={styles.topBox}></View>
           <View style={styles.bottomPlusBox}>
             <SVG.plusIconOutlined
@@ -312,7 +314,10 @@ const Home = () => {
             />
           </View>
         </View>
-        <View style={styles.box}></View>
+        <View style={styles.box}></View> */}
+        <BoardingBoxWrapper />
+        <BoardingBoxWrapper />
+        <BoardingBoxWrapper Component={NextTask} />
       </View>
       <View style={styles.bottomView}>
         <View style={{width: '35.33%'}}>

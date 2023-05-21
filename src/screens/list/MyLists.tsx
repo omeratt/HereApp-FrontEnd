@@ -11,7 +11,11 @@ import React, {memo, useCallback, useEffect, useRef} from 'react';
 import constants, {ListType} from '../../assets/constants';
 import MyListsWrapper from './MyListsWrapper';
 import ListItem from './ListItem';
-import {useEditListFlagMutation, useGetListsQuery} from '../../app/api/listApi';
+import {
+  useDeleteManyListInCategoryMutation,
+  useEditListFlagMutation,
+  useGetListsQuery,
+} from '../../app/api/listApi';
 import {
   RouteProp,
   useFocusEffect,
@@ -46,6 +50,8 @@ const MyLists = () => {
   const navigation = useNavigation();
   const [isSelect, setIsSelect] = React.useState(false);
   const [selected, setSelected] = React.useState<string[]>([]);
+  const [deleteManyListInCategory, {isLoading: deleteManyListLoading}] =
+    useDeleteManyListInCategoryMutation();
   const toggleSelect = React.useCallback(() => {
     setIsSelect(!isSelect);
     Vibration.vibrate(1);
@@ -166,13 +172,20 @@ const MyLists = () => {
     (item: ListType) => item._id!,
     [],
   );
+  const handleDelete = useCallback(async () => {
+    setIsSelect(false);
+    bottomSheetRef.current?.closeModal();
+    await deleteManyListInCategory(selected);
+  }, [bottomSheetRef, deleteManyListInCategory, selected]);
+
   return (
     <MyListsWrapper
       title={lists?.[index]?.name || 'loading...'}
-      rightBtn
-      onSelectPress={toggleSelect}
-      isSelected={isSelect}
-      onRightBtnPress={navigateToList}
+      rightBtn={!deleteManyListLoading}
+      onSelectPress={deleteManyListLoading ? undefined : toggleSelect}
+      isSelected={deleteManyListLoading ? undefined : isSelect}
+      onRightBtnPress={deleteManyListLoading ? undefined : navigateToList}
+      isLoading={deleteManyListLoading}
       onDonePress={() => {
         navigation.goBack();
       }}>
@@ -220,9 +233,7 @@ const MyLists = () => {
         </Animated.View>
       )}
       <BottomSheetDeleteModal
-        onDelete={() => {
-          console.log('deleteClicked');
-        }}
+        onDelete={handleDelete}
         ids={selected}
         ref={bottomSheetRef}
       />

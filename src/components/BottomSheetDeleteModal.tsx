@@ -26,8 +26,9 @@ const marginBottom = bottomSheetHeight * (39 / bottomSheetHeight);
 
 const btnWidth = constants.WIDTH * (71 / constants.WIDTH);
 const btnHeight = bottomSheetHeight * (41 / bottomSheetHeight);
-const paddingHorizontal = bottomSheetHeight * (81 / constants.WIDTH);
-const txtHeight = bottomSheetHeight * (90 / bottomSheetHeight);
+const paddingHorizontal = (81 / 414) * constants.WIDTH;
+// const txtHeight = bottomSheetHeight * (90 / bottomSheetHeight);
+const txtHeight = bottomSheetHeight * 0.26627218934911242603550295857988;
 const BottomSheetDeleteModal = forwardRef<BottomSheetDeleteModalHandles, Props>(
   ({onDelete, ids}, ref) => {
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -59,11 +60,25 @@ const BottomSheetDeleteModal = forwardRef<BottomSheetDeleteModalHandles, Props>(
           <View style={styles.txtContainer}>
             <View style={{flex: 1}}>
               <Text
-                adjustsFontSizeToFit={true}
-                numberOfLines={3}
-                ellipsizeMode="tail"
+                // adjustsFontSizeToFit={true}
+                // numberOfLines={1}
+                // ellipsizeMode="tail"
                 style={styles.contentTxt}>
-                Are you sure you want to delete this item?
+                {`Are you sure you`}
+              </Text>
+              <Text
+                // adjustsFontSizeToFit={true}
+                // numberOfLines={1}
+                // ellipsizeMode="tail"
+                style={styles.contentTxt}>
+                {`want to delete this`}
+              </Text>
+              <Text
+                // adjustsFontSizeToFit={true}
+                // numberOfLines={1}
+                // ellipsizeMode="tail"
+                style={styles.contentTxt}>
+                {`item?`}
               </Text>
             </View>
             <Line
@@ -119,8 +134,8 @@ const styles = StyleSheet.create({
   contentTxt: {
     fontFamily: constants.Fonts.text,
     color: constants.colors.OFF_WHITE,
-    fontSize: txtHeight / 4.94,
-    // lineHeight: txtHeight / 3,
+    fontSize: txtHeight / 4,
+    lineHeight: txtHeight / 3.8,
     // height: txtHeight,
   },
   btnContainer: {

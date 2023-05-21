@@ -26,7 +26,7 @@ const marginBottom = bottomSheetHeight * (39 / bottomSheetHeight);
 
 const btnWidth = constants.WIDTH * (71 / constants.WIDTH);
 const btnHeight = bottomSheetHeight * (41 / bottomSheetHeight);
-const paddingHorizontal = (81 / 414) * constants.WIDTH;
+const paddingHorizontal = (87 / 414) * constants.WIDTH;
 // const txtHeight = bottomSheetHeight * (90 / bottomSheetHeight);
 const txtHeight = bottomSheetHeight * 0.26627218934911242603550295857988;
 const BottomSheetDeleteModal = forwardRef<BottomSheetDeleteModalHandles, Props>(
@@ -57,28 +57,41 @@ const BottomSheetDeleteModal = forwardRef<BottomSheetDeleteModalHandles, Props>(
         backgroundStyle={{backgroundColor: constants.colors.BGC}}
         stackBehavior="replace">
         <View style={styles.container}>
-          <View style={styles.txtContainer}>
-            <View style={{flex: 1}}>
+          <View
+            style={[
+              styles.txtContainer,
+              {width: constants.WIDTH - paddingHorizontal * 2},
+            ]}>
+            <View style={{flex: 1, backgroundColor: 'black'}}>
               <Text
                 // adjustsFontSizeToFit={true}
                 // numberOfLines={1}
+                // maxFontSizeMultiplier={1}
                 // ellipsizeMode="tail"
+                // textBreakStrategy="balanced"
+                // lineBreakMode="middle"
                 style={styles.contentTxt}>
                 {`Are you sure you`}
               </Text>
               <Text
-                // adjustsFontSizeToFit={true}
+                // adjustsFontSizeToFit
                 // numberOfLines={1}
+                // maxFontSizeMultiplier={1}
                 // ellipsizeMode="tail"
-                style={styles.contentTxt}>
-                {`want to delete this`}
+                // textBreakStrategy="balanced"
+                // lineBreakMode="middle"
+                style={[styles.contentTxt]}>
+                want to delete this
               </Text>
               <Text
                 // adjustsFontSizeToFit={true}
                 // numberOfLines={1}
+                // maxFontSizeMultiplier={1}
                 // ellipsizeMode="tail"
+                // textBreakStrategy="balanced"
+                // lineBreakMode="middle"
                 style={styles.contentTxt}>
-                {`item?`}
+                {`item`}
               </Text>
             </View>
             <Line
@@ -134,7 +147,8 @@ const styles = StyleSheet.create({
   contentTxt: {
     fontFamily: constants.Fonts.text,
     color: constants.colors.OFF_WHITE,
-    fontSize: txtHeight / 4,
+    // fontSize: 12,
+    fontSize: (constants.WIDTH - paddingHorizontal * 2) / 11,
     lineHeight: txtHeight / 3.8,
     // height: txtHeight,
   },

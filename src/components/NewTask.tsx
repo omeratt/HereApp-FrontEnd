@@ -23,7 +23,7 @@ import {useFocusEffect} from '@react-navigation/native';
 import {TaskType} from '../app/Reducers/User/userSlice';
 import {getRealDate, getTimeFromDateString} from './WeeklyCalender';
 const realDate = new Date();
-const hours = getTimeFromDateString(realDate.toISOString(), true);
+const hours = getTimeFromDateString(realDate.toISOString(), true, true);
 interface props {
   task?: TaskType;
   setTask: React.Dispatch<React.SetStateAction<TaskType | undefined>>;
@@ -56,18 +56,24 @@ const NewTask: React.FC<props> = ({
   const [description, setDescription] = useState<string>(task?.details || '');
   // console.log(first)
   const [startDate, setStartDate] = useState<Date>(
-    task?.targetDate ? new Date(task?.targetDate) : getRealDate(targetDate),
+    task?.targetDate
+      ? new Date(task?.targetDate)
+      : getRealDate(targetDate, true),
+    // task?.targetDate
+    //   ? getRealDate(new Date(task?.targetDate))
+    //   : getRealDate(targetDate, true),
   );
   const [endDate, setEndDate] = useState<Date>();
   const [AddTask, {isLoading, data, isSuccess, isError, error}] =
     useAddTaskMutation();
-  // useGetTask
   const isEndDate = useRef<boolean>(false);
   const isSetTime = useRef<boolean>(false);
+
   const targetDateHoursRef = useRef<string>(
-    task ? getTimeFromDateString(startDate.toISOString(), true) : hours,
+    task?.targetDate
+      ? getTimeFromDateString(task?.targetDate, false, true)
+      : hours,
   );
-  console.log(hours);
 
   const taskNameInputRef = React.useRef<TextInput>(null);
   const taskDescriptionInputRef = React.useRef<TextInput>(null);
@@ -81,24 +87,31 @@ const NewTask: React.FC<props> = ({
   const SetEndDate = useCallback((date: Date) => {
     setEndDate(date);
   }, []);
+
+  React.useEffect(() => {
+    return () => {
+      setTask(undefined);
+    };
+  }, []);
   const submit = async () => {
     try {
       if (!description || !taskName) return;
-      const realDate = new Date(
-        startDate.getTime() - startDate.getTimezoneOffset() * 60000,
-      );
+      // const realDate = new Date(
+      //   startDate.getTime() - startDate.getTimezoneOffset() * 60000,
+      // );
       closeModal();
       if (startDate !== targetDate) {
-        findDateAndScroll(realDate);
+        findDateAndScroll(startDate);
       }
-      // setTargetDate(realDate);
+      // setTargetDate(startDate);
       const data = await AddTask({
         name: taskName,
         details: description,
         targetDate: startDate,
         frequency: freq,
         ...(endDate && freq !== 'None' && {endDate}),
-        ...(isSetTime.current && {isSetTime: true}),
+        isSetTime: true,
+        ...(task?._id && {_id: task._id}),
       }).unwrap();
       setDescription('');
       setTaskName('');
@@ -192,7 +205,7 @@ const NewTask: React.FC<props> = ({
       day: '2-digit',
     });
     const arr = format.split(' ');
-    const fixedString = `${day} ${arr[0]} ${arr[1]}`;
+    const fixedString = `${day} ${arr[0]}`;
     return fixedString;
   }, []);
 

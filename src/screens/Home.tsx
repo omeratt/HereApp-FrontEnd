@@ -140,12 +140,15 @@ const Home = () => {
 
   // callbacks
   const openTaskModal = useCallback(() => {
+    console.log('opening task');
+
     bottomSheetModalRef.current?.present();
   }, []);
   const closeTaskModal = useCallback(() => {
-    setEditTaskDetails(undefined);
+    console.log('closing task');
     bottomSheetModalRef.current?.dismiss();
-  }, []);
+    setEditTaskDetails(undefined);
+  }, [bottomSheetModalRef.current]);
   const handleSheetChanges = useCallback((index: number) => {}, []);
 
   const tempGetMonthFromStringDate = useMemo(() => {
@@ -355,16 +358,17 @@ const Home = () => {
           ref={bottomSheetModalRef}
           index={0}
           snapPoints={snapPoints}
+          // onDismiss={}
           keyboardBlurBehavior="restore"
           handleIndicatorStyle={{backgroundColor: constants.colors.UNDER_LINE}}
-          onAnimate={(fromIndex, toIndex) => {
-            if (fromIndex === 0) {
-              // closeTaskModal();
-              setTimeout(() => {
-                setEditTaskDetails(undefined);
-              }, 300);
-            }
-          }}
+          // onAnimate={(fromIndex, toIndex) => {
+          //   if (fromIndex === 0) {
+          //     // closeTaskModal();
+          //     // setTimeout(() => {
+          //     //   setEditTaskDetails(undefined);
+          //     // }, 300);
+          //   }
+          // }}
           handleStyle={{
             backgroundColor: constants.colors.OFF_WHITE,
           }}

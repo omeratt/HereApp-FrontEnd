@@ -19,7 +19,7 @@ export interface TaskType {
   done?: boolean;
   details?: string;
   push?: boolean;
-  targetDate?: Date;
+  targetDate?: string;
   isSetTime?: boolean;
 }
 // Define the initial state using that type

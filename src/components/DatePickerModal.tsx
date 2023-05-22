@@ -15,6 +15,7 @@ import {
 import constants from '../assets/constants';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
+import {getRealDate} from './WeeklyCalender';
 
 interface DatePickerProps {
   date: Date;
@@ -46,32 +47,36 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
   const [hours, setHours] = React.useState<string>('');
 
   const handleConfirm = () => {
-    const realDate = new Date(
-      currentDate.getTime() - currentDate.getTimezoneOffset() * 60000,
-    );
-    setDate(realDate);
-    if (dateFormat !== 'time') return close();
+    if (dateFormat !== 'time') {
+      setDate(currentDate);
+      return close();
+    }
     if (!hours) return close();
-    const [_hours, minutes] = hours.split(':');
-    const fixedDate = new Date(currentDate.setUTCHours(+_hours, +minutes));
-    setDate(fixedDate);
+    setDate(currentDate);
     isSetTimeRef.current = true;
     close();
   };
   const handleChange = (date1: Date) => {
-    dateFormat === 'time' ? handleHoursChange(date1) : setCurrentDate(date1);
+    let date = date1;
+
+    if (dateFormat !== 'time' && hours) {
+      const [_hours, minutes] = hours.split(':');
+
+      date.setUTCHours(+_hours, +minutes);
+    }
+    dateFormat === 'time' ? handleHoursChange(date) : setCurrentDate(date);
   };
 
   const handleHoursChange = (date: Date) => {
-    const time = date.toLocaleTimeString();
-    const [hours, minutes] = time.split(':');
+    const time = date.toISOString();
+
+    const [hours, minutes] = time.split('T')[1].split(':');
     const formattedTime = `${hours}:${minutes}`;
     setHours(formattedTime);
     if (targetDateHoursRef && targetDateHoursRef.current)
       targetDateHoursRef.current = formattedTime;
 
-    const fixedDate = new Date(currentDate.setUTCHours(+hours, +minutes));
-    setCurrentDate(fixedDate);
+    currentDate.setUTCHours(+hours, +minutes);
   };
   const cancelConfirm = () => {
     setCurrentDate(date);
@@ -136,7 +141,8 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
         onChange={handleSheetChanges}>
         <View>
           <DatePicker
-            date={new Date(date.getTime() + date.getTimezoneOffset() * 60000)}
+            date={date}
+            timeZoneOffsetInMinutes={60000}
             mode={dateFormat}
             onDateChange={handleChange}
             fadeToColor={constants.colors.BGC}

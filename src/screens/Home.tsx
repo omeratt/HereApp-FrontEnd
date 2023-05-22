@@ -22,6 +22,7 @@ import CalendarModal from '../components/CalendarModal';
 import RenderListCategoryHome from '../components/RenderListCategoryHome';
 import BoardingBoxWrapper from '../components/boardingBox/BoardingBoxWrapper';
 import NextTask from '../components/boardingBox/NextTask';
+import {TaskType} from '../app/Reducers/User/userSlice';
 
 const CURRENT_DATE = new Date();
 const allDates = getDatesForYear(CURRENT_DATE);
@@ -59,6 +60,9 @@ const Home = () => {
   const [dateHeader, setDateHeader] = useState<DateObject>();
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
+  const [editTaskDetails, setEditTaskDetails] = useState<TaskType | undefined>(
+    undefined,
+  );
   const SetDateHeader = useCallback((header: any) => {
     setDateHeader(header);
   }, []);
@@ -135,8 +139,12 @@ const Home = () => {
   const snapPoints = useMemo(() => ['100%'], []);
 
   // callbacks
-  const handlePresentModalPress = useCallback(() => {
+  const openTaskModal = useCallback(() => {
     bottomSheetModalRef.current?.present();
+  }, []);
+  const closeTaskModal = useCallback(() => {
+    setEditTaskDetails(undefined);
+    bottomSheetModalRef.current?.dismiss();
   }, []);
   const handleSheetChanges = useCallback((index: number) => {}, []);
 
@@ -246,7 +254,9 @@ const Home = () => {
               datePress={datePress}
               flatListData={flatListData}
               snapToOffsets={snapToOffsets}
-              handlePresentModalPress={handlePresentModalPress}
+              openTaskModal={openTaskModal}
+              task={editTaskDetails}
+              setTask={setEditTaskDetails}
             />
 
             {/* {tasks?.length > 0 ? (
@@ -347,17 +357,27 @@ const Home = () => {
           snapPoints={snapPoints}
           keyboardBlurBehavior="restore"
           handleIndicatorStyle={{backgroundColor: constants.colors.UNDER_LINE}}
+          onAnimate={(fromIndex, toIndex) => {
+            if (fromIndex === 0) {
+              // closeTaskModal();
+              setTimeout(() => {
+                setEditTaskDetails(undefined);
+              }, 300);
+            }
+          }}
           handleStyle={{
             backgroundColor: constants.colors.OFF_WHITE,
           }}
           onChange={handleSheetChanges}>
           <NewTask
-            closeModal={bottomSheetModalRef.current?.dismiss}
+            closeModal={closeTaskModal}
             targetDate={selectedDate}
             setTargetDate={SetSelectedDate}
             maximumDate={flatListData[initialNumToRender - 1]?.fullDate}
             minimumDate={flatListData[0]?.fullDate}
             findDateAndScroll={findDateAndScroll}
+            task={editTaskDetails}
+            setTask={setEditTaskDetails}
           />
         </BottomSheetModal>
       </BottomSheetModalProvider>

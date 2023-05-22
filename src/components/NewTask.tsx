@@ -22,10 +22,11 @@ import {BottomSheetModal} from '@gorhom/bottom-sheet';
 import {useFocusEffect} from '@react-navigation/native';
 import {TaskType} from '../app/Reducers/User/userSlice';
 import {getRealDate, getTimeFromDateString} from './WeeklyCalender';
-const realDate = getRealDate(new Date());
+const realDate = new Date();
 const hours = getTimeFromDateString(realDate.toISOString(), true);
 interface props {
   task?: TaskType;
+  setTask: React.Dispatch<React.SetStateAction<TaskType | undefined>>;
   closeModal: any;
   targetDate: Date;
   setTargetDate: (date: Date) => void;
@@ -38,6 +39,7 @@ const FreqData = [...constants.FreqList];
 const currFreq = FreqData[0];
 const NewTask: React.FC<props> = ({
   task,
+  setTask,
   closeModal,
   targetDate,
   setTargetDate,
@@ -52,8 +54,9 @@ const NewTask: React.FC<props> = ({
   const dateTypeRef = useRef<DateFormat>('datetime');
   const [taskName, setTaskName] = useState<string>(task?.name || '');
   const [description, setDescription] = useState<string>(task?.details || '');
+  // console.log(first)
   const [startDate, setStartDate] = useState<Date>(
-    task?.targetDate || getRealDate(targetDate),
+    task?.targetDate ? new Date(task?.targetDate) : getRealDate(targetDate),
   );
   const [endDate, setEndDate] = useState<Date>();
   const [AddTask, {isLoading, data, isSuccess, isError, error}] =
@@ -61,7 +64,11 @@ const NewTask: React.FC<props> = ({
   // useGetTask
   const isEndDate = useRef<boolean>(false);
   const isSetTime = useRef<boolean>(false);
-  const targetDateHoursRef = useRef<string>(hours || '00:00');
+  const targetDateHoursRef = useRef<string>(
+    task ? getTimeFromDateString(startDate.toISOString(), true) : hours,
+  );
+  console.log(hours);
+
   const taskNameInputRef = React.useRef<TextInput>(null);
   const taskDescriptionInputRef = React.useRef<TextInput>(null);
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -198,6 +205,7 @@ const NewTask: React.FC<props> = ({
               ref={taskNameInputRef}
               maxLength={19}
               onChangeText={setTaskName}
+              defaultValue={taskName}
               placeholder="New task"
               placeholderTextColor={constants.colors.UNDER_LINE}
               selectionColor={constants.colors.GREEN}

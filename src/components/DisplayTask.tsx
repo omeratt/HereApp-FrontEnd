@@ -22,6 +22,7 @@ import SVG from '../assets/svg';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import {FlashList} from '@shopify/flash-list';
 import {DateObject, getTimeFromDateString} from './WeeklyCalender';
+import {TaskType} from '../app/Reducers/User/userSlice';
 
 interface RenderItemProps {
   _id?: string;
@@ -41,7 +42,9 @@ interface props {
   datePress: (dateItem: DateObject) => void;
   flatListData: DateObject[];
   snapToOffsets: number[];
-  handlePresentModalPress: () => void;
+  openTaskModal: () => void;
+  task?: TaskType;
+  setTask: React.Dispatch<React.SetStateAction<TaskType | undefined>>;
 }
 const TASK_CONTAINER_HEIGHT =
   constants.HEIGHT * 0.64 * 0.84 - //topView till lists
@@ -60,7 +63,9 @@ const DisplayTask = ({
   datePress,
   flatListData,
   snapToOffsets,
-  handlePresentModalPress,
+  openTaskModal,
+  task,
+  setTask,
 }: props) => {
   const [
     DeleteTask,
@@ -97,6 +102,10 @@ const DisplayTask = ({
       bottomSheetModalRef.current?.present();
     }, 150);
   };
+  const goToEditTask = useCallback((_task: TaskType) => {
+    setTask(_task);
+    openTaskModal();
+  }, []);
   const DeleteModal = ({_id, name}: {_id: string; name: string}) => {
     return (
       <BottomSheetModal
@@ -175,11 +184,12 @@ const DisplayTask = ({
           style={[styles.taskListContainer, {...(!index && {marginTop: 0})}]}>
           <View style={styles.taskListContent}>
             <TouchableOpacity
-              onPress={() =>
-                openDeleteModal({
-                  name: item.name as string,
-                  id: item._id as string,
-                })
+              onPress={
+                () => goToEditTask(item as TaskType)
+                // openDeleteModal({
+                //   name: item.name as string,
+                //   id: item._id as string,
+                // })
               }>
               {item.isSetTime && (
                 <View style={{alignSelf: 'flex-start'}}>
@@ -283,7 +293,7 @@ const DisplayTask = ({
       }}>
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={handlePresentModalPress}
+          onPress={openTaskModal}
           style={[styles.PlusIcon, {zIndex: 1}]}>
           <SVG.plusIconOutlined fill={constants.colors.BGC} />
         </TouchableOpacity>

@@ -112,6 +112,9 @@ export default function SignInForm({
             secureTextEntry
             placeholder="Password"
             onBlur={() => setFieldTouched('password')}
+            onSubmitEditing={() => {
+              handleSubmit();
+            }}
           />
           <ErrTxt txt={errors.password} touched={touched.password} />
           <View

@@ -2,15 +2,37 @@ import {Dimensions} from 'react-native';
 
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
+export interface CategoryListType {
+  _id: string;
+  name: string;
+  lists: ListType[];
+}
+export interface ListType {
+  _id: string;
+  title: string;
+  flag: boolean;
+  checkBoxListType: 'NUMBERS' | 'DOTS' | 'V' | 'NONE';
+  listItems: ListItemType[];
+  categoryId?: string;
+  new?: boolean;
+}
+
+export interface ListItemType {
+  _id: string;
+  description: string;
+  done: boolean;
+  flag: boolean;
+}
 
 const constants = {
-  BASE_URL: 'https://here.cyclic.app/',
+  // BASE_URL: 'https://here.cyclic.app/',
+  DOMAIN: 'here.cyclic.app',
   // BASE_URL: 'https://here-app.onrender.com/',
   /***************** Eliran ***************/
-  // BASE_URL: 'http://192.168.1.30:3000/',
-
+  BASE_URL: 'http://192.168.1.41:3000/',
+  //
   /***************** Omer ***************/
-  // BASE_URL: 'http://192.168.1.58:3000/',
+  // BASE_URL: 'http://192.168.1.26:3000/',
   colors: {
     GREEN: '#D0FD0C',
     BLACK: '#000000',
@@ -20,9 +42,10 @@ const constants = {
     UNDER_LINE: '#B9AB85',
   },
   Fonts: {
-    // paragraph: 'Report-Regular',
-    paragraph: 'SansSerifFLF',
+    paragraph: 'Report-Regular',
+    // paragraph: 'SansSerifFLF',
     text: 'Montserrat-Regular',
+    text_medium: 'Montserrat-Medium',
     button: 'Montserrat-Thin',
     italic: 'Montserrat-MediumItalic',
   },
@@ -53,7 +76,7 @@ const constants = {
     'Every year',
   ],
   OnBoardingList: [
-    {txt: 'Reading Comprehension'},
+    {txt: 'Postponement of tasks'},
     {txt: 'Frustration'},
     {txt: 'Distractions'},
     {txt: 'Lack of focus'},
@@ -65,8 +88,6 @@ const constants = {
     {txt: 'Unorganized'},
     {txt: 'Anxiety'},
     {txt: 'Feeling abnormal'},
-    {txt: 'Postponement of tasks'},
-    {txt: 'confusion'},
   ],
 };
 export default constants;

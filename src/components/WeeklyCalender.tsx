@@ -9,14 +9,39 @@ export const compareDates = (date1: Date, date2: Date): boolean => {
   return date1?.toDateString() === date2?.toDateString();
 };
 
-const getShortName = (dayOfWeek: number): string => {
+export const getShortName = (dayOfWeek: number): string => {
   const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   return names[dayOfWeek];
 };
+export const getRealDate = (
+  date: Date,
+  isSetToCurrentHours?: boolean,
+): Date => {
+  const realDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  if (isSetToCurrentHours) {
+    // const localDate = new Date().toISOString();
+    //  console.log(date.toLocaleTimeString());
+    // console.log(new Date().toLocaleTimeString());
+    const time = new Date().toLocaleTimeString();
+    // const subTime = time.split(':');
+    const [hours, minutes] = time.split(':');
+    realDate.setUTCHours(+hours, +minutes);
+    // const [];
+  }
+  return realDate;
+};
 
-export const getTimeFromDateString = (date?: string, isIn24Hours?: boolean) => {
+export const getTimeFromDateString = (
+  date?: string,
+  isRealDate?: boolean,
+  isIn24Hours?: boolean,
+) => {
   if (!date) return ' ';
-  const itemTime = date.split('T')[1];
+  // console.log()
+  const fixedDate = isRealDate
+    ? getRealDate(new Date(date)).toISOString()
+    : date;
+  const itemTime = fixedDate.split('T')[1];
   const [hours, minutes] = itemTime.split(':');
   if (isIn24Hours) return `${hours}:${minutes} `;
   const amOrPm = +hours >= 12 ? 'PM' : 'AM';

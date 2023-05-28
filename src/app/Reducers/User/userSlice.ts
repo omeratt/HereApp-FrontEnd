@@ -17,6 +17,10 @@ export interface TaskType {
   _id?: string;
   name?: string;
   done?: boolean;
+  details?: string;
+  push?: boolean;
+  targetDate?: string;
+  isSetTime?: boolean;
 }
 // Define the initial state using that type
 const initialState: UserState = {

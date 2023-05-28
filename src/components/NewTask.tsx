@@ -1,4 +1,5 @@
 import {
+  BackHandler,
   Keyboard,
   StyleSheet,
   Text,
@@ -17,39 +18,66 @@ import DatePickerModal from './DatePickerModal';
 import Notes from './Notes';
 import SetTimeContent from './SetTimeContent';
 import FrequencyPickerModal from './FrequencyPickerModal';
-
+import {BottomSheetModal} from '@gorhom/bottom-sheet';
+import {useFocusEffect} from '@react-navigation/native';
+import {TaskType} from '../app/Reducers/User/userSlice';
+import {getRealDate, getTimeFromDateString} from './WeeklyCalender';
+const realDate = new Date();
+const hours = getTimeFromDateString(realDate.toISOString(), true, true);
 interface props {
+  task?: TaskType;
+  setTask: React.Dispatch<React.SetStateAction<TaskType | undefined>>;
   closeModal: any;
   targetDate: Date;
   setTargetDate: (date: Date) => void;
   minimumDate: Date;
   maximumDate: Date;
+  findDateAndScroll: (DateToCheck: Date) => void;
 }
 type DateFormat = 'datetime' | 'date' | 'time';
 const FreqData = [...constants.FreqList];
 const currFreq = FreqData[0];
 const NewTask: React.FC<props> = ({
+  task,
+  setTask,
   closeModal,
   targetDate,
   setTargetDate,
   minimumDate,
   maximumDate,
+  findDateAndScroll,
 }) => {
-  const [pushOn, setPushOn] = useState(false);
+  const [pushOn, setPushOn] = useState(task?.push ? task.push : false);
   const [datePickerOpen, setDatePickerOpen] = useState<boolean>(false);
   const [freqPickerOpen, setFreqPickerOpen] = useState<boolean>(false);
   const [freq, setFreq] = useState<string>(currFreq);
   const dateTypeRef = useRef<DateFormat>('datetime');
-  const [taskName, setTaskName] = useState<string>();
-  const [description, setDescription] = useState<string>();
+  const [taskName, setTaskName] = useState<string>(task?.name || '');
+  const [description, setDescription] = useState<string>(task?.details || '');
+  // console.log(first)
+  const [startDate, setStartDate] = useState<Date>(
+    task?.targetDate
+      ? new Date(task?.targetDate)
+      : getRealDate(targetDate, true),
+    // task?.targetDate
+    //   ? getRealDate(new Date(task?.targetDate))
+    //   : getRealDate(targetDate, true),
+  );
   const [endDate, setEndDate] = useState<Date>();
   const [AddTask, {isLoading, data, isSuccess, isError, error}] =
     useAddTaskMutation();
   const isEndDate = useRef<boolean>(false);
   const isSetTime = useRef<boolean>(false);
-  const targetDateHoursRef = useRef<string>('00:00');
+
+  const targetDateHoursRef = useRef<string>(
+    task?.targetDate
+      ? getTimeFromDateString(task?.targetDate, false, true)
+      : hours,
+  );
+
   const taskNameInputRef = React.useRef<TextInput>(null);
   const taskDescriptionInputRef = React.useRef<TextInput>(null);
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const SetFreqPickerOpen = useCallback((state: boolean) => {
     setFreqPickerOpen(state);
   }, []);
@@ -59,44 +87,75 @@ const NewTask: React.FC<props> = ({
   const SetEndDate = useCallback((date: Date) => {
     setEndDate(date);
   }, []);
+
+  React.useEffect(() => {
+    return () => {
+      setTask(undefined);
+    };
+  }, []);
   const submit = async () => {
     try {
       if (!description || !taskName) return;
+      // const realDate = new Date(
+      //   startDate.getTime() - startDate.getTimezoneOffset() * 60000,
+      // );
       closeModal();
+      if (startDate !== targetDate) {
+        findDateAndScroll(startDate);
+      }
+      // setTargetDate(startDate);
       const data = await AddTask({
         name: taskName,
         details: description,
-        targetDate,
+        targetDate: startDate,
         frequency: freq,
-        ...(endDate && {endDate}),
-        ...(isSetTime.current && {isSetTime: true}),
+        ...(endDate && freq !== 'None' && {endDate}),
+        isSetTime: true,
+        ...(task?._id && {_id: task._id}),
       }).unwrap();
-      console.log(data);
       setDescription('');
       setTaskName('');
     } catch (err) {
-      console.log('error from signup', err);
+      console.log('error from add Task submit', err);
     }
   };
 
   Keyboard.addListener('keyboardDidHide', () => {
     taskNameInputRef?.current?.blur();
-  });
-  Keyboard.addListener('keyboardDidHide', () => {
     taskDescriptionInputRef?.current?.blur();
   });
+
+  React.useEffect(() => {
+    taskNameInputRef?.current?.focus();
+  }, []);
 
   /**
    * @param type which format to use in date picker
    * @param _isDateEnd should date picker use setTargetDate or setEndDate
    */
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        closeModal();
+        return true;
+      };
+      const subscription = BackHandler.addEventListener(
+        'hardwareBackPress',
+        onBackPress,
+      );
+
+      return () => subscription.remove();
+    }, []),
+  );
   const openCloseDatePicker = useCallback(
     (dateType: DateFormat = 'date', _isEndDate: boolean = false) => {
+      if (datePickerOpen) bottomSheetModalRef.current?.dismiss();
+      else bottomSheetModalRef.current?.present();
       setDatePickerOpen(prev => !prev);
       dateTypeRef.current = dateType;
       isEndDate.current = _isEndDate;
     },
-    [setDatePickerOpen, dateTypeRef],
+    [setDatePickerOpen, dateTypeRef, datePickerOpen],
   );
   const openCloseFreqPicker = useCallback(
     (dateType: DateFormat = 'datetime') => {
@@ -146,7 +205,7 @@ const NewTask: React.FC<props> = ({
       day: '2-digit',
     });
     const arr = format.split(' ');
-    const fixedString = `${day} ${arr[0]} ${arr[1]}`;
+    const fixedString = `${day} ${arr[0]}`;
     return fixedString;
   }, []);
 
@@ -159,6 +218,7 @@ const NewTask: React.FC<props> = ({
               ref={taskNameInputRef}
               maxLength={19}
               onChangeText={setTaskName}
+              defaultValue={taskName}
               placeholder="New task"
               placeholderTextColor={constants.colors.UNDER_LINE}
               selectionColor={constants.colors.GREEN}
@@ -167,7 +227,7 @@ const NewTask: React.FC<props> = ({
               onSubmitEditing={Keyboard.dismiss}
             />
           </View>
-          <View style={{flex: 3}}>
+          <View style={{flex: 2.5}}>
             <View style={[styles.descriptionContainer]}>
               <Line
                 strength={1}
@@ -240,7 +300,7 @@ const NewTask: React.FC<props> = ({
               <View
                 style={[
                   styles.EveryContainer,
-                  {paddingHorizontal: 0, paddingLeft: '6%'},
+                  {paddingHorizontal: 0, paddingLeft: '6%', flex: 1},
                 ]}>
                 <View style={[styles.setTimeSubContainer]}>
                   <SetTimeContent
@@ -256,15 +316,19 @@ const NewTask: React.FC<props> = ({
                   />
                   <SetTimeContent
                     title={'Start date'}
-                    buttonTxt={formattedDate(targetDate)}
+                    buttonTxt={formattedDate(startDate)}
                     onPress={openCloseDatePicker}
                   />
-                  <SetTimeContent
-                    title={'End Date'}
-                    buttonTxt={formattedDate(endDate || targetDate)}
-                    onPress={openCloseDatePicker}
-                  />
-                  {PushForMe}
+                  {freq !== 'None' && (
+                    <>
+                      <SetTimeContent
+                        title={'End Date'}
+                        buttonTxt={formattedDate(endDate || startDate)}
+                        onPress={openCloseDatePicker}
+                      />
+                      {PushForMe}
+                    </>
+                  )}
                 </View>
               </View>
             </View>
@@ -282,20 +346,15 @@ const NewTask: React.FC<props> = ({
         </TouchableOpacity>
         <DatePickerModal
           isOpen={datePickerOpen}
-          date={targetDate}
+          date={startDate}
           dateFormat={dateTypeRef.current}
-          setDate={isEndDate.current ? SetEndDate : setTargetDate}
+          setDate={isEndDate.current ? SetEndDate : setStartDate}
           minimumDate={minimumDate}
           maximumDate={maximumDate}
           isSetTimeRef={isSetTime}
           targetDateHoursRef={targetDateHoursRef}
-        />
-        <FrequencyPickerModal
-          isOpen={freqPickerOpen}
-          setFreq={SetFreq}
-          data={FreqData}
-          freq={freq}
-          setIsOpen={SetFreqPickerOpen}
+          bottomSheetModalRef={bottomSheetModalRef}
+          setIsOpen={setDatePickerOpen}
         />
         <FrequencyPickerModal
           isOpen={freqPickerOpen}

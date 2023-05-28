@@ -3,11 +3,7 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import constants from '../assets/constants';
 import SVG from '../assets/svg';
 import NewTask from '../components/NewTask';
-import Animated, {
-  FadeIn,
-  FadeOutUp,
-  useSharedValue,
-} from 'react-native-reanimated';
+import Animated, {FlipInEasyY, useSharedValue} from 'react-native-reanimated';
 import {tasksApi, useGetTasksByDateQuery} from '../app/api/taskApi';
 import DisplayTask from '../components/DisplayTask';
 import {useAppDispatch} from '../app/hooks';
@@ -18,6 +14,15 @@ import Line from '../components/Line';
 import {FlashList} from '@shopify/flash-list';
 import DatesFlatList from '../components/DatesFlatList';
 import moment from 'moment';
+import {
+  useGetListsQuery,
+  useGetPrioritizedListsQuery,
+} from '../app/api/listApi';
+import CalendarModal from '../components/CalendarModal';
+import RenderListCategoryHome from '../components/RenderListCategoryHome';
+import BoardingBoxWrapper from '../components/boardingBox/BoardingBoxWrapper';
+import NextTask from '../components/boardingBox/NextTask';
+import {TaskType} from '../app/Reducers/User/userSlice';
 
 const CURRENT_DATE = new Date();
 const allDates = getDatesForYear(CURRENT_DATE);
@@ -30,6 +35,8 @@ export const TASK_CONTAINER_HEIGHT =
   constants.HEIGHT * 0.64 * 0.84 * 0.2 - //dates list
   8.7 - //triangle
   constants.WIDTH * 0.025; //container padding
+
+export const ListCategoryWidth = constants.WIDTH * 0.2925925996568468;
 const Home = () => {
   const getIndexByKey = useCallback(
     (obj: Record<string, any>, key: string): number => {
@@ -43,10 +50,8 @@ const Home = () => {
     const index = getIndexByKey(allDates, key);
     return index;
   }, []);
-  const [tasks, setTasks] = useState<any[]>([]);
-  const [selectedFinalDate, setSelectedFinalDate] =
-    useState<Date>(CURRENT_DATE);
-  const [isTaskLoading, setIsTaskLoading] = useState<boolean>(false);
+  // const [tasks, setTasks] = useState<any[]>([]);
+  // const [isTaskLoading, setIsTaskLoading] = useState<boolean>(false);
   const flashListRef = useRef<FlashList<DateObject> | null>(null);
   const [selectedScrollDate, setSelectedScrollDate] =
     useState<Date>(CURRENT_DATE);
@@ -55,96 +60,98 @@ const Home = () => {
   const [dateHeader, setDateHeader] = useState<DateObject>();
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
+  const [editTaskDetails, setEditTaskDetails] = useState<TaskType | undefined>(
+    undefined,
+  );
   const SetDateHeader = useCallback((header: any) => {
     setDateHeader(header);
-  }, []);
-  const SetSelectedFinalDate = useCallback((date: any) => {
-    setSelectedFinalDate(date);
   }, []);
   const SetSelectedDate = useCallback((date: Date) => {
     setSelectedDate(date);
   }, []);
   const sharedX = useSharedValue(0);
   const {
-    isLoading: taskLoading,
-    data: tasks1,
+    data: lists,
+    error: listsFetchError,
+    isLoading: listsLoading,
+  } = useGetListsQuery(null);
+  const {
+    data: prioritizedLists,
+    error: prioritizedListsFetchError,
+    isLoading: prioritizedListsLoading,
+  } = useGetPrioritizedListsQuery(null);
+
+  const {
+    isLoading: tasksLoading,
+    data: tasks,
     isSuccess: taskSuccess,
     isError: taskIsError,
     error: tasksError,
     isFetching: taskFetch,
-  } = useGetTasksByDateQuery(CURRENT_DATE);
+  } = useGetTasksByDateQuery(selectedDate);
+  const [calendarVisible, setCalendarVisible] = useState(false);
   const FetchTasks = useCallback((date: Date) => {
     const result = dispatch(tasksApi.endpoints.getTasksByDate.initiate(date))
-      .then(res => {
-        setTasks(res.data);
-      })
+      .then((res: any) => {})
       .catch(err => {
         console.log('error getting tasks', err);
-      })
-      .finally(() => setIsTaskLoading(false));
+      });
   }, []);
-  const datePress = useCallback(
-    (dateItem: DateObject) => {
-      const date = dateItem.fullDate;
-      findDateAndScroll(date);
-      setIsTaskLoading(true);
-      SetSelectedFinalDate(date);
-      SetSelectedDate(date);
-      // runOnJS(FetchTasks)(date);
-      SetDateHeader(dateItem);
-      FetchTasks(date);
-    },
-    [selectedFinalDate],
-  );
 
-  // TODO: find a way to handle scroll to index
+  const datePress = useCallback((dateItem: DateObject) => {
+    const realDate = new Date(
+      dateItem.fullDate.getTime() -
+        dateItem.fullDate.getTimezoneOffset() * 60000,
+    );
+    findDateAndScroll(realDate);
+    FetchTasks(realDate);
+  }, []);
 
   const findDateAndScroll = useCallback((DateToCheck: Date) => {
     const key = DateToCheck.toLocaleDateString();
     const index = getIndexByKey(allDates, key);
+    SetSelectedDate(DateToCheck);
+    SetDateHeader(flatListData[index]);
     scrollToIndex(index);
   }, []);
 
   useEffect(() => {
-    // if (!selectedDate.current) findDateAndScroll(CURRENT_DATE);
-    // else
-    // console.log('first render', selectedDate);
-    findDateAndScroll(selectedDate);
+    findDateAndScroll(CURRENT_DATE);
   }, []);
 
-  useEffect(() => {
-    if (taskFetch) {
-      setIsTaskLoading(true);
-    } else {
-      setIsTaskLoading(false);
-    }
-    if (tasks1) {
-      // console.log('getting tasks', tasks);
-      setTasks(tasks1);
-    }
-    if (tasksError) {
-      // console.log('error getting tasks', tasksError);
-    }
-  }, [tasks1, tasksError]);
-
-  const openDrawer = () => {
+  const openDrawer = useCallback(() => {
     navigation.dispatch(DrawerActions.openDrawer());
-  };
+  }, []);
+  const goToPlayGround = useCallback(() => {
+    navigation.navigate('PlayGround' as never);
+  }, []);
+  const handleListPlusIcon = useCallback(() => {
+    navigation.navigate(
+      'ListAndNotesStack' as never,
+      {
+        screen: 'ListAndNotes' as never,
+      } as never,
+    );
+  }, [navigation]);
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
   // variables
   const snapPoints = useMemo(() => ['100%'], []);
 
   // callbacks
-  const handlePresentModalPress = useCallback(() => {
+  const openTaskModal = useCallback(() => {
+    console.log('opening task');
+
     bottomSheetModalRef.current?.present();
   }, []);
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log('handleSheetChanges', index);
-  }, []);
+  const closeTaskModal = useCallback(() => {
+    console.log('closing task');
+    bottomSheetModalRef.current?.dismiss();
+    setEditTaskDetails(undefined);
+  }, [bottomSheetModalRef.current]);
+  const handleSheetChanges = useCallback((index: number) => {}, []);
 
   const tempGetMonthFromStringDate = useMemo(() => {
-    // consnole.log({selec})
     if (!dateHeader) return 'Today';
     const monthName = dateHeader?.fullDate.toLocaleString('eng', {
       month: 'long',
@@ -152,7 +159,7 @@ const Home = () => {
 
     const isToday =
       dateHeader?.fullDate.toDateString() === CURRENT_DATE.toDateString();
-    const formattedDate = `${isToday ? 'Today' : dateHeader.dayName},${
+    const formattedDate = `${isToday ? 'Today' : dateHeader.dayName}, ${
       dateHeader.day
     } ${monthName}`;
     return formattedDate;
@@ -175,27 +182,37 @@ const Home = () => {
     [snapToOffsets],
   );
   //  -------------------------------------------------------- flat list callbacks --------------------------------------------------------
+
+  const toggleCalendar = useCallback(() => {
+    setCalendarVisible(!calendarVisible);
+  }, [calendarVisible]);
   return (
     <Animated.View
-      entering={FadeIn}
-      exiting={FadeOutUp}
+      entering={FlipInEasyY}
+      // exiting={FadeOutUp}
       style={styles.container}>
+      <CalendarModal
+        visible={calendarVisible}
+        toggleCalendar={toggleCalendar}
+        FetchTasks={FetchTasks}
+        findDateAndScroll={findDateAndScroll}
+      />
       <View style={styles.topView}>
         <View style={styles.task}>
           <View style={styles.today}>
-            <TouchableOpacity
-              onPress={handlePresentModalPress}
-              style={[
-                {
-                  zIndex: 1,
-                },
-              ]}>
-              <SVG.plusIconOutlined
-                style={[styles.plusIcon]}
-                fill={constants.colors.BGC}
-              />
-            </TouchableOpacity>
             <Text style={styles.taskTitle}>{tempGetMonthFromStringDate}</Text>
+
+            <TouchableOpacity
+              style={{
+                // backgroundColor: 'black',
+                width: 15,
+                height: 15,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              onPress={toggleCalendar}>
+              <SVG.ArrowDown />
+            </TouchableOpacity>
           </View>
           <View>
             <Line
@@ -212,7 +229,7 @@ const Home = () => {
               flashListRef={flashListRef}
               datePress={datePress}
               // FetchTasks={FetchTasks}
-              selectedFinalDate={selectedFinalDate}
+              selectedFinalDate={selectedDate}
               // setSelectedFinalDate={SetSelectedFinalDate}
               selectedScrollDate={selectedScrollDate}
               flatListData={flatListData}
@@ -231,18 +248,20 @@ const Home = () => {
             />
           </View>
           <View style={styles.taskListColumnContainer}>
-            {
-              <DisplayTask
-                data={tasks}
-                isTaskLoading={isTaskLoading}
-                sharedX={sharedX}
-                flashListRef={flashListRef}
-                sharedDatesIndex={sharedDatesIndex}
-                datePress={datePress}
-                flatListData={flatListData}
-                snapToOffsets={snapToOffsets}
-              />
-            }
+            <DisplayTask
+              data={tasks}
+              isTaskLoading={tasksLoading}
+              sharedX={sharedX}
+              flashListRef={flashListRef}
+              sharedDatesIndex={sharedDatesIndex}
+              datePress={datePress}
+              flatListData={flatListData}
+              snapToOffsets={snapToOffsets}
+              openTaskModal={openTaskModal}
+              task={editTaskDetails}
+              setTask={setEditTaskDetails}
+            />
+
             {/* {tasks?.length > 0 ? (
               <DisplayTask data={tasks} isTaskLoading={isTaskLoading} />
             ) : (
@@ -252,28 +271,43 @@ const Home = () => {
         </View>
         <View style={styles.myListContainer}>
           <View style={styles.myList}>
-            <SVG.plusIconOutlined
-              style={styles.myListPlusIcon}
-              fill={constants.colors.BGC}
-            />
-            <Text style={styles.myListTitle}>My lists</Text>
+            <TouchableOpacity
+              onPress={handleListPlusIcon}
+              style={[
+                {
+                  zIndex: 1,
+                },
+              ]}>
+              <SVG.plusIconOutlined
+                style={[styles.plusIcon]}
+                fill={constants.colors.BGC}
+              />
+            </TouchableOpacity>
+            <Text style={styles.myListTitle}>Lists</Text>
           </View>
-          <View style={styles.categoryContainer}>
-            <View style={styles.myListCategory}>
-              {/* maximum of char = 19 in formik and backend*/}
-              <Text style={styles.listTxt}>House to do's</Text>
-            </View>
-            <View style={styles.myListCategory}>
-              <Text style={styles.listTxt}>House to do's</Text>
-            </View>
-            <View style={styles.myListCategory}>
-              <Text style={styles.listTxt}>Shopping list</Text>
-            </View>
+          <View
+            // onLayout={e => {
+            //   console.log(e.nativeEvent.layout.height / constants.HEIGHT);
+            // }}
+            style={styles.categoryContainer}>
+            {prioritizedLists && lists && (
+              <FlashList
+                contentContainerStyle={{
+                  paddingHorizontal: constants.WIDTH * 0.0444,
+                }}
+                data={prioritizedLists}
+                horizontal={true}
+                showsHorizontalScrollIndicator={false}
+                renderItem={props => <RenderListCategoryHome {...props} />}
+                estimatedItemSize={ListCategoryWidth}
+                extraData={{lists}}
+              />
+            )}
           </View>
         </View>
       </View>
       <View style={styles.middleView}>
-        <View style={styles.box}>
+        {/* <View style={styles.box}>
           <View style={styles.topBox}></View>
           <View style={styles.bottomPlusBox}>
             <SVG.plusIconOutlined
@@ -293,9 +327,24 @@ const Home = () => {
             />
           </View>
         </View>
-        <View style={styles.box}></View>
+        <View style={styles.box}></View> */}
+        <BoardingBoxWrapper />
+        <BoardingBoxWrapper />
+        <BoardingBoxWrapper Component={NextTask} />
       </View>
       <View style={styles.bottomView}>
+        <View style={{width: '35.33%'}}>
+          <SVG.Search height="100%" width="100%" />
+        </View>
+        <View style={{width: '35.33%'}}>
+          <SVG.BoxIcon
+            onPress={goToPlayGround}
+            fill={constants.colors.BLACK}
+            height="100%"
+            width="100%"
+          />
+        </View>
+
         <TouchableOpacity onPress={openDrawer} style={{width: '35.33%'}}>
           <SVG.MenuIcon
             fill={constants.colors.BLACK}
@@ -303,34 +352,36 @@ const Home = () => {
             width="100%"
           />
         </TouchableOpacity>
-        <View style={{width: '35.33%'}}>
-          <SVG.BoxIcon
-            fill={constants.colors.BLACK}
-            height="100%"
-            width="100%"
-          />
-        </View>
-        <View style={{width: '35.33%'}}>
-          <SVG.Search height="100%" width="100%" />
-        </View>
       </View>
       <BottomSheetModalProvider>
         <BottomSheetModal
           ref={bottomSheetModalRef}
           index={0}
           snapPoints={snapPoints}
+          // onDismiss={}
           keyboardBlurBehavior="restore"
           handleIndicatorStyle={{backgroundColor: constants.colors.UNDER_LINE}}
+          // onAnimate={(fromIndex, toIndex) => {
+          //   if (fromIndex === 0) {
+          //     // closeTaskModal();
+          //     // setTimeout(() => {
+          //     //   setEditTaskDetails(undefined);
+          //     // }, 300);
+          //   }
+          // }}
           handleStyle={{
             backgroundColor: constants.colors.OFF_WHITE,
           }}
           onChange={handleSheetChanges}>
           <NewTask
-            closeModal={bottomSheetModalRef.current?.dismiss}
+            closeModal={closeTaskModal}
             targetDate={selectedDate}
             setTargetDate={SetSelectedDate}
             maximumDate={flatListData[initialNumToRender - 1]?.fullDate}
             minimumDate={flatListData[0]?.fullDate}
+            findDateAndScroll={findDateAndScroll}
+            task={editTaskDetails}
+            setTask={setEditTaskDetails}
           />
         </BottomSheetModal>
       </BottomSheetModalProvider>
@@ -338,7 +389,7 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default React.memo(Home);
 
 const styles = StyleSheet.create({
   container: {
@@ -353,11 +404,12 @@ const styles = StyleSheet.create({
     height: '64%',
     width: '100%',
     alignItems: 'center',
-    borderRadius: 40,
+    borderRadius: 32,
     borderWidth: 1,
     borderColor: constants.colors.UNDER_LINE,
     backgroundColor: constants.colors.OFF_WHITE,
     elevation: 2,
+    overflow: 'hidden',
   },
   middleView: {
     height: '22.5%',
@@ -395,14 +447,17 @@ const styles = StyleSheet.create({
   today: {
     // backgroundColor: 'blue',
     // marginBottom: 5,
+    alignItems: 'center',
+    flexDirection: 'row',
     padding: '5%',
     height: '20%',
   },
   taskTitle: {
     fontFamily: constants.Fonts.paragraph,
-    color: constants.colors.BLACK,
+    color: constants.colors.BGC,
     fontSize: 30,
     zIndex: 0,
+    marginRight: '4%',
   },
   plusIcon: {
     position: 'absolute',
@@ -460,16 +515,19 @@ const styles = StyleSheet.create({
   },
   myListTitle: {
     fontFamily: constants.Fonts.paragraph,
-    color: constants.colors.BLACK,
+    color: constants.colors.BGC,
     fontSize: 20,
     // fontWeight: '600',
   },
   categoryContainer: {
     flexDirection: 'row',
-    width: '100%',
+    minWidth: 2,
+    width: constants.WIDTH * 0.9444444444444444,
+    height: constants.HEIGHT * 0.03201422854602046 + 2,
     alignContent: 'center',
     justifyContent: 'space-evenly',
     alignItems: 'center',
+    overflow: 'hidden',
     // backgroundColor: constants.colors.BLACK,
   },
   myListCategory: {

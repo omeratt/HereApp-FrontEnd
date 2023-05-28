@@ -1,15 +1,11 @@
-import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-import constants from '../../assets/constants';
 import {login, logout} from '../Reducers/User/userSlice';
 import {store} from '../store';
 import CookieManager from '@react-native-cookies/cookies';
 import {tasksApi} from './taskApi';
+import {apiSlice} from './baseApi';
+import {listsApi} from './listApi';
 
-export const userApi = createApi({
-  reducerPath: 'userApi',
-  baseQuery: fetchBaseQuery({baseUrl: constants.BASE_URL}),
-
-  tagTypes: ['Users', 'Tasks', 'TasksByDate'],
+export const userApi = apiSlice.injectEndpoints({
   endpoints: builder => ({
     home: builder.query({
       query: () => '/',
@@ -42,32 +38,12 @@ export const userApi = createApi({
         store?.dispatch(
           login({...response.data, isSignIn: response?.data.signIn}),
         );
-        // console.log(response, meta, arg);
-        // console.log(meta);
-        // console.log(arg);
-        const {accessToken, refreshToken} = response.data;
-        await CookieManager.set(
-          constants.BASE_URL,
-          {
-            name: 'accessToken',
-            value: accessToken,
-            httpOnly: true,
-          },
-          true,
-        );
-
-        await CookieManager.set(
-          constants.BASE_URL,
-          {
-            name: 'refreshToken',
-            value: refreshToken,
-            httpOnly: true,
-          },
-          true,
-        );
         return response.data;
       },
-      invalidatesTags: ['Users'],
+      invalidatesTags: [
+        // 'TasksByDate',
+        // 'Lists',
+      ],
       // providesTags:['Users']
     }),
     myProfile: builder.query({
@@ -89,16 +65,18 @@ export const userApi = createApi({
         credentials: 'include',
         method: 'post',
       }),
-      transformResponse: (response: any, meta, arg) => {
+      transformResponse: async (response: any, meta, arg) => {
         store?.dispatch(logout());
-        CookieManager.clearAll();
+        await CookieManager.clearAll();
         store?.dispatch(tasksApi.util.resetApiState());
+        store?.dispatch(listsApi.util.resetApiState());
         return response.data;
       },
-      transformErrorResponse: (response: any, meta, arg) => {
+      transformErrorResponse: async (response: any, meta, arg) => {
         store?.dispatch(logout());
-        CookieManager.clearAll();
+        await CookieManager.clearAll();
         store?.dispatch(tasksApi.util.resetApiState());
+        store?.dispatch(listsApi.util.resetApiState());
         return response;
       },
       invalidatesTags: ['Users'],

@@ -16,12 +16,13 @@ import Animated, {
 import constants from '../assets/constants';
 import CircleCheckBox from './CircleCheckBox';
 import {CheckBox} from '@rneui/themed';
-import {useDeleteTaskMutation} from '../app/api/taskApi';
+import {tasksApi, useDeleteTaskMutation} from '../app/api/taskApi';
 import {BottomSheetModal} from '@gorhom/bottom-sheet';
 import SVG from '../assets/svg';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import {FlashList} from '@shopify/flash-list';
 import {DateObject, getTimeFromDateString} from './WeeklyCalender';
+import {TaskType} from '../app/Reducers/User/userSlice';
 
 interface RenderItemProps {
   _id?: string;
@@ -30,6 +31,7 @@ interface RenderItemProps {
   expires?: string;
   done: false;
   targetDate?: string;
+  isSetTime?: boolean;
 }
 interface props {
   data: any[];
@@ -40,6 +42,9 @@ interface props {
   datePress: (dateItem: DateObject) => void;
   flatListData: DateObject[];
   snapToOffsets: number[];
+  openTaskModal: () => void;
+  task?: TaskType;
+  setTask: React.Dispatch<React.SetStateAction<TaskType | undefined>>;
 }
 const TASK_CONTAINER_HEIGHT =
   constants.HEIGHT * 0.64 * 0.84 - //topView till lists
@@ -49,7 +54,7 @@ const TASK_CONTAINER_HEIGHT =
   constants.WIDTH * 0.025;
 const height = TASK_CONTAINER_HEIGHT;
 
-export default function DisplayTask({
+const DisplayTask = ({
   data,
   isTaskLoading,
   sharedX,
@@ -58,14 +63,17 @@ export default function DisplayTask({
   datePress,
   flatListData,
   snapToOffsets,
-}: props) {
+  openTaskModal,
+  task,
+  setTask,
+}: props) => {
   const [
     DeleteTask,
     {isLoading, data: responseDelete, isSuccess, isError, error},
   ] = useDeleteTaskMutation();
-  const onPressDelete = (_id: string) => {
+  const onPressDelete = async (_id: string) => {
     try {
-      DeleteTask(_id).unwrap();
+      await DeleteTask(_id).unwrap();
       closeDeleteModal();
     } catch (err: any) {
       console.log('err in delete', err);
@@ -74,7 +82,6 @@ export default function DisplayTask({
   let timer: any;
   useEffect(() => {
     return () => {
-      console.log({timer});
       clearTimeout(timer);
     };
   }, []);
@@ -83,7 +90,6 @@ export default function DisplayTask({
 
   // variables
   const snapPoints = useMemo(() => ['15%', '15%'], []);
-
   // callbacks
   const closeDeleteModal = useCallback(() => {
     bottomSheetModalRef.current?.dismiss();
@@ -96,6 +102,10 @@ export default function DisplayTask({
       bottomSheetModalRef.current?.present();
     }, 150);
   };
+  const goToEditTask = useCallback((_task: TaskType) => {
+    setTask(_task);
+    openTaskModal();
+  }, []);
   const DeleteModal = ({_id, name}: {_id: string; name: string}) => {
     return (
       <BottomSheetModal
@@ -161,23 +171,35 @@ export default function DisplayTask({
     ({item, index}) => {
       const itemHours = getTimeFromDateString(item.targetDate);
       useEffect(() => {
-        sharedX.value = sharedX.value < 0 ? -TASK_WIDTH : TASK_WIDTH;
+        // if (sharedX.value !== 0) {
+        sharedX.value = sharedX.value < 0 ? TASK_WIDTH * 2 : -TASK_WIDTH * 2;
         sharedX.value = withSpring(0, springConfig);
+        // sharedX.value = 0;
+        // }
       }, []);
       return (
         <Animated.View
+          // entering={ZoomIn.duration(500)}
+          // {...(sharedX.value === 0 && {exiting: SlideOutRight})}
           style={[styles.taskListContainer, {...(!index && {marginTop: 0})}]}>
           <View style={styles.taskListContent}>
             <TouchableOpacity
-              onPress={() =>
-                openDeleteModal({
-                  name: item.name as string,
-                  id: item._id as string,
-                })
+              onPress={
+                () => goToEditTask(item as TaskType)
+                // openDeleteModal({
+                //   name: item.name as string,
+                //   id: item._id as string,
+                // })
               }>
-              <Text style={styles.taskContentTitle}>{itemHours}</Text>
-              <Text style={styles.taskContentTitle}>{item.name}</Text>
-              <Text style={styles.taskContentBody}>{item.details}</Text>
+              {item.isSetTime && (
+                <View style={{alignSelf: 'flex-start'}}>
+                  <Text style={styles.taskContentHour}>{itemHours}</Text>
+                </View>
+              )}
+              <Text style={styles.taskContentName}>{item.name}</Text>
+              <Text style={styles.taskContentDetails} numberOfLines={1}>
+                {item.details}
+              </Text>
             </TouchableOpacity>
             <CheckBox
               checked={item.done}
@@ -225,7 +247,6 @@ export default function DisplayTask({
   const press: () => void = useCallback(() => {
     datePress(flatListData[sharedDatesIndex.value]);
   }, []);
-
   const endScroll: () => void = useCallback(() => {
     flashListRef?.current?.scrollToOffset({
       offset: snapToOffsets[sharedDatesIndex.value],
@@ -260,6 +281,9 @@ export default function DisplayTask({
         }),
     [],
   );
+  const renderItem = useCallback((props: any) => <RenderItem {...props} />, []);
+  const keyExtractor: (item: RenderItemProps, index: number) => string =
+    useCallback((item: RenderItemProps) => item._id!, []);
   return (
     <View
       style={{
@@ -268,10 +292,11 @@ export default function DisplayTask({
         height: height,
       }}>
       <View style={styles.header}>
-        <SVG.plusIconOutlined
-          style={styles.PlusIcon}
-          fill={constants.colors.BGC}
-        />
+        <TouchableOpacity
+          onPress={openTaskModal}
+          style={[styles.PlusIcon, {zIndex: 1}]}>
+          <SVG.plusIconOutlined fill={constants.colors.BGC} />
+        </TouchableOpacity>
         <Text style={styles.taskHeaderTitle}>Tasks</Text>
       </View>
       <View
@@ -284,8 +309,8 @@ export default function DisplayTask({
             style={{transform: [{translateX: sharedX}]}}
             data={data}
             ListEmptyComponent={emptyList}
-            renderItem={props => <RenderItem {...props} />}
-            keyExtractor={item => item._id as string}
+            renderItem={renderItem}
+            keyExtractor={keyExtractor}
             contentContainerStyle={{paddingBottom: height * 0.01}}
           />
         </GestureDetector>
@@ -296,7 +321,7 @@ export default function DisplayTask({
             height: height * 0.03,
             // backgroundColor: 'red',
           }}>
-          <SVG.ArrowDown />
+          {data?.length > 2 && <SVG.ArrowDown />}
         </View>
         <DeleteModal
           _id={deleteProps.id as string}
@@ -305,8 +330,8 @@ export default function DisplayTask({
       </View>
     </View>
   );
-}
-
+};
+export default React.memo(DisplayTask);
 const styles = StyleSheet.create({
   taskListContainer: {
     marginTop: '2.2%',
@@ -315,6 +340,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     width: '90.36%',
     height: height * 0.3663,
+    backgroundColor: constants.colors.OFF_WHITE,
     // height
     // backgroundColor: 'red',
   },
@@ -338,7 +364,7 @@ const styles = StyleSheet.create({
   },
   taskHeaderTitle: {
     fontFamily: constants.Fonts.paragraph,
-    color: constants.colors.BLACK,
+    color: constants.colors.BGC,
     fontSize: 20,
     // fontWeight: '600',
   },
@@ -356,24 +382,38 @@ const styles = StyleSheet.create({
   taskListContent: {
     // height: constants.HEIGHT * 0.1,
     borderRadius: 20,
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderColor: constants.colors.UNDER_LINE,
     width: '100%',
     padding: '3%',
-    elevation: 2,
-    backgroundColor: constants.colors.OFF_WHITE,
+    // elevation: 1,
+    // shadowRadius: 20,
+    // shadowColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     justifyContent: 'center',
     // backgroundColor: 'red',
     // zIndex: 9999,
   },
-  taskContentTitle: {
+  taskContentHour: {
     fontFamily: constants.Fonts.text,
+    borderBottomColor: constants.colors.UNDER_LINE,
+    borderBottomWidth: 1,
+    // backgroundColor: 'red',
+    textAlign: 'left',
     fontWeight: 'bold',
     fontSize: 14,
     color: constants.colors.BLACK,
   },
-  taskContentBody: {
+  taskContentName: {
     fontFamily: constants.Fonts.text,
+    textAlign: 'left',
+    fontWeight: 'bold',
+    fontSize: 14,
+    color: constants.colors.BLACK,
+  },
+  taskContentDetails: {
+    fontFamily: constants.Fonts.text,
+    textAlign: 'left',
     fontSize: 12.5,
     color: constants.colors.UNDER_LINE,
   },

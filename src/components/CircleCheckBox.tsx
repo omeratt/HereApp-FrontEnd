@@ -6,8 +6,14 @@ interface props {
   size: number;
   fill?: string;
   borderColor?: string;
+  notCheckedFillColor?: string;
 }
-export default function CircleCheckBox({size, fill, borderColor}: props) {
+export default function CircleCheckBox({
+  size,
+  fill,
+  borderColor,
+  notCheckedFillColor = constants.colors.OFF_WHITE,
+}: props) {
   return (
     <View
       style={[
@@ -16,7 +22,7 @@ export default function CircleCheckBox({size, fill, borderColor}: props) {
           width: size,
           height: size,
           borderColor: borderColor ? borderColor : constants.colors.GREY,
-          backgroundColor: fill ? fill : constants.colors.OFF_WHITE,
+          backgroundColor: fill ? fill : notCheckedFillColor,
           borderRadius: size / 2,
 
           elevation: 5,

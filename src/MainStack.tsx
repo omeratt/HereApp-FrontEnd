@@ -16,6 +16,7 @@ import OnBoarding from './screens/OnBoarding';
 import ListAndNotesNavigator from './Navigation/ListNavigation';
 import {useGetListsQuery} from './app/api/listApi';
 import PlayGround from './screens/PlayGround';
+import Messages from './screens/message/Messages';
 const ICON_SIZE = 20;
 // const Stack = createNativeStackNavigator();
 const Stack = createDrawerNavigator();
@@ -72,7 +73,7 @@ export default function MainStack() {
           <>
             <Stack.Screen
               name="Welcome"
-              component={Welcome}
+              component={Messages}
               options={{
                 headerShown: false,
                 drawerItemStyle: {display: 'none'},

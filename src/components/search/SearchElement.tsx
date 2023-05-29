@@ -1,17 +1,23 @@
 import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import constants from '../../assets/constants';
+import {ISearchElementProps} from './types';
 const {HEIGHT, WIDTH} = constants;
 const paddingVertical = HEIGHT * (45 / 896);
-const SearchElement: React.FC<ISearchElementProps> = ({data, title}) => {
+const SearchElement: React.FC<ISearchElementProps> = ({items, title}) => {
+  if (!items) return <React.Fragment />;
   return (
     <View style={styles.container}>
       <Text style={styles.titleTxt}>{title}</Text>
-      {data.map(({description, name}, index) => {
+      {items.map(({data: {description, name}}, index) => {
         return (
           <View style={styles.txtContainer} key={index}>
-            <Text style={styles.dataName}>{name}</Text>
-            <Text style={styles.dataDesc}>{description}</Text>
+            <Text numberOfLines={1} style={styles.dataName}>
+              {name}
+            </Text>
+            <Text numberOfLines={1} style={styles.dataDesc}>
+              {description}
+            </Text>
           </View>
         );
       })}
@@ -20,7 +26,8 @@ const SearchElement: React.FC<ISearchElementProps> = ({data, title}) => {
 };
 
 export default SearchElement;
-const lineHeight = 22;
+const lineHeight = 24;
+const maxWidth = '45%';
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
@@ -32,6 +39,8 @@ const styles = StyleSheet.create({
     color: constants.colors.UNDER_LINE,
     fontSize: 12,
     lineHeight,
+    // backgroundColor: 'cyan',
+    textAlign: 'left',
   },
   dataName: {
     fontFamily: constants.Fonts.text,
@@ -39,12 +48,17 @@ const styles = StyleSheet.create({
     color: constants.colors.OFF_WHITE,
     fontSize: 12,
     lineHeight,
+    maxWidth,
+    paddingLeft: 1.5,
   },
   dataDesc: {
     fontFamily: constants.Fonts.text,
     color: constants.colors.OFF_WHITE,
     fontSize: 12,
     lineHeight,
+    maxWidth,
+    textAlign: 'left',
+    width: maxWidth,
   },
   txtContainer: {
     flexDirection: 'row',

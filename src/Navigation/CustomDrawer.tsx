@@ -69,30 +69,8 @@ const CustomDrawer: React.FC<ICustomerDrawer> = props => {
       <View
         style={{
           // backgroundColor: 'red',
-          height: bottomContainerHeight,
+          height: bottomContainerHeight - bottomContainerHeight * 0.6,
         }}>
-        <View
-          style={{
-            height: bottomContainerHeight * 0.6,
-            alignItems: 'flex-end',
-            // backgroundColor: 'blue',
-          }}>
-          <SVG.SearchBtn width={25} style={{position: 'relative', top: 30}} />
-          <TextInput
-            style={{
-              borderBottomColor: constants.colors.OFF_WHITE,
-              // backgroundColor: 'blue',
-              width: '100%',
-              top: 0,
-              // bottom: 0,
-              marginTop: 0,
-              marginBottom: 0,
-            }}
-          />
-          <Text style={styles.bottomSearchTxt}>
-            You can search for anything you want
-          </Text>
-        </View>
         <SVG.XBtn
           onPress={closeDrawer}
           style={{

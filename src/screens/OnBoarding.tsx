@@ -70,10 +70,10 @@ export default function OnBoarding() {
       return [...prev, item];
     });
   }, []);
-
+  
   const goHome = useCallback(() => {
     nav.navigate('HomePage' as never);
-  }, []);
+  }, [nav]);
   const BallonTxt = useCallback(
     ({txt, index, selectedItems, SetSelectedItems}: BallonProps) => {
       const isTimeManagement = txt === 'Time management';

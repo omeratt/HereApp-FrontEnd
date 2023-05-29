@@ -91,3 +91,41 @@ const constants = {
   ],
 };
 export default constants;
+export const searchTasksData: ISearchElement[] = [
+  {
+    name: 'Home work',
+    description: 'Finish with Biology HM',
+  },
+  {
+    name: 'Home work',
+    description: 'Finish with Biology HM',
+  },
+  {
+    name: 'Home work',
+    description: 'Finish with Biology HM',
+  },
+];
+export const searchListsData: ISearchElement[] = [
+  {
+    name: 'Interactive',
+    description: 'Finish with ...',
+  },
+  {
+    name: 'biology',
+    description: 'Finish with ...',
+  },
+  {
+    name: 'Home deco',
+    description: 'Finish with ...',
+  },
+];
+export const searchMessageData: ISearchElement[] = [
+  {
+    name: '14/5/23',
+    description: 'finish with omer’s birth...',
+  },
+  {
+    name: '4/6/22',
+    description: 'Finish with ...',
+  },
+];

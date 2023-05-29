@@ -62,7 +62,7 @@ const BottomSheetDeleteModal = forwardRef<BottomSheetDeleteModalHandles, Props>(
               styles.txtContainer,
               {width: constants.WIDTH - paddingHorizontal * 2},
             ]}>
-            <View style={{flex: 1, backgroundColor: 'black'}}>
+            <View style={{flex: 1}}>
               <Text
                 // adjustsFontSizeToFit={true}
                 // numberOfLines={1}

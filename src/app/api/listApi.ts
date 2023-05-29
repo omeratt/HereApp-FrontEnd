@@ -36,7 +36,7 @@ export const listsApi = apiSlice.injectEndpoints({
         body: title,
         credentials: 'include',
       }),
-      invalidatesTags: ['Lists'],
+      invalidatesTags: ['Lists', 'PrioritizedLists'],
       transformResponse: (response: any, meta, arg) => {
         return response.data;
       },

@@ -18,6 +18,7 @@ import {useGetListsQuery} from './app/api/listApi';
 import PlayGround from './screens/PlayGround';
 import Message from './screens/message/Message';
 import Messages from './screens/message/Messages';
+import Search from './screens/Search';
 const ICON_SIZE = 20;
 // const Stack = createNativeStackNavigator();
 const Stack = createDrawerNavigator();
@@ -72,20 +73,15 @@ export default function MainStack() {
         )}>
         {isSignIn ? (
           <>
-            {/* <Stack.Screen
-              name="Welcome"
-              component={Message}
-              options={{
-                headerShown: false,
-                drawerItemStyle: {display: 'none'},
-              }}
-            /> */}
             <Stack.Screen
-              name="Messages"
-              component={Messages}
+              name="Search"
+              component={Search}
               options={{
+                swipeEnabled: false,
                 headerShown: false,
-                drawerItemStyle: {display: 'none'},
+                drawerLabel(props) {
+                  return <Label label={'Search'} isFocused={props.focused} />;
+                },
               }}
             />
             <Stack.Screen
@@ -118,6 +114,33 @@ export default function MainStack() {
                 drawerLabel(props) {
                   return <Label label={'Home'} isFocused={props.focused} />;
                 },
+              }}
+            />
+            <Stack.Screen
+              name="Messages"
+              component={Messages}
+              options={{
+                swipeEnabled: false,
+                headerShown: false,
+                unmountOnBlur: true,
+                drawerLabel(props) {
+                  return (
+                    <Label
+                      label={'Message To My Self'}
+                      isFocused={props.focused}
+                    />
+                  );
+                },
+              }}
+            />
+            <Stack.Screen
+              name="Message"
+              component={Message}
+              options={{
+                swipeEnabled: false,
+                headerShown: false,
+                drawerItemStyle: {display: 'none'},
+                unmountOnBlur: true,
               }}
             />
             <Stack.Screen

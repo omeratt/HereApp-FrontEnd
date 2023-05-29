@@ -1,15 +1,20 @@
 import {
+  BackHandler,
   LayoutChangeEvent,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import React from 'react';
+import React, {useRef} from 'react';
 import constants from '../../assets/constants';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {useNavigation} from '@react-navigation/core';
-import {useGetMessagesQuery} from '../../app/api/messageApi';
+import {useFocusEffect, useNavigation} from '@react-navigation/core';
+import {
+  useAddOrEditMessageMutation,
+  useDeleteMessagesMutation,
+  useGetMessagesQuery,
+} from '../../app/api/messageApi';
 import {FlashList, ListRenderItem} from '@shopify/flash-list';
 import RenderMessageItem from './RenderMessageItem';
 import Line from '../../components/Line';
@@ -17,6 +22,9 @@ import SVG from '../../assets/svg';
 import {Vibration} from 'react-native';
 import Animated, {FadeInUp, ZoomIn, ZoomOut} from 'react-native-reanimated';
 import CheckBox from '../../components/CheckBox';
+import BottomSheetDeleteModal, {
+  BottomSheetDeleteModalHandles,
+} from '../../components/BottomSheetDeleteModal';
 const {WIDTH, HEIGHT} = constants;
 const paddingHorizontal = WIDTH * (30.37 / 414);
 const paddingVertical = HEIGHT * (22 / 896);
@@ -38,13 +46,13 @@ const initialValues: IMessageValues = {
 const Messages = () => {
   const navigation = useNavigation();
   const {data, isLoading} = useGetMessagesQuery(null);
-  const handleBackPress = () => {
-    navigation.goBack();
-  };
+
+  const [deleteMsgs, {isLoading: deleteLoading}] = useDeleteMessagesMutation();
   const [lastMsg, setLastMsg] = React.useState<IMessageValues>(initialValues);
   const [isSelectOn, setIsSelectOn] = React.useState<boolean>(false);
   const [selected, setSelected] = React.useState<string[]>([]);
   const [lastMsgTxtHeight, setLastMsgTxtHeight] = React.useState<number>(0);
+  const bottomSheetRef = useRef<BottomSheetDeleteModalHandles>(null);
   const onLayout = React.useCallback((event: LayoutChangeEvent) => {
     const {height: _height, width} = event.nativeEvent.layout;
     setLastMsgTxtHeight(_height);
@@ -58,6 +66,15 @@ const Messages = () => {
       }
     });
   }, []);
+  const handleDelete = React.useCallback(async () => {
+    setIsSelectOn(false);
+    bottomSheetRef.current?.closeModal();
+    await deleteMsgs(selected);
+  }, [bottomSheetRef, deleteMsgs, selected]);
+
+  const openDeleteModal = React.useCallback(() => {
+    bottomSheetRef.current?.openModal();
+  }, []);
   React.useEffect(() => {
     if (data) {
       setLastMsg(data[data.length - 1]);
@@ -70,13 +87,38 @@ const Messages = () => {
     setSelected([]);
   }, [isSelectOn]);
 
-  const navToEditTask = React.useCallback((id: string) => {
-    console.log('navigate to edit list', id);
+  const navToEditTask = React.useCallback((msg: IMessageValues) => {
+    navigation.navigate('Message' as never, {messageRouteProp: msg} as never);
   }, []);
 
   const isLastSelected = React.useMemo(() => {
     return selected.includes(lastMsg._id!);
   }, [selected, lastMsg]);
+
+  const goBack = React.useCallback(() => {
+    navigation.navigate('HomePage' as never);
+  }, []);
+
+  const navToMessage = React.useCallback(() => {
+    navigation.navigate('Message' as never);
+  }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        if (isSelectOn) setIsSelectOn(false);
+        else goBack();
+        return true;
+      };
+      const subscription = BackHandler.addEventListener(
+        'hardwareBackPress',
+        onBackPress,
+      );
+
+      return () => subscription.remove();
+    }, [navigation, isSelectOn]),
+  );
+
   const renderItem: ListRenderItem<IMessageValues> = React.useCallback(
     props => {
       const isLastIndex = props.index === data!.length - 2;
@@ -99,25 +141,52 @@ const Messages = () => {
           alignItems: 'center',
           //   backgroundColor: 'red',
         }}>
-        <TouchableOpacity style={styles.backIcon} onPress={handleBackPress}>
+        <TouchableOpacity style={styles.backIcon} onPress={goBack}>
           <AntDesign
             name="leftcircle"
             color={constants.colors.OFF_WHITE}
             size={ICON_BACK_SIZE - 1}
           />
         </TouchableOpacity>
-        <TouchableOpacity onPress={toggleSelect}>
-          <SVG.Select
-            height={ICON_BACK_SIZE}
-            width={50}
-            fill={
-              isSelectOn ? constants.colors.GREEN : constants.colors.OFF_WHITE
-            }
-            style={{
-              borderRadius: ICON_BACK_SIZE / 2,
-            }}
-          />
-        </TouchableOpacity>
+        <View
+          style={{
+            flexDirection: 'row-reverse',
+            width: '35%',
+            justifyContent: 'space-between',
+          }}>
+          <TouchableOpacity onPress={toggleSelect}>
+            <SVG.Select
+              height={ICON_BACK_SIZE}
+              width={50}
+              fill={
+                isSelectOn ? constants.colors.GREEN : constants.colors.OFF_WHITE
+              }
+              style={{
+                borderRadius: ICON_BACK_SIZE / 2,
+              }}
+            />
+          </TouchableOpacity>
+          {isSelectOn && (
+            <Animated.View
+              entering={ZoomIn.duration(250)}
+              exiting={ZoomOut.duration(250)}
+              style={{}}>
+              <TouchableOpacity
+              // style={}
+              // onPress={onVCheckboxPress}
+              >
+                {selected.length > 0 ? (
+                  <SVG.TrashGreen
+                    height={ICON_BACK_SIZE}
+                    onPress={openDeleteModal}
+                  />
+                ) : (
+                  <SVG.TrashWhite height={ICON_BACK_SIZE} />
+                )}
+              </TouchableOpacity>
+            </Animated.View>
+          )}
+        </View>
       </View>
       <View style={styles.msgContainer}>
         {data && (
@@ -155,7 +224,7 @@ const Messages = () => {
                 onPress={() =>
                   isSelectOn
                     ? handleSelected(lastMsg._id!)
-                    : navToEditTask(lastMsg._id!)
+                    : navToEditTask(lastMsg)
                 }>
                 <Animated.View
                   style={{height: lastMsgH, width: width * 0.9}}
@@ -165,9 +234,9 @@ const Messages = () => {
                       numberOfLines={4}
                       textBreakStrategy="highQuality"
                       style={styles.lastMsgTxt}>
-                      {/* {lastMsg.message} */}
-                      An idea I had for an interactive course - to search in
-                      science books
+                      {lastMsg.message}
+                      {/* An idea I had for an interactive course - to search in
+                      science books */}
                     </Text>
                     <Text style={styles.dateTxt}>
                       {new Date(lastMsg.createdAt!).toLocaleString('eng', {
@@ -199,13 +268,18 @@ const Messages = () => {
           </>
         )}
       </View>
-      <TouchableOpacity style={styles.plusIcon} onPress={handleBackPress}>
+      <TouchableOpacity style={styles.plusIcon} onPress={navToMessage}>
         <AntDesign
           name="pluscircleo"
           color={constants.colors.OFF_WHITE}
           size={ICON_PLUS_SIZE - 1}
         />
       </TouchableOpacity>
+      <BottomSheetDeleteModal
+        onDelete={handleDelete}
+        ids={selected}
+        ref={bottomSheetRef}
+      />
     </View>
   );
 };
@@ -272,5 +346,9 @@ const styles = StyleSheet.create({
     width: 25,
     right: 0,
     top: lastMsgPaddingTop,
+  },
+  trashIcon: {
+    position: 'absolute',
+    bottom: 0,
   },
 });

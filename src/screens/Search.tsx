@@ -16,6 +16,7 @@ import SearchElement from '../components/search/SearchElement';
 import Line from '../components/Line';
 import {useNavigation} from '@react-navigation/core';
 import {useSearchQuery} from '../app/api/searchApi';
+import Animated, {SequencedTransition} from 'react-native-reanimated';
 const {HEIGHT, WIDTH} = constants;
 const paddingHorizontal = WIDTH * (80 / 896);
 const paddingVertical = HEIGHT * (45 / 896);
@@ -66,30 +67,31 @@ const Search = () => {
       </View>
 
       <View style={[styles.searchContent, {height: flashListHeight}]}>
-        <ScrollView
-          style={{flexGrow: 1}}
+        <Animated.ScrollView
+          contentContainerStyle={{flex: 1}}
+          style={{flex: 1}}
           fadingEdgeLength={150}
           showsVerticalScrollIndicator={false}
           nestedScrollEnabled>
           {shouldDisplayTask && (
             <SearchElement title="TASKS" items={searchResult?.tasks} />
           )}
-          {(shouldDisplayList || shouldDisplayMsg) && (
+          {shouldDisplayTask && (shouldDisplayList || shouldDisplayMsg) && (
             <Line strength={1} lineColor={constants.colors.UNDER_LINE} />
           )}
           {shouldDisplayList && (
             <SearchElement title="LIST & NOTES" items={searchResult?.lists} />
           )}
-          {(shouldDisplayTask || shouldDisplayMsg) && (
+          {shouldDisplayMsg && (shouldDisplayTask || shouldDisplayList) && (
             <Line strength={1} lineColor={constants.colors.UNDER_LINE} />
           )}
-          {searchResult?.messages && searchResult?.messages.length > 0 && (
+          {shouldDisplayMsg && (
             <SearchElement
               title="MESSAGE TO MYSELF"
               items={searchResult?.messages}
             />
           )}
-        </ScrollView>
+        </Animated.ScrollView>
       </View>
       <SVG.XBtn
         onPress={() => navigate.navigate('HomePage' as never)}

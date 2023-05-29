@@ -4,54 +4,62 @@ import React from 'react';
 import constants from '../../assets/constants';
 import {ISearchElementProps} from './types';
 import {getTimeFromDateString} from '../WeeklyCalender';
-import Animated, {FadeInUp, FadeOutDown} from 'react-native-reanimated';
+import Animated, {
+  FadeInUp,
+  FadeOutDown,
+  FadeOutUp,
+  SequencedTransition,
+} from 'react-native-reanimated';
 const {HEIGHT, WIDTH} = constants;
 const paddingVertical = HEIGHT * (45 / 896);
-const formatDate = (value: string) =>
-  value.replace(/(\d{2})(\/)(\d{2})(\/)(\d{2})/g, '$1 / $3 / $5');
+
+const options: Intl.DateTimeFormatOptions = {
+  day: '2-digit',
+  month: '2-digit',
+  year: '2-digit',
+};
+const formatDate = (date: Date) =>
+  date
+    .toLocaleDateString('en', options)
+    .replace(/\./g, '/')
+    .replace(/(\d{2})(\/)(\d{2})(\/)(\d{2})/g, '$1 / $3 / $5');
 
 const SearchElement: React.FC<ISearchElementProps> = ({items, title}) => {
-  // if (!items)
-  // return <Animated.View exiting={FadeOutDown} entering={FadeInUp} />;
+  //   if (!items) return <Animated.View exiting={FadeOutUp} entering={FadeInUp} />;
   const isTask = React.useMemo(() => title === 'TASKS', [title]);
   const isMsg = React.useMemo(() => title === 'MESSAGE TO MYSELF', [title]);
 
   return (
-    <>
-      {items && (
-        <Animated.View
-          style={styles.container}
-          entering={FadeInUp}
-          exiting={FadeOutDown}>
-          <Text style={styles.titleTxt}>{title}</Text>
-          {items.map(({data: {description, name}}, index) => {
-            return (
-              <View style={styles.txtContainer} key={index}>
-                <Text numberOfLines={1} style={styles.dataName}>
-                  {isMsg
-                    ? formatDate(new Date(name).toLocaleDateString())
-                    : name}
+    <Animated.View
+      style={styles.container}
+      layout={SequencedTransition}
+      entering={FadeInUp}
+      exiting={FadeOutUp}>
+      <Text style={styles.titleTxt}>{title}</Text>
+      {items?.map(({data: {description, name}}, index) => {
+        return (
+          <View style={styles.txtContainer} key={index}>
+            <Text numberOfLines={1} style={styles.dataName}>
+              {isMsg ? formatDate(new Date(name)) : name}
+            </Text>
+            {!isTask ? (
+              <Text numberOfLines={1} style={styles.dataDesc}>
+                {description}
+              </Text>
+            ) : (
+              <View style={styles.taskDateContainer}>
+                <Text numberOfLines={1} style={styles.taskDate}>
+                  {formatDate(new Date(description))}
                 </Text>
-                {!isTask ? (
-                  <Text numberOfLines={1} style={styles.dataDesc}>
-                    {description}
-                  </Text>
-                ) : (
-                  <View style={styles.taskDateContainer}>
-                    <Text numberOfLines={1} style={styles.taskDate}>
-                      {new Date(description).toLocaleDateString()}
-                    </Text>
-                    <Text numberOfLines={1} style={styles.taskDate}>
-                      {getTimeFromDateString(description, false, true)}
-                    </Text>
-                  </View>
-                )}
+                <Text numberOfLines={1} style={styles.taskDate}>
+                  {getTimeFromDateString(description, false, true)}
+                </Text>
               </View>
-            );
-          })}
-        </Animated.View>
-      )}
-    </>
+            )}
+          </View>
+        );
+      })}
+    </Animated.View>
   );
 };
 
@@ -60,7 +68,7 @@ const lineHeight = 24;
 const maxWidth = '45%';
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
+    // flex: 1,
     paddingVertical,
   },
   titleTxt: {

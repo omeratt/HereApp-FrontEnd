@@ -7,7 +7,7 @@ import {
   View,
   ScrollView,
 } from 'react-native';
-import React, {useEffect} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import constants, {searchTasksData} from '../assets/constants';
 import SVG from '../assets/svg';
 import {Keyboard} from 'react-native';
@@ -29,6 +29,18 @@ const Search = () => {
     number | undefined
   >(undefined);
   const {data: searchResult} = useSearchQuery({input: inputValue});
+  const shouldDisplayList = useMemo(
+    () => searchResult?.lists && searchResult?.lists?.length > 0,
+    [searchResult],
+  );
+  const shouldDisplayTask = useMemo(
+    () => searchResult?.tasks && searchResult?.tasks?.length > 0,
+    [searchResult],
+  );
+  const shouldDisplayMsg = useMemo(
+    () => searchResult?.messages && searchResult?.messages?.length > 0,
+    [searchResult],
+  );
   const onLayout = React.useCallback((event: LayoutChangeEvent) => {
     const {height, width} = event.nativeEvent.layout;
     setSearchHeight(height);
@@ -59,17 +71,17 @@ const Search = () => {
           fadingEdgeLength={150}
           showsVerticalScrollIndicator={false}
           nestedScrollEnabled>
-          {searchResult?.tasks && searchResult?.tasks.length > 0 && (
-            <>
-              <SearchElement title="TASKS" items={searchResult?.tasks} />
-              <Line strength={1} lineColor={constants.colors.UNDER_LINE} />
-            </>
+          {shouldDisplayTask && (
+            <SearchElement title="TASKS" items={searchResult?.tasks} />
           )}
-          {searchResult?.lists && searchResult?.lists.length > 0 && (
-            <>
-              <SearchElement title="LIST & NOTES" items={searchResult?.lists} />
-              <Line strength={1} lineColor={constants.colors.UNDER_LINE} />
-            </>
+          {(shouldDisplayList || shouldDisplayMsg) && (
+            <Line strength={1} lineColor={constants.colors.UNDER_LINE} />
+          )}
+          {shouldDisplayList && (
+            <SearchElement title="LIST & NOTES" items={searchResult?.lists} />
+          )}
+          {(shouldDisplayTask || shouldDisplayMsg) && (
+            <Line strength={1} lineColor={constants.colors.UNDER_LINE} />
           )}
           {searchResult?.messages && searchResult?.messages.length > 0 && (
             <SearchElement

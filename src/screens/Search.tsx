@@ -7,7 +7,7 @@ import {
   View,
   ScrollView,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import constants, {searchTasksData} from '../assets/constants';
 import SVG from '../assets/svg';
 import {Keyboard} from 'react-native';
@@ -15,7 +15,7 @@ import {LayoutChangeEvent} from 'react-native';
 import SearchElement from '../components/search/SearchElement';
 import Line from '../components/Line';
 import {useNavigation} from '@react-navigation/core';
-// import {ScrollView} from 'react-native-gesture-handler';
+import {useSearchQuery} from '../app/api/searchApi';
 const {HEIGHT, WIDTH} = constants;
 const paddingHorizontal = WIDTH * (80 / 896);
 const paddingVertical = HEIGHT * (45 / 896);
@@ -28,6 +28,7 @@ const Search = () => {
   const [flashListHeight, setFlashListHeight] = React.useState<
     number | undefined
   >(undefined);
+  const {data: searchResult} = useSearchQuery({input: inputValue});
   const onLayout = React.useCallback((event: LayoutChangeEvent) => {
     const {height, width} = event.nativeEvent.layout;
     setSearchHeight(height);
@@ -52,29 +53,34 @@ const Search = () => {
         />
       </View>
 
-      {/* <Pressable style={{flex: 1, backgroundColor: 'blue'}}> */}
       <View style={[styles.searchContent, {height: flashListHeight}]}>
         <ScrollView
           style={{flexGrow: 1}}
           fadingEdgeLength={150}
           showsVerticalScrollIndicator={false}
           nestedScrollEnabled>
-          <SearchElement title="TASKS" data={searchTasksData} />
-          <Line strength={1} lineColor={constants.colors.UNDER_LINE} />
-          <SearchElement title="LIST & NOTES" data={searchTasksData} />
-          <Line strength={1} lineColor={constants.colors.UNDER_LINE} />
-          <SearchElement title="MESSEGE TO MYSELF" data={searchTasksData} />
-          <Line strength={1} lineColor={constants.colors.UNDER_LINE} />
-          <SearchElement title="MESSEGE TO MYSELF" data={searchTasksData} />
-          <Line strength={1} lineColor={constants.colors.UNDER_LINE} />
-          <SearchElement title="MESSEGE TO MYSELF" data={searchTasksData} />
-          <Line strength={1} lineColor={constants.colors.UNDER_LINE} />
-          <SearchElement title="MESSEGE TO MYSELF" data={searchTasksData} />
+          {searchResult?.tasks && searchResult?.tasks.length > 0 && (
+            <>
+              <SearchElement title="TASKS" items={searchResult?.tasks} />
+              <Line strength={1} lineColor={constants.colors.UNDER_LINE} />
+            </>
+          )}
+          {searchResult?.lists && searchResult?.lists.length > 0 && (
+            <>
+              <SearchElement title="LIST & NOTES" items={searchResult?.lists} />
+              <Line strength={1} lineColor={constants.colors.UNDER_LINE} />
+            </>
+          )}
+          {searchResult?.messages && searchResult?.messages.length > 0 && (
+            <SearchElement
+              title="MESSAGE TO MYSELF"
+              items={searchResult?.messages}
+            />
+          )}
         </ScrollView>
       </View>
-      {/* </Pressable> */}
       <SVG.XBtn
-        onPress={() => navigate.navigate('HomePage')}
+        onPress={() => navigate.navigate('HomePage' as never)}
         height={xBtnSize}
         style={{
           alignSelf: 'center',

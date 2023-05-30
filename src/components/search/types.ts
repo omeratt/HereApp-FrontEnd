@@ -17,12 +17,12 @@ export interface ISearchResult {
   messages: IMessageSearchResult[];
 }
 
-interface ITaskSearchResult extends TaskType {
+export interface ITaskSearchResult extends TaskType {
   data: ISearchElement;
 }
-interface IListSearchResult extends ListType {
+export interface IListSearchResult extends ListType {
   data: ISearchElement;
 }
-interface IMessageSearchResult extends IMessageValues {
+export interface IMessageSearchResult extends IMessageValues {
   data: ISearchElement;
 }

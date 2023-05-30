@@ -23,8 +23,9 @@ import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import {FlashList} from '@shopify/flash-list';
 import {DateObject, getTimeFromDateString} from './WeeklyCalender';
 import {TaskType} from '../app/Reducers/User/userSlice';
+import RenderTask from '../screens/task/RenderTask';
 
-interface RenderItemProps {
+export interface RenderItemProps {
   _id?: string;
   name?: string;
   details?: string;
@@ -32,6 +33,8 @@ interface RenderItemProps {
   done: false;
   targetDate?: string;
   isSetTime?: boolean;
+  sharedX?: SharedValue<number>;
+  goToEditTask?: (_task: TaskType) => void;
 }
 interface props {
   data: any[];
@@ -44,15 +47,17 @@ interface props {
   snapToOffsets: number[];
   openTaskModal: () => void;
   task?: TaskType;
+  isRenderTaskFromAllTasks?: boolean;
   setTask: React.Dispatch<React.SetStateAction<TaskType | undefined>>;
+  TASK_CONTAINER_HEIGHT: number;
 }
-const TASK_CONTAINER_HEIGHT =
-  constants.HEIGHT * 0.64 * 0.84 - //topView till lists
-  constants.HEIGHT * 0.64 * 0.84 * 0.2 - //date header
-  constants.HEIGHT * 0.64 * 0.84 * 0.2 - //dates list
-  8.7 - //triangle
-  constants.WIDTH * 0.025;
-const height = TASK_CONTAINER_HEIGHT;
+// const TASK_CONTAINER_HEIGHT =
+//   constants.HEIGHT * 0.64 * 0.84 - //topView till lists
+//   constants.HEIGHT * 0.64 * 0.84 * 0.2 - //date header
+//   constants.HEIGHT * 0.64 * 0.84 * 0.2 - //dates list
+//   8.7 - //triangle
+//   constants.WIDTH * 0.025;
+// const height = TASK_CONTAINER_HEIGHT;
 
 const DisplayTask = ({
   data,
@@ -66,6 +71,8 @@ const DisplayTask = ({
   openTaskModal,
   task,
   setTask,
+  isRenderTaskFromAllTasks,
+  TASK_CONTAINER_HEIGHT,
 }: props) => {
   const [
     DeleteTask,
@@ -181,16 +188,13 @@ const DisplayTask = ({
         <Animated.View
           // entering={ZoomIn.duration(500)}
           // {...(sharedX.value === 0 && {exiting: SlideOutRight})}
-          style={[styles.taskListContainer, {...(!index && {marginTop: 0})}]}>
+          style={[
+            styles.taskListContainer,
+            {height: TASK_CONTAINER_HEIGHT * 0.3663},
+            {...(!index && {marginTop: 0})},
+          ]}>
           <View style={styles.taskListContent}>
-            <TouchableOpacity
-              onPress={
-                () => goToEditTask(item as TaskType)
-                // openDeleteModal({
-                //   name: item.name as string,
-                //   id: item._id as string,
-                // })
-              }>
+            <TouchableOpacity onPress={() => goToEditTask(item as TaskType)}>
               {item.isSetTime && (
                 <View style={{alignSelf: 'flex-start'}}>
                   <Text style={styles.taskContentHour}>{itemHours}</Text>
@@ -281,48 +285,65 @@ const DisplayTask = ({
         }),
     [],
   );
-  const renderItem = useCallback((props: any) => <RenderItem {...props} />, []);
+  const renderItem = useCallback((props: any) => {
+    if (isRenderTaskFromAllTasks) {
+      const item = {...props.item, sharedX, goToEditTask};
+      return <RenderTask {...props} item={item} />;
+    }
+    return isRenderTaskFromAllTasks ? (
+      <RenderTask {...props} />
+    ) : (
+      <RenderItem {...props} />
+    );
+  }, []);
   const keyExtractor: (item: RenderItemProps, index: number) => string =
     useCallback((item: RenderItemProps) => item._id!, []);
+  const contentH = useMemo(() => {
+    return isRenderTaskFromAllTasks
+      ? TASK_CONTAINER_HEIGHT
+      : TASK_CONTAINER_HEIGHT - 0.185 * TASK_CONTAINER_HEIGHT;
+  }, [isRenderTaskFromAllTasks, TASK_CONTAINER_HEIGHT]);
   return (
     <View
       style={{
         justifyContent: 'flex-start',
         alignItems: 'center',
-        height: height,
+        height: TASK_CONTAINER_HEIGHT,
       }}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={openTaskModal}
-          style={[styles.PlusIcon, {zIndex: 1}]}>
-          <SVG.plusIconOutlined fill={constants.colors.BGC} />
-        </TouchableOpacity>
-        <Text style={styles.taskHeaderTitle}>Tasks</Text>
-      </View>
       <View
         style={{
           width: '100%',
-          height: height - 0.185 * height,
+          height: contentH,
+          // backgroundColor: 'red',
         }}>
         <GestureDetector gesture={gestureX}>
           <Animated.FlatList
+            fadingEdgeLength={350}
             style={{transform: [{translateX: sharedX}]}}
             data={data}
             ListEmptyComponent={emptyList}
             renderItem={renderItem}
             keyExtractor={keyExtractor}
-            contentContainerStyle={{paddingBottom: height * 0.01}}
+            contentContainerStyle={{
+              paddingBottom: TASK_CONTAINER_HEIGHT * 0.07,
+            }}
           />
         </GestureDetector>
-        <View
-          style={{
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: height * 0.03,
-            // backgroundColor: 'red',
-          }}>
-          {data?.length > 2 && <SVG.ArrowDown />}
-        </View>
+        {!isRenderTaskFromAllTasks && (
+          <View
+            style={{
+              // alignItems: 'center',
+              // justifyContent: 'flex-end',
+              alignSelf: 'center',
+              // position: 'absolute',
+              bottom: 0,
+              // flex: 1,
+              height: TASK_CONTAINER_HEIGHT - contentH,
+              // backgroundColor: 'red',
+            }}>
+            {data?.length > 2 && <SVG.ArrowDown />}
+          </View>
+        )}
         <DeleteModal
           _id={deleteProps.id as string}
           name={deleteProps.name as string}
@@ -339,7 +360,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignSelf: 'center',
     width: '90.36%',
-    height: height * 0.3663,
+    // height: TASK_CONTAINER_HEIGHT * 0.3663,
     backgroundColor: constants.colors.OFF_WHITE,
     // height
     // backgroundColor: 'red',
@@ -351,22 +372,6 @@ const styles = StyleSheet.create({
     borderRadius: 9999,
     backgroundColor: constants.colors.OFF_WHITE,
     elevation: 5,
-  },
-  header: {
-    // marginBottom: 6,
-    width: '100%',
-    paddingLeft: '5%',
-    paddingRight: '5%',
-    // backgroundColor: 'red',
-    height: height * 0.17,
-    justifyContent: 'center',
-    // alignItems: 'center',
-  },
-  taskHeaderTitle: {
-    fontFamily: constants.Fonts.paragraph,
-    color: constants.colors.BGC,
-    fontSize: 20,
-    // fontWeight: '600',
   },
   taskTxt: {
     fontSize: 15,

@@ -87,7 +87,7 @@ const Messages = () => {
     setSelected([]);
   }, [isSelectOn]);
 
-  const navToEditTask = React.useCallback((msg: IMessageValues) => {
+  const navToEditMessage = React.useCallback((msg: IMessageValues) => {
     navigation.navigate('Message' as never, {messageRouteProp: msg} as never);
   }, []);
 
@@ -139,7 +139,7 @@ const Messages = () => {
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
-          //   backgroundColor: 'red',
+          // backgroundColor: 'red',
         }}>
         <TouchableOpacity style={styles.backIcon} onPress={goBack}>
           <AntDesign
@@ -205,7 +205,7 @@ const Messages = () => {
                   isSelectOn,
                   handleSelected,
                   selected,
-                  navToEditTask,
+                  navToEditMessage,
                 }}
                 scrollToOverflowEnabled
               />
@@ -224,7 +224,7 @@ const Messages = () => {
                 onPress={() =>
                   isSelectOn
                     ? handleSelected(lastMsg._id!)
-                    : navToEditTask(lastMsg)
+                    : navToEditMessage(lastMsg)
                 }>
                 <Animated.View
                   style={{height: lastMsgH, width: width * 0.9}}

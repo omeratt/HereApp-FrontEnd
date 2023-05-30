@@ -1,6 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 import type {RootState} from '../../store';
+import {CategoryListType} from '../../../assets/constants';
 
 // Define a type for the slice state
 export interface UserState {
@@ -11,6 +12,7 @@ export interface UserState {
   isSignIn?: boolean;
   img?: string;
   tasks?: TaskType[];
+  categoriesList: CategoryListType[];
   token?: string;
 }
 export interface TaskType {
@@ -32,20 +34,13 @@ const initialState: UserState = {
   img: undefined,
   isSignIn: false,
   token: '',
+  categoriesList: [],
 };
 
 export const userSlice = createSlice({
   name: 'user',
-  // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: {
-    // increment: state => {
-    //   state.value += 1;
-    // },
-    // decrement: state => {
-    //   state.value -= 1;
-    // },
-    // Use the PayloadAction type to declare the contents of `action.payload`
     setUser: (state, action: PayloadAction<UserState>) => {
       state = {...state, ...action.payload};
       return state;
@@ -58,14 +53,20 @@ export const userSlice = createSlice({
       state = {...initialState};
       return state;
     },
+    setCategoriesList: (state, action: PayloadAction<CategoryListType[]>) => {
+      state = {...state, categoriesList: [...action.payload]};
+      return state;
+    },
   },
 });
 
-export const {setUser, login, logout} = userSlice.actions;
+export const {setUser, login, logout, setCategoriesList} = userSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectUser = (state: RootState) => state.reducer.user;
 export const selectUserToken = (state: RootState) => state.reducer.user.token;
 export const selectIsSignIn = (state: RootState) => state.reducer.user.isSignIn;
+export const selectCategoriesList = (state: RootState) =>
+  state.reducer.user.categoriesList;
 
 export default userSlice.reducer;

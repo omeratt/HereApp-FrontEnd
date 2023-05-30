@@ -31,7 +31,10 @@ const paddingVertical = HEIGHT * (22 / 896);
 const textLengthLimit = 21;
 
 type RootStackParamList = {
-  Message: {messageRouteProp: IMessageValues | undefined};
+  Message: {
+    messageRouteProp: IMessageValues | undefined;
+    navFromSearch: boolean | undefined;
+  };
 };
 type MessageRouteProp = RouteProp<RootStackParamList, 'Message'>;
 const initialValues: IMessageValues = {
@@ -44,6 +47,7 @@ const initialValues: IMessageValues = {
 const Message: React.FC<IMessagesProps> = () => {
   const messageRouteProp =
     useRoute<MessageRouteProp>().params?.messageRouteProp;
+  const navFromSearch = useRoute<MessageRouteProp>().params?.navFromSearch;
   const [addMsg, {isLoading: addLoading}] = useAddOrEditMessageMutation();
   const navigation = useNavigation();
   const [darkMode, setDarkMode] = useState<boolean>(false);
@@ -53,6 +57,9 @@ const Message: React.FC<IMessagesProps> = () => {
   const inputRef = React.useRef<TextInput>(null);
   const changeDarkMode = () => setDarkMode(prev => !prev);
   const goBack = React.useCallback(() => {
+    if (navFromSearch) {
+      return navigation.navigate('Search' as never);
+    }
     navigation.navigate('Messages' as never);
   }, []);
 

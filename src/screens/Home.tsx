@@ -22,7 +22,7 @@ import CalendarModal from '../components/CalendarModal';
 import RenderListCategoryHome from '../components/RenderListCategoryHome';
 import BoardingBoxWrapper from '../components/boardingBox/BoardingBoxWrapper';
 import NextTask from '../components/boardingBox/NextTask';
-import {TaskType} from '../app/Reducers/User/userSlice';
+import {TaskType, setCategoriesList} from '../app/Reducers/User/userSlice';
 
 const CURRENT_DATE = new Date();
 const allDates = getDatesForYear(CURRENT_DATE);
@@ -80,7 +80,9 @@ const Home = () => {
     error: prioritizedListsFetchError,
     isLoading: prioritizedListsLoading,
   } = useGetPrioritizedListsQuery(null);
-
+  useEffect(() => {
+    if (lists) dispatch(setCategoriesList(lists));
+  }, [lists]);
   const {
     isLoading: tasksLoading,
     data: tasks,
@@ -124,6 +126,9 @@ const Home = () => {
   }, []);
   const goToPlayGround = useCallback(() => {
     navigation.navigate('PlayGround' as never);
+  }, []);
+  const goToSearch = useCallback(() => {
+    navigation.navigate('Search' as never);
   }, []);
   const handleListPlusIcon = useCallback(() => {
     navigation.navigate(
@@ -248,6 +253,14 @@ const Home = () => {
             />
           </View>
           <View style={styles.taskListColumnContainer}>
+            <View style={styles.taskHeader}>
+              <TouchableOpacity
+                onPress={openTaskModal}
+                style={[styles.PlusIcon, {zIndex: 1}]}>
+                <SVG.plusIconOutlined fill={constants.colors.BGC} />
+              </TouchableOpacity>
+              <Text style={styles.taskHeaderTitle}>Tasks</Text>
+            </View>
             <DisplayTask
               data={tasks}
               isTaskLoading={tasksLoading}
@@ -260,6 +273,7 @@ const Home = () => {
               openTaskModal={openTaskModal}
               task={editTaskDetails}
               setTask={setEditTaskDetails}
+              TASK_CONTAINER_HEIGHT={TASK_CONTAINER_HEIGHT}
             />
 
             {/* {tasks?.length > 0 ? (
@@ -285,11 +299,7 @@ const Home = () => {
             </TouchableOpacity>
             <Text style={styles.myListTitle}>Lists</Text>
           </View>
-          <View
-            // onLayout={e => {
-            //   console.log(e.nativeEvent.layout.height / constants.HEIGHT);
-            // }}
-            style={styles.categoryContainer}>
+          <View style={styles.categoryContainer}>
             {prioritizedLists && lists && (
               <FlashList
                 contentContainerStyle={{
@@ -307,34 +317,13 @@ const Home = () => {
         </View>
       </View>
       <View style={styles.middleView}>
-        {/* <View style={styles.box}>
-          <View style={styles.topBox}></View>
-          <View style={styles.bottomPlusBox}>
-            <SVG.plusIconOutlined
-              style={styles.boxPlusIcon}
-              fill={constants.colors.BGC}
-              height="80%"
-            />
-          </View>
-        </View>
-        <View style={styles.box}>
-          <View style={styles.topBox}></View>
-          <View style={styles.bottomPlusBox}>
-            <SVG.plusIconOutlined
-              style={styles.boxPlusIcon}
-              fill={constants.colors.BGC}
-              height="80%"
-            />
-          </View>
-        </View>
-        <View style={styles.box}></View> */}
         <BoardingBoxWrapper />
         <BoardingBoxWrapper />
         <BoardingBoxWrapper Component={NextTask} />
       </View>
       <View style={styles.bottomView}>
         <View style={{width: '35.33%'}}>
-          <SVG.Search height="100%" width="100%" />
+          <SVG.Search onPress={goToSearch} height="100%" width="100%" />
         </View>
         <View style={{width: '35.33%'}}>
           <SVG.BoxIcon
@@ -499,6 +488,31 @@ const styles = StyleSheet.create({
     // borderColor: 'brown',
     // borderWidth: 1,
     padding: '0%',
+  },
+  taskHeader: {
+    // marginBottom: 6,
+    width: '100%',
+    paddingLeft: '5%',
+    paddingRight: '5%',
+    // backgroundColor: 'red',
+    flexDirection: 'row',
+    height: TASK_CONTAINER_HEIGHT * 0.17,
+    // justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  PlusIcon: {
+    position: 'absolute',
+    color: constants.colors.BLACK,
+    right: '6.5%',
+    borderRadius: 9999,
+    backgroundColor: constants.colors.OFF_WHITE,
+    elevation: 5,
+  },
+  taskHeaderTitle: {
+    fontFamily: constants.Fonts.paragraph,
+    color: constants.colors.BGC,
+    fontSize: 20,
+    // fontWeight: '600',
   },
   myListContainer: {
     // height: '16%',

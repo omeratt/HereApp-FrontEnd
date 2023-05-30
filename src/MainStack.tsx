@@ -19,6 +19,7 @@ import PlayGround from './screens/PlayGround';
 import Message from './screens/message/Message';
 import Messages from './screens/message/Messages';
 import Search from './screens/Search';
+import AllMyTasks from './screens/task/AllMyTasks';
 const ICON_SIZE = 20;
 // const Stack = createNativeStackNavigator();
 const Stack = createDrawerNavigator();
@@ -74,6 +75,19 @@ export default function MainStack() {
         {isSignIn ? (
           <>
             <Stack.Screen
+              name="AllMyTasks"
+              component={AllMyTasks}
+              options={{
+                swipeEnabled: false,
+                headerShown: false,
+                drawerLabel(props) {
+                  return (
+                    <Label label={'All My Tasks'} isFocused={props.focused} />
+                  );
+                },
+              }}
+            />
+            {/* <Stack.Screen
               name="Search"
               component={Search}
               options={{
@@ -104,7 +118,7 @@ export default function MainStack() {
                   );
                 },
               }}
-            />
+            /> */}
             <Stack.Screen
               name="HomePage"
               component={Home}

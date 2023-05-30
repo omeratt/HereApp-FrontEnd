@@ -17,6 +17,7 @@ export interface ListType {
   categoryId?: string;
   new?: boolean;
   categoryName?: string;
+  category?: string;
 }
 
 export interface ListItemType {

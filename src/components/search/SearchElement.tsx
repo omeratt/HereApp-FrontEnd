@@ -1,8 +1,12 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 
 import React from 'react';
-import constants from '../../assets/constants';
-import {ISearchElementProps} from './types';
+import constants, {CategoryListType} from '../../assets/constants';
+import {
+  IListSearchResult,
+  IMessageSearchResult,
+  ISearchElementProps,
+} from './types';
 import {getTimeFromDateString} from '../WeeklyCalender';
 import Animated, {
   FadeInUp,
@@ -10,6 +14,9 @@ import Animated, {
   FadeOutUp,
   SequencedTransition,
 } from 'react-native-reanimated';
+import {useNavigation} from '@react-navigation/core';
+import {useAppSelector} from '../../app/hooks';
+import {selectCategoriesList} from '../../app/Reducers/User/userSlice';
 const {HEIGHT, WIDTH} = constants;
 const paddingVertical = HEIGHT * (45 / 896);
 
@@ -25,10 +32,57 @@ const formatDate = (date: Date) =>
     .replace(/(\d{2})(\/)(\d{2})(\/)(\d{2})/g, '$1 / $3 / $5');
 
 const SearchElement: React.FC<ISearchElementProps> = ({items, title}) => {
-  //   if (!items) return <Animated.View exiting={FadeOutUp} entering={FadeInUp} />;
   const isTask = React.useMemo(() => title === 'TASKS', [title]);
   const isMsg = React.useMemo(() => title === 'MESSAGE TO MYSELF', [title]);
-
+  const isList = React.useMemo(() => title === 'LIST & NOTES', [title]);
+  const navigation = useNavigation();
+  const categoriesList = useAppSelector(selectCategoriesList);
+  const findCategoryIndex = (categoryId: string) => {
+    const listIndex = categoriesList.findIndex(list => list._id === categoryId);
+    return listIndex;
+  };
+  const findListIndexInCategory = (categoryIndex: number, listId: string) => {
+    const listIndex = categoriesList[categoryIndex]?.lists?.findIndex(
+      list => list._id === listId,
+    );
+    return listIndex;
+  };
+  const navigateToList = React.useCallback(
+    (indexOfSearch: number) => {
+      const categoryId = (items as IListSearchResult[])[indexOfSearch]
+        .category!;
+      const listId = (items as IListSearchResult[])[indexOfSearch]._id;
+      const categoryIndex = findCategoryIndex(categoryId);
+      const listIndex = findListIndexInCategory(categoryIndex, listId);
+      console.log({categoryId, categoryIndex, listIndex});
+      navigation.navigate(
+        'ListAndNotesStack' as never,
+        {
+          screen: 'CreateOrEditList' as never,
+          params: {categoryIndex, listIndex, navFromHome: false} as never,
+        } as never,
+      );
+    },
+    [categoriesList],
+  );
+  const navToEditMessage = React.useCallback((index: number) => {
+    const msg = (items as IMessageSearchResult[])[index];
+    navigation.navigate(
+      'Message' as never,
+      {messageRouteProp: msg, navFromSearch: true} as never,
+    );
+  }, []);
+  const navigateByType = React.useCallback(
+    (index: number) => {
+      if (isList) {
+        return navigateToList(index);
+      }
+      if (isMsg) {
+        return navToEditMessage(index);
+      }
+    },
+    [isList, isMsg, isTask],
+  );
   return (
     <Animated.View
       style={styles.container}
@@ -38,25 +92,31 @@ const SearchElement: React.FC<ISearchElementProps> = ({items, title}) => {
       <Text style={styles.titleTxt}>{title}</Text>
       {items?.map(({data: {description, name}}, index) => {
         return (
-          <View style={styles.txtContainer} key={index}>
-            <Text numberOfLines={1} style={styles.dataName}>
-              {isMsg ? formatDate(new Date(name)) : name}
-            </Text>
-            {!isTask ? (
-              <Text numberOfLines={1} style={styles.dataDesc}>
-                {description}
+          <TouchableOpacity key={index} onPress={() => navigateByType(index)}>
+            <Animated.View
+              layout={SequencedTransition}
+              entering={FadeInUp}
+              exiting={FadeOutUp}
+              style={styles.txtContainer}>
+              <Text numberOfLines={1} style={styles.dataName}>
+                {isMsg ? formatDate(new Date(name)) : name}
               </Text>
-            ) : (
-              <View style={styles.taskDateContainer}>
-                <Text numberOfLines={1} style={styles.taskDate}>
-                  {formatDate(new Date(description))}
+              {!isTask ? (
+                <Text numberOfLines={1} style={styles.dataDesc}>
+                  {description}
                 </Text>
-                <Text numberOfLines={1} style={styles.taskDate}>
-                  {getTimeFromDateString(description, false, true)}
-                </Text>
-              </View>
-            )}
-          </View>
+              ) : (
+                <View style={styles.taskDateContainer}>
+                  <Text numberOfLines={1} style={styles.taskDate}>
+                    {formatDate(new Date(description))}
+                  </Text>
+                  <Text numberOfLines={1} style={styles.taskDate}>
+                    {getTimeFromDateString(description, false, true)}
+                  </Text>
+                </View>
+              )}
+            </Animated.View>
+          </TouchableOpacity>
         );
       })}
     </Animated.View>

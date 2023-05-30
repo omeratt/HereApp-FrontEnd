@@ -33,7 +33,7 @@ const RenderMessageItem = (props: Props) => {
         onPress={() =>
           props.extraData.isSelectOn
             ? props.extraData.handleSelected(props.item._id!)
-            : props.extraData.navToEditTask(props.item)
+            : props.extraData.navToEditMessage(props.item)
         }>
         <Animated.View
           entering={FadeInUp}

@@ -9,39 +9,42 @@ import {
   View,
 } from 'react-native';
 import React, {useCallback, useMemo, useRef, useState} from 'react';
-import constants from '../assets/constants';
-import SVG from '../assets/svg';
-import Line from './Line';
+import constants from '../../assets/constants';
+import SVG from '../../assets/svg';
 import SwitchToggle from 'react-native-switch-toggle';
-import {useAddTaskMutation} from '../app/api/taskApi';
-import DatePickerModal from './DatePickerModal';
-import Notes from './Notes';
-import SetTimeContent from './SetTimeContent';
-import FrequencyPickerModal from './FrequencyPickerModal';
+import {useAddTaskMutation} from '../../app/api/taskApi';
+
 import {BottomSheetModal} from '@gorhom/bottom-sheet';
 import {useFocusEffect} from '@react-navigation/native';
-import {TaskType} from '../app/Reducers/User/userSlice';
-import {getRealDate, getTimeFromDateString} from './WeeklyCalender';
+import {TaskType} from '../../app/Reducers/User/userSlice';
+import {
+  getRealDate,
+  getTimeFromDateString,
+} from '../../components/WeeklyCalender';
+import Line from '../../components/Line';
+import SetTimeContent from '../../components/SetTimeContent';
+import Notes from '../../components/Notes';
+import DatePickerModal from '../../components/DatePickerModal';
+import FrequencyPickerModal from '../../components/FrequencyPickerModal';
 const realDate = new Date();
 const hours = getTimeFromDateString(realDate.toISOString(), true, true);
-const {min: minimumDate, max: maximumDate} = constants.Dates;
+const {min: minDate, max: maxDate} = constants.Dates;
 interface props {
   task?: TaskType;
-  setTask?: React.Dispatch<React.SetStateAction<TaskType | undefined>>;
+  setTask: React.Dispatch<React.SetStateAction<TaskType | undefined>>;
   closeModal: any;
-  targetDate?: Date;
-  setTargetDate?: (date: Date) => void;
+  targetDate: Date;
+  setTargetDate: (date: Date) => void;
   findDateAndScroll?: (DateToCheck: Date) => void;
 }
 type DateFormat = 'datetime' | 'date' | 'time';
 const FreqData = [...constants.FreqList];
 const currFreq = FreqData[0];
-const NewTask: React.FC<props> = ({
+const Task: React.FC<props> = ({
   task,
   setTask,
   closeModal,
   targetDate,
-  setTargetDate,
   findDateAndScroll,
 }) => {
   const [pushOn, setPushOn] = useState(task?.push ? task.push : false);
@@ -83,7 +86,7 @@ const NewTask: React.FC<props> = ({
 
   React.useEffect(() => {
     return () => {
-      setTask?.(undefined);
+      setTask(undefined);
     };
   }, []);
   const submit = async () => {
@@ -342,8 +345,8 @@ const NewTask: React.FC<props> = ({
           date={startDate}
           dateFormat={dateTypeRef.current}
           setDate={isEndDate.current ? SetEndDate : setStartDate}
-          minimumDate={minimumDate}
-          maximumDate={maximumDate}
+          minimumDate={minDate}
+          maximumDate={maxDate}
           isSetTimeRef={isSetTime}
           targetDateHoursRef={targetDateHoursRef}
           bottomSheetModalRef={bottomSheetModalRef}
@@ -361,15 +364,16 @@ const NewTask: React.FC<props> = ({
   );
 };
 
-export default NewTask;
+export default React.memo(Task);
 
 const styles = StyleSheet.create({
   container: {
+    alignSelf: 'center',
     width: constants.WIDTH,
     height: '100%',
-    // flexGrow: 1,
     backgroundColor: constants.colors.OFF_WHITE,
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: '3.2%',
   },
   realContainer: {

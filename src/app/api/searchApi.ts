@@ -8,6 +8,7 @@ export const searchApi = apiSlice.injectEndpoints({
         url: 'search',
         params,
       }),
+      providesTags: ['Search'],
       transformResponse: (response: any, meta, arg) => {
         return response.data as ISearchResult;
       },

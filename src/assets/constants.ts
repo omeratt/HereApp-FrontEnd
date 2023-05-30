@@ -52,6 +52,10 @@ const constants = {
     button: 'Montserrat-Thin',
     italic: 'Montserrat-MediumItalic',
   },
+  Dates: {
+    max: new Date(),
+    min: new Date(),
+  },
   HEIGHT,
   WIDTH,
   FreqList: [

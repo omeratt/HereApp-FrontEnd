@@ -264,8 +264,6 @@ const Home = () => {
             closeModal={closeTaskModal}
             targetDate={selectedDate}
             setTargetDate={SetSelectedDate}
-            maximumDate={flatListData[initialNumToRender - 1]?.fullDate}
-            minimumDate={flatListData[0]?.fullDate}
             findDateAndScroll={findDateAndScroll}
             task={editTaskDetails}
             setTask={setEditTaskDetails}

@@ -75,19 +75,6 @@ export default function MainStack() {
         {isSignIn ? (
           <>
             <Stack.Screen
-              name="AllMyTasks"
-              component={AllMyTasks}
-              options={{
-                swipeEnabled: false,
-                headerShown: false,
-                drawerLabel(props) {
-                  return (
-                    <Label label={'All My Tasks'} isFocused={props.focused} />
-                  );
-                },
-              }}
-            />
-            {/* <Stack.Screen
               name="Search"
               component={Search}
               options={{
@@ -118,7 +105,7 @@ export default function MainStack() {
                   );
                 },
               }}
-            /> */}
+            />
             <Stack.Screen
               name="HomePage"
               component={Home}
@@ -155,6 +142,19 @@ export default function MainStack() {
                 headerShown: false,
                 drawerItemStyle: {display: 'none'},
                 unmountOnBlur: true,
+              }}
+            />
+            <Stack.Screen
+              name="AllMyTasks"
+              component={AllMyTasks}
+              options={{
+                swipeEnabled: false,
+                headerShown: false,
+                drawerLabel(props) {
+                  return (
+                    <Label label={'All My Tasks'} isFocused={props.focused} />
+                  );
+                },
               }}
             />
             <Stack.Screen

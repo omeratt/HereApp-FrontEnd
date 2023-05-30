@@ -10,6 +10,10 @@ export interface ISearchElementProps {
   title?: string;
   items?: IListSearchResult[] | ITaskSearchResult[] | IMessageSearchResult[];
   navigateTo?: (id: string) => void;
+  setSelectedTask?: React.Dispatch<
+    React.SetStateAction<ITaskSearchResult | undefined>
+  >;
+  openTaskModal?: () => void;
 }
 export interface ISearchResult {
   lists: IListSearchResult[];

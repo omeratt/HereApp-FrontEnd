@@ -1,11 +1,12 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 
-import React from 'react';
+import React, {useCallback, useMemo, useRef} from 'react';
 import constants, {CategoryListType} from '../../assets/constants';
 import {
   IListSearchResult,
   IMessageSearchResult,
   ISearchElementProps,
+  ITaskSearchResult,
 } from './types';
 import {getTimeFromDateString} from '../WeeklyCalender';
 import Animated, {
@@ -16,7 +17,12 @@ import Animated, {
 } from 'react-native-reanimated';
 import {useNavigation} from '@react-navigation/core';
 import {useAppSelector} from '../../app/hooks';
-import {selectCategoriesList} from '../../app/Reducers/User/userSlice';
+import {
+  TaskType,
+  selectCategoriesList,
+} from '../../app/Reducers/User/userSlice';
+import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import NewTask from '../NewTask';
 const {HEIGHT, WIDTH} = constants;
 const paddingVertical = HEIGHT * (45 / 896);
 
@@ -31,7 +37,12 @@ const formatDate = (date: Date) =>
     .replace(/\./g, '/')
     .replace(/(\d{2})(\/)(\d{2})(\/)(\d{2})/g, '$1 / $3 / $5');
 
-const SearchElement: React.FC<ISearchElementProps> = ({items, title}) => {
+const SearchElement: React.FC<ISearchElementProps> = ({
+  items,
+  title,
+  setSelectedTask,
+  openTaskModal,
+}) => {
   const isTask = React.useMemo(() => title === 'TASKS', [title]);
   const isMsg = React.useMemo(() => title === 'MESSAGE TO MYSELF', [title]);
   const isList = React.useMemo(() => title === 'LIST & NOTES', [title]);
@@ -72,6 +83,11 @@ const SearchElement: React.FC<ISearchElementProps> = ({items, title}) => {
       {messageRouteProp: msg, navFromSearch: true} as never,
     );
   }, []);
+  const navToTask = React.useCallback((index: number) => {
+    const task = (items as ITaskSearchResult[])[index];
+    setSelectedTask?.(task);
+    openTaskModal?.();
+  }, []);
   const navigateByType = React.useCallback(
     (index: number) => {
       if (isList) {
@@ -80,9 +96,11 @@ const SearchElement: React.FC<ISearchElementProps> = ({items, title}) => {
       if (isMsg) {
         return navToEditMessage(index);
       }
+      if (isTask) return navToTask(index);
     },
     [isList, isMsg, isTask],
   );
+
   return (
     <Animated.View
       style={styles.container}
@@ -119,6 +137,7 @@ const SearchElement: React.FC<ISearchElementProps> = ({items, title}) => {
           </TouchableOpacity>
         );
       })}
+      {/* Task Modal */}
     </Animated.View>
   );
 };

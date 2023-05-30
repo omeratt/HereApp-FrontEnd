@@ -60,7 +60,7 @@ export const tasksApi = apiSlice.injectEndpoints({
         body: task,
         credentials: 'include',
       }),
-      invalidatesTags: ['TasksByDate'],
+      invalidatesTags: ['TasksByDate', 'Search'],
       transformResponse: (response: any, meta, arg) => {
         return response.data;
       },

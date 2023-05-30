@@ -27,7 +27,12 @@ import {TaskType, setCategoriesList} from '../app/Reducers/User/userSlice';
 const CURRENT_DATE = new Date();
 const allDates = getDatesForYear(CURRENT_DATE);
 const flatListData = Object.values(allDates);
+// maximumDate={flatListData[initialNumToRender - 1]?.fullDate}
+//             minimumDate={flatListData[0]?.fullDate}
 const initialNumToRender = flatListData.length;
+console.log({initialNumToRender});
+constants.Dates.max = flatListData[initialNumToRender - 1]?.fullDate;
+constants.Dates.min = flatListData[0]?.fullDate;
 export const DATE_WIDTH = constants.WIDTH * 0.89444444444444444444444444444444;
 export const TASK_CONTAINER_HEIGHT =
   constants.HEIGHT * 0.64 * 0.84 - //topView till lists
@@ -366,8 +371,6 @@ const Home = () => {
             closeModal={closeTaskModal}
             targetDate={selectedDate}
             setTargetDate={SetSelectedDate}
-            maximumDate={flatListData[initialNumToRender - 1]?.fullDate}
-            minimumDate={flatListData[0]?.fullDate}
             findDateAndScroll={findDateAndScroll}
             task={editTaskDetails}
             setTask={setEditTaskDetails}

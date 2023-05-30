@@ -14,19 +14,17 @@ export const getShortName = (dayOfWeek: number): string => {
   return names[dayOfWeek];
 };
 export const getRealDate = (
-  date: Date,
+  date?: Date,
   isSetToCurrentHours?: boolean,
 ): Date => {
-  const realDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  const fixedDate = date ? date : new Date();
+  const realDate = new Date(
+    fixedDate.getTime() - fixedDate.getTimezoneOffset() * 60000,
+  );
   if (isSetToCurrentHours) {
-    // const localDate = new Date().toISOString();
-    //  console.log(date.toLocaleTimeString());
-    // console.log(new Date().toLocaleTimeString());
     const time = new Date().toLocaleTimeString();
-    // const subTime = time.split(':');
     const [hours, minutes] = time.split(':');
     realDate.setUTCHours(+hours, +minutes);
-    // const [];
   }
   return realDate;
 };

@@ -55,7 +55,9 @@ const TextInput = forwardRef<InputHandle, MyTextInputProps>((props, ref) => {
             : [styles.textInput, props.style]
         }
         secureTextEntry={isSecurePass}
-        placeholderTextColor={constants.colors.GREY}
+        placeholderTextColor={
+          props.placeholderTextColor || constants.colors.GREY
+        }
         returnKeyType={props.onSubmitEditing ? 'next' : 'done'}
         blurOnSubmit={props.onSubmitEditing ? false : true}
         ref={textInputRef}

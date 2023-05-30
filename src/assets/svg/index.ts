@@ -19,7 +19,13 @@ import GreenSelect from './GreenSelect.svg';
 import NotePlus from './NotePlus.svg';
 import Trash from './Trash.svg';
 import TrashBlack from './TrashBlack.svg';
+import TrashWhite from './TrashWhite.svg';
+import TrashGreen from './TrashGreen.svg';
+import SendBtn from './SendBtn.svg';
 const SVG = {
+  TrashWhite,
+  TrashGreen,
+  SendBtn,
   TrashBlack,
   Trash,
   GreenSelect,

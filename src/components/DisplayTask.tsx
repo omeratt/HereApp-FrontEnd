@@ -35,6 +35,7 @@ export interface RenderItemProps {
   isSetTime?: boolean;
   sharedX?: SharedValue<number>;
   goToEditTask?: (_task: TaskType) => void;
+  taskH: number;
 }
 interface props {
   data: any[];
@@ -178,11 +179,8 @@ const DisplayTask = ({
     ({item, index}) => {
       const itemHours = getTimeFromDateString(item.targetDate);
       useEffect(() => {
-        // if (sharedX.value !== 0) {
         sharedX.value = sharedX.value < 0 ? TASK_WIDTH * 2 : -TASK_WIDTH * 2;
         sharedX.value = withSpring(0, springConfig);
-        // sharedX.value = 0;
-        // }
       }, []);
       return (
         <Animated.View
@@ -190,7 +188,7 @@ const DisplayTask = ({
           // {...(sharedX.value === 0 && {exiting: SlideOutRight})}
           style={[
             styles.taskListContainer,
-            {height: TASK_CONTAINER_HEIGHT * 0.3663},
+            {height: TASK_CONTAINER_HEIGHT * 0.32},
             {...(!index && {marginTop: 0})},
           ]}>
           <View style={styles.taskListContent}>
@@ -287,7 +285,12 @@ const DisplayTask = ({
   );
   const renderItem = useCallback((props: any) => {
     if (isRenderTaskFromAllTasks) {
-      const item = {...props.item, sharedX, goToEditTask};
+      const item = {
+        ...props.item,
+        sharedX,
+        goToEditTask,
+        taskH: TASK_CONTAINER_HEIGHT,
+      };
       return <RenderTask {...props} item={item} />;
     }
     return isRenderTaskFromAllTasks ? (
@@ -318,14 +321,16 @@ const DisplayTask = ({
         }}>
         <GestureDetector gesture={gestureX}>
           <Animated.FlatList
-            fadingEdgeLength={350}
+            fadingEdgeLength={isRenderTaskFromAllTasks ? 350 : 50}
             style={{transform: [{translateX: sharedX}]}}
             data={data}
             ListEmptyComponent={emptyList}
             renderItem={renderItem}
             keyExtractor={keyExtractor}
             contentContainerStyle={{
-              paddingBottom: TASK_CONTAINER_HEIGHT * 0.07,
+              paddingBottom: !isRenderTaskFromAllTasks
+                ? TASK_CONTAINER_HEIGHT * 0.005
+                : TASK_CONTAINER_HEIGHT * 0.07,
             }}
           />
         </GestureDetector>

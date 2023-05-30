@@ -58,6 +58,9 @@ const Home = () => {
 
   const goBack = useCallback(() => {
     console.log('goBack');
+    navigation.canGoBack()
+      ? navigation.goBack()
+      : navigation.navigate('HomePage' as never);
   }, [navigation]);
 
   const SetDateHeader = useCallback((header: any) => {
@@ -223,21 +226,16 @@ const Home = () => {
             />
             <View
               style={{
-                // alignItems: 'center',
-                // justifyContent: 'flex-end',
                 height: 20,
                 width: 20,
                 alignSelf: 'center',
                 justifyContent: 'center',
                 alignItems: 'center',
                 position: 'absolute',
-                bottom: -20,
+                bottom: '-5%',
                 zIndex: 20,
-                // flex: 1,
-                // height: TASK_CONTAINER_HEIGHT - contentH,
-                backgroundColor: 'red',
               }}>
-              {tasks?.length >= 6 && <SVG.ArrowDown />}
+              {tasks?.length >= 6 && <SVG.ArrowDown fill={'black'} />}
             </View>
           </View>
         </View>
@@ -323,9 +321,6 @@ const styles = StyleSheet.create({
   },
   task: {
     height: '100%',
-    // borderColor: constants.colors.UNDER_LINE,
-    // borderBottomWidth: 1,
-    // backgroundColor: 'red',
     // padding: '5%',
     // position: 'relative',
   },
@@ -356,7 +351,7 @@ const styles = StyleSheet.create({
   },
   taskListColumnContainer: {
     height: tasksH, //container padding
-    overflow: 'hidden',
+    overflow: 'visible',
     // justifyContent: 'center',
     paddingVertical: 12,
     // backgroundColor: 'cyan',

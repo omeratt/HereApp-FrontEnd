@@ -273,7 +273,7 @@ const Home = () => {
               openTaskModal={openTaskModal}
               task={editTaskDetails}
               setTask={setEditTaskDetails}
-              TASK_CONTAINER_HEIGHT={TASK_CONTAINER_HEIGHT}
+              TASK_CONTAINER_HEIGHT={TASK_CONTAINER_HEIGHT * 1.18}
             />
 
             {/* {tasks?.length > 0 ? (

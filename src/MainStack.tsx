@@ -20,6 +20,7 @@ import Message from './screens/message/Message';
 import Messages from './screens/message/Messages';
 import Search from './screens/Search';
 import AllMyTasks from './screens/task/AllMyTasks';
+import IamNotStupid from './screens/IamNotStupid';
 const ICON_SIZE = 20;
 // const Stack = createNativeStackNavigator();
 const Stack = createDrawerNavigator();
@@ -48,6 +49,29 @@ export default function MainStack() {
     },
     [],
   );
+  const StupidLabel = React.useCallback(({isFocused}: {isFocused: boolean}) => {
+    return (
+      <Text
+        style={[
+          styles.label,
+          {
+            color: isFocused
+              ? constants.colors.GREEN
+              : constants.colors.OFF_WHITE,
+          },
+        ]}>
+        {'I AM '}
+        <Text
+          style={[
+            styles.label,
+            {fontFamily: constants.Fonts.italic, color: constants.colors.GREEN},
+          ]}>
+          {'NOT'}
+        </Text>
+        {' Stupid'}
+      </Text>
+    );
+  }, []);
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -75,22 +99,22 @@ export default function MainStack() {
         {isSignIn ? (
           <>
             <Stack.Screen
-              name="Search"
-              component={Search}
-              options={{
-                swipeEnabled: false,
-                headerShown: false,
-                drawerLabel(props) {
-                  return <Label label={'Search'} isFocused={props.focused} />;
-                },
-              }}
-            />
-            <Stack.Screen
               name="OnBoarding"
               component={OnBoarding}
               options={{
                 headerShown: false,
                 drawerItemStyle: {display: 'none'},
+              }}
+            />
+            <Stack.Screen
+              name="HomePage"
+              component={Home}
+              options={{
+                swipeEnabled: false,
+                headerShown: false,
+                drawerLabel(props) {
+                  return <Label label={'Home'} isFocused={props.focused} />;
+                },
               }}
             />
             <Stack.Screen
@@ -106,14 +130,15 @@ export default function MainStack() {
                 },
               }}
             />
+
             <Stack.Screen
-              name="HomePage"
-              component={Home}
+              name="IamNotStupid"
+              component={IamNotStupid}
               options={{
                 swipeEnabled: false,
                 headerShown: false,
                 drawerLabel(props) {
-                  return <Label label={'Home'} isFocused={props.focused} />;
+                  return <StupidLabel isFocused={props.focused} />;
                 },
               }}
             />
@@ -167,6 +192,17 @@ export default function MainStack() {
                   return <Label label={'Lists'} isFocused={props.focused} />;
                 },
                 unmountOnBlur: true,
+              }}
+            />
+            <Stack.Screen
+              name="Search"
+              component={Search}
+              options={{
+                swipeEnabled: false,
+                headerShown: false,
+                drawerLabel(props) {
+                  return <Label label={'Search'} isFocused={props.focused} />;
+                },
               }}
             />
           </>

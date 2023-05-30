@@ -22,7 +22,11 @@ import TrashBlack from './TrashBlack.svg';
 import TrashWhite from './TrashWhite.svg';
 import TrashGreen from './TrashGreen.svg';
 import SendBtn from './SendBtn.svg';
+import IAmNotStupidTxt from './IAmNotStupidTxt.svg';
+import IAmNotStupid from './IAmNotStupid.svg';
 const SVG = {
+  IAmNotStupid,
+  IAmNotStupidTxt,
   TrashWhite,
   TrashGreen,
   SendBtn,

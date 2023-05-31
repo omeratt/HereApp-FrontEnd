@@ -135,8 +135,10 @@ export default function MainStack() {
               name="IamNotStupid"
               component={IamNotStupid}
               options={{
+                unmountOnBlur: true,
                 swipeEnabled: false,
                 headerShown: false,
+
                 drawerLabel(props) {
                   return <StupidLabel isFocused={props.focused} />;
                 },

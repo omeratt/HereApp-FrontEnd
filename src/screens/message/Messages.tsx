@@ -198,7 +198,7 @@ const Messages = () => {
                 keyExtractor={keyExtractor}
                 estimatedItemSize={200}
                 showsVerticalScrollIndicator={false}
-                initialScrollIndex={data.length - 2}
+                // initialScrollIndex={data.length - 2}
                 contentContainerStyle={{paddingVertical: lastMsgPaddingTop}}
                 fadingEdgeLength={600}
                 extraData={{
@@ -207,7 +207,7 @@ const Messages = () => {
                   selected,
                   navToEditMessage,
                 }}
-                scrollToOverflowEnabled
+                inverted
               />
             </View>
             <Line
@@ -232,8 +232,11 @@ const Messages = () => {
                   <View onLayout={onLayout} style={{alignSelf: 'flex-start'}}>
                     <Text
                       numberOfLines={4}
-                      textBreakStrategy="highQuality"
-                      style={styles.lastMsgTxt}>
+                      // textBreakStrategy="highQuality"
+                      style={[
+                        styles.lastMsgTxt,
+                        // , {maxHeight: '30%'}
+                      ]}>
                       {lastMsg.message}
                       {/* An idea I had for an interactive course - to search in
                       science books */}
@@ -331,6 +334,7 @@ const styles = StyleSheet.create({
     lineHeight: 32,
     color: constants.colors.GREEN,
     width: width * 0.9,
+    // backgroundColor: 'red',
   },
   dateTxt: {
     fontFamily: constants.Fonts.text,

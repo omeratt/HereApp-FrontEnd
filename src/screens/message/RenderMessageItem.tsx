@@ -7,6 +7,7 @@ import {LayoutChangeEvent} from 'react-native';
 import Animated, {
   FadeInDown,
   FadeInUp,
+  SequencedTransition,
   ZoomIn,
   ZoomInRight,
   ZoomOut,
@@ -26,6 +27,16 @@ const RenderMessageItem = (props: Props) => {
   const isSelected = React.useMemo(() => {
     return props.extraData?.selected?.includes(props.item._id!);
   }, [props.extraData?.selected, props.item._id, props.index]);
+  const messageSubString = React.useMemo(() => {
+    const index = props.item.message.indexOf(props.item.title);
+    let result: string;
+    if (index !== -1) {
+      result = props.item.message.substring(0, index);
+    } else {
+      result = props.item.message;
+    }
+    return result;
+  }, [props.item.message, props.item.title]);
 
   return (
     <>
@@ -38,12 +49,13 @@ const RenderMessageItem = (props: Props) => {
         <Animated.View
           entering={FadeInUp}
           onLayout={onLayout}
+          layout={SequencedTransition}
           style={[
             styles.container,
             {...(props.isLastIndex && {marginBottom: 0})},
           ]}>
           <Text style={styles.msgTitleTxt}>{props.item.title}</Text>
-          <Text style={styles.msgTxt}>{props.item.message}</Text>
+          <Text style={styles.msgTxt}>{messageSubString}</Text>
           <Text style={styles.dateTxt}>
             {new Date(props.item.createdAt!).toLocaleString('eng', {
               month: 'short',

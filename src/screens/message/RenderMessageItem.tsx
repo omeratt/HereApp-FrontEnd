@@ -14,6 +14,7 @@ import Animated, {
   ZoomOut,
   ZoomOutRight,
 } from 'react-native-reanimated';
+import {RFPercentage, RFValue} from 'react-native-responsive-fontsize';
 
 const marginBottom = constants.HEIGHT * (40 / 896);
 interface Props extends ListRenderItemInfo<IMessageValues> {
@@ -54,7 +55,7 @@ const RenderMessageItem = (props: Props) => {
           layout={SequencedTransition}
           style={[
             styles.container,
-            {...(props.isLastIndex && {marginBottom: 0})},
+            {...(props.index === 0 && {marginBottom: 0})},
           ]}>
           <Text style={styles.msgTitleTxt}>{props.item.title}</Text>
           <Text style={styles.msgTxt}>{messageSubString}</Text>
@@ -85,31 +86,28 @@ const RenderMessageItem = (props: Props) => {
 };
 
 export default React.memo(RenderMessageItem);
-
+const lineHeight = RFPercentage(3);
 const styles = StyleSheet.create({
   container: {
     alignSelf: 'flex-start',
     marginBottom,
-    // position: 'relative',
-    // zIndex: 0,
-    // backgroundColor: 'red',
   },
   msgTitleTxt: {
     fontFamily: constants.Fonts.text_medium,
-    fontSize: 20,
+    fontSize: RFPercentage(3),
     color: constants.colors.GREEN,
   },
   msgTxt: {
     fontFamily: constants.Fonts.text,
-    fontSize: 15,
+    fontSize: RFPercentage(2),
     color: constants.colors.GREEN,
-    lineHeight: 18,
+    lineHeight: lineHeight,
   },
   dateTxt: {
     fontFamily: constants.Fonts.text,
-    fontSize: 10,
+    fontSize: RFPercentage(1.5),
     color: constants.colors.GREEN,
-    lineHeight: 18,
+    lineHeight: lineHeight,
   },
   checkBoxContainer: {
     position: 'absolute',

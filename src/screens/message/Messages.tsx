@@ -6,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  SafeAreaView,
 } from 'react-native';
 import React, {useRef} from 'react';
 import constants from '../../assets/constants';
@@ -32,6 +33,7 @@ import CheckBox from '../../components/CheckBox';
 import BottomSheetDeleteModal, {
   BottomSheetDeleteModalHandles,
 } from '../../components/BottomSheetDeleteModal';
+import {RFValue} from 'react-native-responsive-fontsize';
 const {WIDTH, HEIGHT} = constants;
 const paddingHorizontal = WIDTH * (30.37 / 414);
 const paddingVertical = HEIGHT * (22 / 896);
@@ -151,6 +153,7 @@ const Messages = () => {
     [],
   );
   return (
+    // <SafeAreaView style={{flex: 1}}>
     <View style={styles.container}>
       <View
         style={{
@@ -250,7 +253,10 @@ const Messages = () => {
                     : navToEditMessage(lastMsg)
                 }>
                 <Animated.View
-                  style={{height: lastMsgH, width: width * 0.9}}
+                  style={{
+                    height: lastMsgH,
+                    width: width * 0.9,
+                  }}
                   layout={SequencedTransition}
                   entering={FadeInUp}
                   exiting={FadeOutUp}>
@@ -276,6 +282,13 @@ const Messages = () => {
                   </View>
                 </Animated.View>
               </TouchableOpacity>
+              <TouchableOpacity style={styles.plusIcon} onPress={navToMessage}>
+                <AntDesign
+                  name="pluscircleo"
+                  color={constants.colors.OFF_WHITE}
+                  size={ICON_PLUS_SIZE - 1}
+                />
+              </TouchableOpacity>
               {isSelectOn && (
                 <Animated.View
                   entering={ZoomIn.duration(250)}
@@ -296,24 +309,25 @@ const Messages = () => {
           </>
         )}
       </View>
-      <TouchableOpacity style={styles.plusIcon} onPress={navToMessage}>
+      {/* <TouchableOpacity style={styles.plusIcon} onPress={navToMessage}>
         <AntDesign
           name="pluscircleo"
           color={constants.colors.OFF_WHITE}
           size={ICON_PLUS_SIZE - 1}
         />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <BottomSheetDeleteModal
         onDelete={handleDelete}
         ids={selected}
         ref={bottomSheetRef}
       />
     </View>
+    // </SafeAreaView>
   );
 };
 
 export default Messages;
-
+const lineHeight = RFValue(32);
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal,
@@ -322,7 +336,7 @@ const styles = StyleSheet.create({
     // alignItems: 'center',
 
     // justifyContent: 'center',
-    // backgroundColor: 'red',
+    // backgroundColor: 'blue',
   },
   backIcon: {
     height: ICON_BACK_SIZE,
@@ -332,6 +346,8 @@ const styles = StyleSheet.create({
     height: ICON_PLUS_SIZE,
     width: ICON_PLUS_SIZE,
     alignSelf: 'flex-end',
+    position: 'absolute',
+    bottom: 0,
   },
   msgContainer: {
     height: msgContainerH,
@@ -351,21 +367,20 @@ const styles = StyleSheet.create({
     height: lastMsgH,
     width,
     paddingTop: lastMsgPaddingTop,
-    // backgroundColor: 'red',
   },
   lastMsgTxt: {
     fontFamily: constants.Fonts.paragraph,
-    fontSize: 32,
-    lineHeight: 32,
+    fontSize: RFValue(32),
+    lineHeight: lineHeight,
     color: constants.colors.GREEN,
     width: width * 0.9,
     // backgroundColor: 'red',
   },
   dateTxt: {
     fontFamily: constants.Fonts.text,
-    fontSize: 10,
+    fontSize: RFValue(10),
     color: constants.colors.GREEN,
-    lineHeight: 32,
+    lineHeight: lineHeight,
   },
   checkBoxContainer: {
     position: 'absolute',

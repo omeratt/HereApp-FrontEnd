@@ -19,19 +19,35 @@ import {Provider} from 'react-redux';
 import {persistor, store} from './src/app/store';
 import {PersistGate} from 'redux-persist/integration/react';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
+// import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {Dimensions, StatusBar} from 'react-native';
 
 const App = () => {
+  // const insets = useSafeAreaInsets();
+  // const navigationBarHeight = insets.bottom;
+  // console.log({navigationBarHeight, insets});
+  const screenHeight = Dimensions.get('screen').height;
+  const windowHeight = Dimensions.get('window').height;
+  const navbarHeight = screenHeight - windowHeight;
+  console.log({navbarHeight});
   return (
     <>
-      <GestureHandlerRootView style={styles.container}>
-        <PersistGate persistor={persistor} loading={<Text>Loading...</Text>}>
-          <Provider store={store}>
-            <BottomSheetModalProvider>
-              <MainStack />
-            </BottomSheetModalProvider>
-          </Provider>
-        </PersistGate>
-      </GestureHandlerRootView>
+      <SafeAreaProvider>
+        <SafeAreaView style={{flex: 1}}>
+          <GestureHandlerRootView style={styles.container}>
+            <PersistGate
+              persistor={persistor}
+              loading={<Text>Loading...</Text>}>
+              <Provider store={store}>
+                <BottomSheetModalProvider>
+                  <MainStack />
+                </BottomSheetModalProvider>
+              </Provider>
+            </PersistGate>
+          </GestureHandlerRootView>
+        </SafeAreaView>
+      </SafeAreaProvider>
     </>
   );
 };

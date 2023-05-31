@@ -1,7 +1,7 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
 import {ListRenderItemInfo} from '@shopify/flash-list';
-import constants from '../../assets/constants';
+import constants, {verticalScale} from '../../assets/constants';
 import CheckBox from '../../components/CheckBox';
 import {LayoutChangeEvent} from 'react-native';
 import Animated, {
@@ -54,7 +54,7 @@ const RenderMessageItem = (props: Props) => {
           layout={SequencedTransition}
           style={[
             styles.container,
-            {...(props.isLastIndex && {marginBottom: 0})},
+            {...(props.index === 0 && {marginBottom: 0})},
           ]}>
           <Text style={styles.msgTitleTxt}>{props.item.title}</Text>
           <Text style={styles.msgTxt}>{messageSubString}</Text>
@@ -96,20 +96,20 @@ const styles = StyleSheet.create({
   },
   msgTitleTxt: {
     fontFamily: constants.Fonts.text_medium,
-    fontSize: 20,
+    fontSize: verticalScale(20),
     color: constants.colors.GREEN,
   },
   msgTxt: {
     fontFamily: constants.Fonts.text,
-    fontSize: 15,
+    fontSize: verticalScale(15),
     color: constants.colors.GREEN,
-    lineHeight: 18,
+    lineHeight: verticalScale(20),
   },
   dateTxt: {
     fontFamily: constants.Fonts.text,
-    fontSize: 10,
+    fontSize: verticalScale(11),
     color: constants.colors.GREEN,
-    lineHeight: 18,
+    lineHeight: verticalScale(20),
   },
   checkBoxContainer: {
     position: 'absolute',

@@ -6,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  SafeAreaView,
 } from 'react-native';
 import React, {useRef} from 'react';
 import constants from '../../assets/constants';
@@ -151,6 +152,7 @@ const Messages = () => {
     [],
   );
   return (
+    // <SafeAreaView style={{flex: 1}}>
     <View style={styles.container}>
       <View
         style={{
@@ -250,7 +252,10 @@ const Messages = () => {
                     : navToEditMessage(lastMsg)
                 }>
                 <Animated.View
-                  style={{height: lastMsgH, width: width * 0.9}}
+                  style={{
+                    height: lastMsgH,
+                    width: width * 0.9,
+                  }}
                   layout={SequencedTransition}
                   entering={FadeInUp}
                   exiting={FadeOutUp}>
@@ -309,6 +314,7 @@ const Messages = () => {
         ref={bottomSheetRef}
       />
     </View>
+    // </SafeAreaView>
   );
 };
 
@@ -322,7 +328,7 @@ const styles = StyleSheet.create({
     // alignItems: 'center',
 
     // justifyContent: 'center',
-    // backgroundColor: 'red',
+    // backgroundColor: 'blue',
   },
   backIcon: {
     height: ICON_BACK_SIZE,
@@ -332,6 +338,11 @@ const styles = StyleSheet.create({
     height: ICON_PLUS_SIZE,
     width: ICON_PLUS_SIZE,
     alignSelf: 'flex-end',
+    // position: 'absolute',
+    // bottom: 33 + ICON_PLUS_SIZE,
+    bottom: '5%',
+    // right: '5%',
+    // backgroundColor: 'red',
   },
   msgContainer: {
     height: msgContainerH,

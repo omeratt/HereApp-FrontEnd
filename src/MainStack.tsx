@@ -21,11 +21,14 @@ import Messages from './screens/message/Messages';
 import Search from './screens/Search';
 import AllMyTasks from './screens/task/AllMyTasks';
 import IamNotStupid from './screens/IamNotStupid';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 const ICON_SIZE = 20;
 // const Stack = createNativeStackNavigator();
 const Stack = createDrawerNavigator();
-
 export default function MainStack() {
+  const insets = useSafeAreaInsets();
+  const navigationBarHeight = insets.bottom;
+  console.log({navigationBarHeight, insets});
   const isSignIn = useAppSelector(selectIsSignIn);
   const drawerScreenOptions = {
     gestureEnabled: true,

@@ -2,6 +2,7 @@ import {
   BackHandler,
   Keyboard,
   KeyboardAvoidingView,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -105,13 +106,59 @@ const Message: React.FC<IMessagesProps> = () => {
     setValues(prev => ({...prev, message: value}));
   };
   return (
-    <TouchableWithoutFeedback onPress={dismissKeyboard}>
-      <Animated.View
-        entering={FadeIn}
-        // exiting={FadeOut}
-        style={styles.container}>
-        <View style={styles.Header}>
-          <View style={{height: '90%'}}>
+    // <TouchableWithoutFeedback onPress={dismissKeyboard}>
+    //   <KeyboardAwareScrollView
+    //     contentContainerStyle={styles.container}
+    //     keyboardShouldPersistTaps="handled">
+    //     <View style={styles.Header}>
+    //       <View style={{flex: 1}}>
+    //         <TouchableOpacity style={styles.backIcon} onPress={goBack}>
+    //           <AntDesign
+    //             name="leftcircle"
+    //             color={constants.colors.BLACK}
+    //             size={ICON_SIZE}
+    //           />
+    //         </TouchableOpacity>
+    //         <Text style={styles.topHeaderText}>Message to myself</Text>
+    //         <Text style={styles.title} numberOfLines={2}>
+    //           {values.title}
+    //         </Text>
+    //       </View>
+
+    //       <View style={[styles.bottomHeaderContainer, {flex: 0.5}]}>
+    //         <Text style={styles.bottomHeaderText}>
+    //           {new Date(values.createdAt!).toLocaleString('eng', {
+    //             month: 'short',
+    //             day: '2-digit',
+    //             year: 'numeric',
+    //           })}
+    //         </Text>
+    //       </View>
+    //     </View>
+    //     <KeyboardAvoidingView style={styles.Footer} behavior="padding">
+    //       <TextInput
+    //         ref={inputRef}
+    //         style={styles.contentText}
+    //         multiline
+    //         placeholder={values.message}
+    //         cursorColor={constants.colors.GREEN}
+    //         placeholderTextColor={constants.colors.GREEN}
+    //         onChangeText={handleChangeText}
+    //         value={values.message}
+    //       />
+    //       <TouchableOpacity style={styles.doneContainer} onPress={handleSubmit}>
+    //         <SVG.SendBtn />
+    //       </TouchableOpacity>
+    //     </KeyboardAvoidingView>
+    //   </KeyboardAwareScrollView>
+    // </TouchableWithoutFeedback>
+    <KeyboardAvoidingView style={styles.container} behavior="padding">
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+        bounces={false}>
+        <View style={styles.headerContainer}>
+          <View style={{flex: 1}}>
             <TouchableOpacity style={styles.backIcon} onPress={goBack}>
               <AntDesign
                 name="leftcircle"
@@ -124,8 +171,7 @@ const Message: React.FC<IMessagesProps> = () => {
               {values.title}
             </Text>
           </View>
-
-          <View style={[styles.bottomHeaderContainer, {height: '10%'}]}>
+          <View style={[styles.bottomHeaderContainer, {flex: 0.5}]}>
             <Text style={styles.bottomHeaderText}>
               {new Date(values.createdAt!).toLocaleString('eng', {
                 month: 'short',
@@ -135,7 +181,7 @@ const Message: React.FC<IMessagesProps> = () => {
             </Text>
           </View>
         </View>
-        <KeyboardAvoidingView style={styles.Footer} behavior="height">
+        <View style={styles.formContainer}>
           <TextInput
             ref={inputRef}
             style={styles.contentText}
@@ -149,23 +195,58 @@ const Message: React.FC<IMessagesProps> = () => {
           <TouchableOpacity style={styles.doneContainer} onPress={handleSubmit}>
             <SVG.SendBtn />
           </TouchableOpacity>
-        </KeyboardAvoidingView>
-      </Animated.View>
-    </TouchableWithoutFeedback>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 export default Message;
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    // flexGrow: 1,
+    // height: '120%',
+    // justifyContent: 'center',
+  },
+  headerContainer: {
+    backgroundColor: constants.colors.GREEN,
+    height: HEIGHT - HEIGHT * 0.616,
+    // height: '40%',
+    // flex: 1,
+    paddingVertical,
+    paddingHorizontal,
+  },
+  formContainer: {
+    // flex: 1.6,
+    // alignItems: 'center',
+    // justifyContent: 'center',
+    // height: '60%',
+    height: HEIGHT * 0.616,
+    // backgroundColor: 'red',
+    backgroundColor: constants.colors.BGC,
+    // flex: 1,
+    paddingVertical,
+    paddingHorizontal,
+  },
+  textInput: {
+    // Styling for your text input
+    color: constants.colors.GREEN,
+    fontFamily: constants.Fonts.text_medium,
+    // flex: 1,
+    backgroundColor: 'red',
+    textAlignVertical: 'top',
+  },
+  ////////////////////////////////
   container: {
-    flex: 1,
+    // flex: 1,
+    height: '100%',
     backgroundColor: constants.colors.BGC,
   },
   backIcon: {marginBottom: margin},
   Header: {
     backgroundColor: constants.colors.GREEN,
-    height: HEIGHT - HEIGHT * 0.616,
+    height: HEIGHT * 0.5,
     paddingVertical,
     paddingHorizontal,
   },
@@ -191,7 +272,6 @@ const styles = StyleSheet.create({
   },
   Footer: {
     backgroundColor: constants.colors.BGC,
-    // height: HEIGHT * 0.616,
     flex: 1,
     paddingVertical,
     paddingHorizontal,
@@ -199,24 +279,15 @@ const styles = StyleSheet.create({
   contentText: {
     color: constants.colors.GREEN,
     fontFamily: constants.Fonts.text_medium,
-    // height: HEIGHT * 0.616 * 0.8,
-    flex: 33,
+    flex: 1,
     textAlignVertical: 'top',
-    // backgroundColor: 'red',
   },
   doneContainer: {
-    // backgroundColor: 'blue',
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf: 'center',
     position: 'absolute',
-    // flex: 1,
-    bottom: paddingVertical,
-    // right: paddingHorizontal + 15,
-    // right: '50%',
-    // lef
-    // height: '10%',
-    // width: 122,
+    bottom: '12%',
   },
   darkMode: {},
 });

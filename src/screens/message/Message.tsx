@@ -2,6 +2,7 @@ import {
   BackHandler,
   Keyboard,
   KeyboardAvoidingView,
+  LayoutAnimation,
   ScrollView,
   StyleSheet,
   Text,
@@ -22,8 +23,13 @@ import {
   useNavigation,
   useRoute,
 } from '@react-navigation/core';
-import Animated, {FadeIn, FadeOut} from 'react-native-reanimated';
+import Animated, {
+  FadeIn,
+  FadeOut,
+  SequencedTransition,
+} from 'react-native-reanimated';
 import {useAddOrEditMessageMutation} from '../../app/api/messageApi';
+import {FlashList} from '@shopify/flash-list';
 const {HEIGHT, WIDTH} = constants;
 const ICON_SIZE = HEIGHT * (29.25 / 896);
 const margin = 15;
@@ -34,6 +40,7 @@ const sendSize = 40.75;
 type RootStackParamList = {
   Message: {
     messageRouteProp: IMessageValues | undefined;
+    flashListRef: React.RefObject<FlashList<IMessageValues>> | undefined;
     navFromSearch: boolean | undefined;
   };
 };
@@ -49,11 +56,15 @@ const Message: React.FC<IMessagesProps> = () => {
   const messageRouteProp =
     useRoute<MessageRouteProp>().params?.messageRouteProp;
   const navFromSearch = useRoute<MessageRouteProp>().params?.navFromSearch;
+  const flashListRef = useRoute<MessageRouteProp>().params?.flashListRef;
   const [addMsg, {isLoading: addLoading}] = useAddOrEditMessageMutation();
   const navigation = useNavigation();
   const [darkMode, setDarkMode] = useState<boolean>(false);
   const [values, setValues] = useState<IMessageValues>(
-    messageRouteProp || initialValues,
+    messageRouteProp || {
+      ...initialValues,
+      createdAt: getRealDate(new Date()).toISOString(),
+    },
   );
   const inputRef = React.useRef<TextInput>(null);
   const changeDarkMode = () => setDarkMode(prev => !prev);
@@ -68,6 +79,10 @@ const Message: React.FC<IMessagesProps> = () => {
     console.log('submit', {values});
     goBack();
     await addMsg(values);
+    if (flashListRef?.current) {
+      flashListRef.current?.prepareForLayoutAnimationRender();
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    }
   };
   const sliceTitle = (value: string) => {
     if (value.length > textLengthLimit + 1) return;
@@ -125,6 +140,8 @@ const Message: React.FC<IMessagesProps> = () => {
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <Animated.ScrollView
           entering={FadeIn}
+          exiting={FadeOut}
+          scrollEnabled={keyboardShow}
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="handled"
           bounces={false}>

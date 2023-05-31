@@ -1,5 +1,6 @@
 import {
   BackHandler,
+  LayoutAnimation,
   LayoutChangeEvent,
   StyleSheet,
   Text,
@@ -20,7 +21,13 @@ import RenderMessageItem from './RenderMessageItem';
 import Line from '../../components/Line';
 import SVG from '../../assets/svg';
 import {Vibration} from 'react-native';
-import Animated, {FadeInUp, ZoomIn, ZoomOut} from 'react-native-reanimated';
+import Animated, {
+  FadeInUp,
+  FadeOutUp,
+  SequencedTransition,
+  ZoomIn,
+  ZoomOut,
+} from 'react-native-reanimated';
 import CheckBox from '../../components/CheckBox';
 import BottomSheetDeleteModal, {
   BottomSheetDeleteModalHandles,
@@ -53,6 +60,7 @@ const Messages = () => {
   const [selected, setSelected] = React.useState<string[]>([]);
   const [lastMsgTxtHeight, setLastMsgTxtHeight] = React.useState<number>(0);
   const bottomSheetRef = useRef<BottomSheetDeleteModalHandles>(null);
+  const flashListRef = useRef<FlashList<IMessageValues>>(null);
   const onLayout = React.useCallback((event: LayoutChangeEvent) => {
     const {height: _height, width} = event.nativeEvent.layout;
     setLastMsgTxtHeight(_height);
@@ -69,7 +77,10 @@ const Messages = () => {
   const handleDelete = React.useCallback(async () => {
     setIsSelectOn(false);
     bottomSheetRef.current?.closeModal();
+
     await deleteMsgs(selected);
+    flashListRef.current?.prepareForLayoutAnimationRender();
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   }, [bottomSheetRef, deleteMsgs, selected]);
 
   const openDeleteModal = React.useCallback(() => {
@@ -77,7 +88,7 @@ const Messages = () => {
   }, []);
   React.useEffect(() => {
     if (data) {
-      setLastMsg(data[data.length - 1]);
+      setLastMsg(data[0]);
     }
   }, [data]);
 
@@ -88,7 +99,10 @@ const Messages = () => {
   }, [isSelectOn]);
 
   const navToEditMessage = React.useCallback((msg: IMessageValues) => {
-    navigation.navigate('Message' as never, {messageRouteProp: msg} as never);
+    navigation.navigate(
+      'Message' as never,
+      {messageRouteProp: msg, flashListRef} as never,
+    );
   }, []);
 
   const isLastSelected = React.useMemo(() => {
@@ -124,12 +138,16 @@ const Messages = () => {
       const isLastIndex = props.index === data!.length - 2;
       return <RenderMessageItem {...props} isLastIndex={isLastIndex} />;
     },
-    [data?.length],
+    [data?.length, isSelectOn, handleSelected, selected, navToEditMessage],
   );
   const keyExtractor = React.useCallback(
     (item: IMessageValues, index: number) => {
       return item._id!;
     },
+    [],
+  );
+  const AnimatedFlashList = React.useMemo(
+    () => Animated.createAnimatedComponent(FlashList<IMessageValues>),
     [],
   );
   return (
@@ -192,11 +210,12 @@ const Messages = () => {
         {data && (
           <>
             <View style={styles.flashList}>
-              <FlashList
-                data={[...data.slice(0, data.length - 1)]}
+              <AnimatedFlashList
+                ref={flashListRef}
+                data={[...data.slice(1, data.length)]}
                 renderItem={renderItem}
                 keyExtractor={keyExtractor}
-                estimatedItemSize={200}
+                estimatedItemSize={100}
                 showsVerticalScrollIndicator={false}
                 // initialScrollIndex={data.length - 2}
                 contentContainerStyle={{paddingVertical: lastMsgPaddingTop}}
@@ -219,7 +238,11 @@ const Messages = () => {
                 //   width: WIDTH * 0.94
               }}
             />
-            <View style={styles.flashListFooter}>
+            <Animated.View
+              layout={SequencedTransition}
+              entering={FadeInUp}
+              exiting={FadeOutUp}
+              style={styles.flashListFooter}>
               <TouchableOpacity
                 onPress={() =>
                   isSelectOn
@@ -228,7 +251,9 @@ const Messages = () => {
                 }>
                 <Animated.View
                   style={{height: lastMsgH, width: width * 0.9}}
-                  entering={FadeInUp}>
+                  layout={SequencedTransition}
+                  entering={FadeInUp}
+                  exiting={FadeOutUp}>
                   <View onLayout={onLayout} style={{alignSelf: 'flex-start'}}>
                     <Text
                       numberOfLines={4}
@@ -267,7 +292,7 @@ const Messages = () => {
                   />
                 </Animated.View>
               )}
-            </View>
+            </Animated.View>
           </>
         )}
       </View>

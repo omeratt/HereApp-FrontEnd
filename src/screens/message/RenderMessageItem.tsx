@@ -7,6 +7,7 @@ import {LayoutChangeEvent} from 'react-native';
 import Animated, {
   FadeInDown,
   FadeInUp,
+  FadeOutUp,
   SequencedTransition,
   ZoomIn,
   ZoomInRight,
@@ -48,6 +49,7 @@ const RenderMessageItem = (props: Props) => {
         }>
         <Animated.View
           entering={FadeInUp}
+          exiting={FadeOutUp}
           onLayout={onLayout}
           layout={SequencedTransition}
           style={[

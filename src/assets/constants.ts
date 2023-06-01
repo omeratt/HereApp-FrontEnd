@@ -1,7 +1,6 @@
 import {Dimensions, PixelRatio} from 'react-native';
 import json from '../../AllDates.json';
-const WIDTH = Dimensions.get('window').width;
-const HEIGHT = Dimensions.get('window').height;
+
 export interface CategoryListType {
   _id: string;
   name: string;
@@ -25,7 +24,10 @@ export interface ListItemType {
   done: boolean;
   flag: boolean;
 }
-
+const WIDTH = Dimensions.get('window').width;
+const HEIGHT = Dimensions.get('window').height;
+const fontScale = PixelRatio.getFontScale();
+const rf = (size: number) => size / fontScale;
 const constants = {
   BASE_URL: 'https://here.cyclic.app/',
   DOMAIN: 'here.cyclic.app',
@@ -96,13 +98,14 @@ const constants = {
     {txt: 'Anxiety'},
     {txt: 'Feeling abnormal'},
   ],
-  rf: (size: number, multiplier = 2) => {
-    const scale = (WIDTH / HEIGHT) * multiplier;
+  rf,
+  // rf: (size: number, multiplier = 2) => {
+  //   const scale = (WIDTH / HEIGHT) * multiplier;
 
-    const newSize = size * scale;
+  //   const newSize = size * scale;
 
-    return Math.round(PixelRatio.roundToNearestPixel(newSize));
-  },
+  //   return Math.round(PixelRatio.roundToNearestPixel(newSize));
+  // },
 };
 // export const minimumDate = new Date(json['1.1.2023'].fullDate);
 // export const maximumDate = new Date(json['9.9.2031'].fullDate);

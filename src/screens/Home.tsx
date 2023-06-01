@@ -27,7 +27,7 @@ import json from '../../AllDates.json';
 const CURRENT_DATE = new Date();
 const allDates = json;
 const flatListData = Object.values(allDates);
-
+console.log(allDates['1.1.2023']);
 const initialNumToRender = flatListData.length;
 console.log({initialNumToRender});
 
@@ -104,6 +104,7 @@ const Home = () => {
   }, []);
 
   const datePress = useCallback((dateItem: DateObject) => {
+    // console.log({dateItem});
     const realDate = new Date(
       new Date(dateItem.fullDate).getTime() -
         new Date(dateItem.fullDate).getTimezoneOffset() * 60000,
@@ -115,6 +116,7 @@ const Home = () => {
   const findDateAndScroll = useCallback((DateToCheck: Date) => {
     const key = DateToCheck.toLocaleDateString();
     const index = getIndexByKey(allDates, key);
+    console.log({DateToCheck, key, index});
     SetSelectedDate(DateToCheck);
     SetDateHeader(flatListData[index]);
     scrollToIndex(index);

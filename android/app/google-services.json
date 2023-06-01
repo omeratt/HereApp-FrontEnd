@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "372513103675",
+    "project_id": "here-71213",
+    "storage_bucket": "here-71213.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:372513103675:android:71a1854221a47d59c4611e",
+        "android_client_info": {
+          "package_name": "com.fronend"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUbO9ozr4GWVVmtcXIWuOu57HNdgewKQs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

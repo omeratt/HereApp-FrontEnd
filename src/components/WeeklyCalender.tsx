@@ -54,7 +54,7 @@ export function getDatesForYear(_date: Date): Record<string, DateObject> {
   const dates: Record<string, DateObject> = {};
 
   // Loop over all days of the year
-  for (let month = _month; month < _month + 12; month++) {
+  for (let month = _month; month < _month + 12 * 1; month++) {
     const numDaysInMonth = new Date(year, month + 1, 0).getDate();
     for (let day = 1; day <= numDaysInMonth; day++) {
       const date = new Date(year, month, day);

@@ -43,10 +43,15 @@ const RenderMessageItem = (props: Props) => {
     console.log(props.item.message, props.item.title, result);
     return result.trim();
   }, [props.item.message, props.item.title]);
-
+  const AnimatedTouchableOpacity = React.useMemo(() => {
+    return Animated.createAnimatedComponent(TouchableOpacity);
+  }, []);
   return (
     <>
-      <TouchableOpacity
+      <AnimatedTouchableOpacity
+        layout={SequencedTransition}
+        // style={{flex: 1}}
+        onLongPress={props.extraData.toggleSelect}
         onPress={() =>
           props.extraData.isSelectOn
             ? props.extraData.handleSelected(props.item._id!)
@@ -56,7 +61,6 @@ const RenderMessageItem = (props: Props) => {
           entering={FadeInUp}
           exiting={FadeOutUp}
           onLayout={onLayout}
-          layout={SequencedTransition}
           style={[
             styles.container,
             {flexDirection: 'row'},
@@ -90,7 +94,7 @@ const RenderMessageItem = (props: Props) => {
             </Text>
           </Animated.View>
         </Animated.View>
-      </TouchableOpacity>
+      </AnimatedTouchableOpacity>
     </>
   );
 };

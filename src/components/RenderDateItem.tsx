@@ -27,7 +27,7 @@ const RenderDateItem: ListRenderItem<DateObject> | null | undefined = ({
   index,
 }) => {
   const {selectedFinalDate, onDatePress, scrollX, lastScrollX} = extraData;
-  const itemDate = item.fullDate;
+  const itemDate = new Date(item.fullDate);
   const areDatesEqual = compareDates(selectedFinalDate, itemDate);
   const widthAndHeight = useMemo(() => {
     return DATE_WIDTH / 9;

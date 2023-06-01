@@ -231,6 +231,7 @@ const Messages = () => {
                   handleSelected,
                   selected,
                   navToEditMessage,
+                  toggleSelect,
                 }}
                 inverted
               />
@@ -247,6 +248,7 @@ const Messages = () => {
               exiting={FadeOutUp}
               style={styles.flashListFooter}>
               <TouchableOpacity
+                onLongPress={toggleSelect}
                 onPress={() =>
                   isSelectOn
                     ? handleSelected(lastMsg._id!)
@@ -260,25 +262,47 @@ const Messages = () => {
                   layout={SequencedTransition}
                   entering={FadeInUp}
                   exiting={FadeOutUp}>
-                  <View onLayout={onLayout} style={{alignSelf: 'flex-start'}}>
-                    <Text
-                      numberOfLines={4}
-                      // textBreakStrategy="highQuality"
-                      style={[
-                        styles.lastMsgTxt,
-                        // , {maxHeight: '30%'}
-                      ]}>
-                      {lastMsg.message}
-                      {/* An idea I had for an interactive course - to search in
+                  <View style={{flexDirection: 'row'}}>
+                    {isSelectOn && (
+                      <Animated.View
+                        entering={ZoomIn.duration(250)}
+                        exiting={ZoomOut.duration(250)}
+                        layout={SequencedTransition}
+                        style={[
+                          styles.checkBoxContainer,
+                          {height: lastMsgTxtHeight},
+                        ]}>
+                        <CheckBox
+                          size={25 / 1.05}
+                          isFilled={isLastSelected}
+                          colorFill={constants.colors.GREEN}
+                          onPress={() => handleSelected(lastMsg._id!)}
+                        />
+                      </Animated.View>
+                    )}
+                    <Animated.View
+                      layout={SequencedTransition}
+                      onLayout={onLayout}
+                      style={{alignSelf: 'flex-start'}}>
+                      <Text
+                        numberOfLines={4}
+                        // textBreakStrategy="highQuality"
+                        style={[
+                          styles.lastMsgTxt,
+                          // , {maxHeight: '30%'}
+                        ]}>
+                        {lastMsg.message}
+                        {/* An idea I had for an interactive course - to search in
                       science books */}
-                    </Text>
-                    <Text style={styles.dateTxt}>
-                      {new Date(lastMsg.createdAt!).toLocaleString('eng', {
-                        month: 'short',
-                        day: '2-digit',
-                        year: 'numeric',
-                      })}
-                    </Text>
+                      </Text>
+                      <Text style={styles.dateTxt}>
+                        {new Date(lastMsg.createdAt!).toLocaleString('eng', {
+                          month: 'short',
+                          day: '2-digit',
+                          year: 'numeric',
+                        })}
+                      </Text>
+                    </Animated.View>
                   </View>
                 </Animated.View>
               </TouchableOpacity>
@@ -289,22 +313,6 @@ const Messages = () => {
                   size={ICON_PLUS_SIZE - 1}
                 />
               </TouchableOpacity>
-              {isSelectOn && (
-                <Animated.View
-                  entering={ZoomIn.duration(250)}
-                  exiting={ZoomOut.duration(250)}
-                  style={[
-                    styles.checkBoxContainer,
-                    {height: lastMsgTxtHeight},
-                  ]}>
-                  <CheckBox
-                    size={25 / 1.05}
-                    isFilled={isLastSelected}
-                    colorFill={constants.colors.GREEN}
-                    onPress={() => handleSelected(lastMsg._id!)}
-                  />
-                </Animated.View>
-              )}
             </Animated.View>
           </>
         )}
@@ -387,13 +395,14 @@ const styles = StyleSheet.create({
     lineHeight: lineHeight,
   },
   checkBoxContainer: {
-    position: 'absolute',
+    // position: 'absolute',
     alignItems: 'center',
     justifyContent: 'center',
     height: lastMsgH,
     width: 25,
-    right: 0,
-    top: lastMsgPaddingTop,
+    // right: 0,
+    marginRight: '5%',
+    // top: lastMsgPaddingTop,
   },
   trashIcon: {
     position: 'absolute',

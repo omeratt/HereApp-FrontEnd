@@ -1,5 +1,5 @@
 import {Dimensions, PixelRatio} from 'react-native';
-
+import json from '../../AllDates.json';
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
 export interface CategoryListType {
@@ -52,9 +52,10 @@ const constants = {
     italic: 'Montserrat-MediumItalic',
   },
   Dates: {
-    max: new Date(),
-    min: new Date(),
+    min: new Date(json['1.1.2023'].fullDate),
+    max: new Date(json['9.9.2031'].fullDate),
   },
+  allDates: json,
   HEIGHT,
   WIDTH,
   FreqList: [
@@ -103,4 +104,6 @@ const constants = {
     return Math.round(PixelRatio.roundToNearestPixel(newSize));
   },
 };
+// export const minimumDate = new Date(json['1.1.2023'].fullDate);
+// export const maximumDate = new Date(json['9.9.2031'].fullDate);
 export default constants;

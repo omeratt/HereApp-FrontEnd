@@ -33,13 +33,13 @@ import CheckBox from '../../components/CheckBox';
 import BottomSheetDeleteModal, {
   BottomSheetDeleteModalHandles,
 } from '../../components/BottomSheetDeleteModal';
-import {RFValue} from 'react-native-responsive-fontsize';
+import {RFValue, RFPercentage} from 'react-native-responsive-fontsize';
 const {WIDTH, HEIGHT} = constants;
 const paddingHorizontal = WIDTH * (30.37 / 414);
+const width = WIDTH - 2 * paddingHorizontal;
 const paddingVertical = HEIGHT * (22 / 896);
 
 const height = HEIGHT - 2 * paddingVertical;
-const width = WIDTH - 2 * paddingHorizontal;
 const ICON_BACK_SIZE = HEIGHT * (29.25 / 896) * 1.2;
 const ICON_PLUS_SIZE = HEIGHT * (24.25 / 896) * 1.2;
 const msgContainerH = height - ICON_BACK_SIZE - ICON_PLUS_SIZE;
@@ -218,10 +218,13 @@ const Messages = () => {
                 data={[...data.slice(1, data.length)]}
                 renderItem={renderItem}
                 keyExtractor={keyExtractor}
-                estimatedItemSize={100}
+                estimatedItemSize={200}
                 showsVerticalScrollIndicator={false}
                 // initialScrollIndex={data.length - 2}
-                contentContainerStyle={{paddingVertical: lastMsgPaddingTop}}
+                contentContainerStyle={{
+                  paddingTop: lastMsgPaddingTop,
+                  // paddingBottom: lastMsgPaddingTop * 2,
+                }}
                 fadingEdgeLength={600}
                 extraData={{
                   isSelectOn,
@@ -236,10 +239,7 @@ const Messages = () => {
               lineColor={constants.colors.OFF_WHITE}
               strength={0.5}
               lengthPercentage={110}
-              style={{
-                alignSelf: 'center',
-                //   width: WIDTH * 0.94
-              }}
+              style={{alignSelf: 'center'}}
             />
             <Animated.View
               layout={SequencedTransition}
@@ -325,16 +325,19 @@ const Messages = () => {
     // </SafeAreaView>
   );
 };
-
+console.log(HEIGHT);
 export default Messages;
-const lineHeight = RFValue(32);
+const lineHeight = constants.rf(31);
+const lastMsgFontSize = constants.rf(35);
+const dateFontSize = constants.rf(11);
+// const lineHeight = RF(32);
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal,
     paddingVertical,
     backgroundColor: constants.colors.BGC,
     // alignItems: 'center',
-
+    height: HEIGHT,
     // justifyContent: 'center',
     // backgroundColor: 'blue',
   },
@@ -358,19 +361,20 @@ const styles = StyleSheet.create({
   flashList: {
     height: flashListH,
     width,
+    paddingTop: lastMsgPaddingTop,
 
     // elevation: 5,
-    // shadowColor: 'white',
     // backgroundColor: 'grey',
   },
   flashListFooter: {
+    // backgroundColor: 'orange',
     height: lastMsgH,
     width,
     paddingTop: lastMsgPaddingTop,
   },
   lastMsgTxt: {
     fontFamily: constants.Fonts.paragraph,
-    fontSize: RFValue(32),
+    fontSize: lastMsgFontSize,
     lineHeight: lineHeight,
     color: constants.colors.GREEN,
     width: width * 0.9,
@@ -378,7 +382,7 @@ const styles = StyleSheet.create({
   },
   dateTxt: {
     fontFamily: constants.Fonts.text,
-    fontSize: RFValue(10),
+    fontSize: dateFontSize,
     color: constants.colors.GREEN,
     lineHeight: lineHeight,
   },

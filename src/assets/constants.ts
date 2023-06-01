@@ -1,5 +1,4 @@
-import {Dimensions} from 'react-native';
-import {ISearchElement} from '../components/search/types';
+import {Dimensions, PixelRatio} from 'react-native';
 
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
@@ -96,43 +95,12 @@ const constants = {
     {txt: 'Anxiety'},
     {txt: 'Feeling abnormal'},
   ],
+  rf: (size: number, multiplier = 2) => {
+    const scale = (WIDTH / HEIGHT) * multiplier;
+
+    const newSize = size * scale;
+
+    return Math.round(PixelRatio.roundToNearestPixel(newSize));
+  },
 };
 export default constants;
-export const searchTasksData: ISearchElement[] = [
-  {
-    name: 'Home work',
-    description: 'Finish with Biology HM',
-  },
-  {
-    name: 'Home work',
-    description: 'Finish with Biology HM',
-  },
-  {
-    name: 'Home work',
-    description: 'Finish with Biology HM',
-  },
-];
-export const searchListsData: ISearchElement[] = [
-  {
-    name: 'Interactive',
-    description: 'Finish with ...',
-  },
-  {
-    name: 'biology',
-    description: 'Finish with ...',
-  },
-  {
-    name: 'Home deco',
-    description: 'Finish with ...',
-  },
-];
-export const searchMessageData: ISearchElement[] = [
-  {
-    name: '14/5/23',
-    description: 'finish with omer’s birth...',
-  },
-  {
-    name: '4/6/22',
-    description: 'Finish with ...',
-  },
-];

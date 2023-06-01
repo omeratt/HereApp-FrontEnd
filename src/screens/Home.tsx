@@ -24,6 +24,7 @@ import BoardingBoxWrapper from '../components/boardingBox/BoardingBoxWrapper';
 import NextTask from '../components/boardingBox/NextTask';
 import {TaskType, setCategoriesList} from '../app/Reducers/User/userSlice';
 import json from '../../AllDates.json';
+import PizzaBox from '../components/boardingBox/PizzaBox';
 const CURRENT_DATE = new Date();
 const allDates = json;
 const flatListData = Object.values(allDates);
@@ -324,7 +325,7 @@ const Home = () => {
         </View>
       </View>
       <View style={styles.middleView}>
-        <BoardingBoxWrapper />
+        <BoardingBoxWrapper Component={PizzaBox} basicStyle={false} />
         <BoardingBoxWrapper />
         <BoardingBoxWrapper Component={NextTask} />
       </View>

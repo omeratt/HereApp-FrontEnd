@@ -1,8 +1,6 @@
-import {Dimensions} from 'react-native';
-import {ISearchElement} from '../components/search/types';
+import {Dimensions, PixelRatio} from 'react-native';
+import json from '../../AllDates.json';
 
-const WIDTH = Dimensions.get('window').width;
-const HEIGHT = Dimensions.get('window').height;
 export interface CategoryListType {
   _id: string;
   name: string;
@@ -26,7 +24,10 @@ export interface ListItemType {
   done: boolean;
   flag: boolean;
 }
-
+const WIDTH = Dimensions.get('window').width;
+const HEIGHT = Dimensions.get('window').height;
+const fontScale = PixelRatio.getFontScale();
+const rf = (size: number) => size / fontScale;
 const constants = {
   BASE_URL: 'https://here.cyclic.app/',
   DOMAIN: 'here.cyclic.app',
@@ -53,9 +54,10 @@ const constants = {
     italic: 'Montserrat-MediumItalic',
   },
   Dates: {
-    max: new Date(),
-    min: new Date(),
+    min: new Date(json['1.1.2023'].fullDate),
+    max: new Date(json['9.9.2031'].fullDate),
   },
+  allDates: json,
   HEIGHT,
   WIDTH,
   FreqList: [
@@ -96,43 +98,15 @@ const constants = {
     {txt: 'Anxiety'},
     {txt: 'Feeling abnormal'},
   ],
+  rf,
+  // rf: (size: number, multiplier = 2) => {
+  //   const scale = (WIDTH / HEIGHT) * multiplier;
+
+  //   const newSize = size * scale;
+
+  //   return Math.round(PixelRatio.roundToNearestPixel(newSize));
+  // },
 };
+// export const minimumDate = new Date(json['1.1.2023'].fullDate);
+// export const maximumDate = new Date(json['9.9.2031'].fullDate);
 export default constants;
-export const searchTasksData: ISearchElement[] = [
-  {
-    name: 'Home work',
-    description: 'Finish with Biology HM',
-  },
-  {
-    name: 'Home work',
-    description: 'Finish with Biology HM',
-  },
-  {
-    name: 'Home work',
-    description: 'Finish with Biology HM',
-  },
-];
-export const searchListsData: ISearchElement[] = [
-  {
-    name: 'Interactive',
-    description: 'Finish with ...',
-  },
-  {
-    name: 'biology',
-    description: 'Finish with ...',
-  },
-  {
-    name: 'Home deco',
-    description: 'Finish with ...',
-  },
-];
-export const searchMessageData: ISearchElement[] = [
-  {
-    name: '14/5/23',
-    description: 'finish with omer’s birth...',
-  },
-  {
-    name: '4/6/22',
-    description: 'Finish with ...',
-  },
-];

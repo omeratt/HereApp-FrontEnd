@@ -23,16 +23,13 @@ import RenderListCategoryHome from '../components/RenderListCategoryHome';
 import BoardingBoxWrapper from '../components/boardingBox/BoardingBoxWrapper';
 import NextTask from '../components/boardingBox/NextTask';
 import {TaskType, setCategoriesList} from '../app/Reducers/User/userSlice';
-
+import json from '../../AllDates.json';
+import PizzaBox from '../components/boardingBox/PizzaBox';
 const CURRENT_DATE = new Date();
-const allDates = getDatesForYear(CURRENT_DATE);
+const allDates = json;
 const flatListData = Object.values(allDates);
-// maximumDate={flatListData[initialNumToRender - 1]?.fullDate}
-//             minimumDate={flatListData[0]?.fullDate}
 const initialNumToRender = flatListData.length;
-console.log({initialNumToRender});
-constants.Dates.max = flatListData[initialNumToRender - 1]?.fullDate;
-constants.Dates.min = flatListData[0]?.fullDate;
+
 export const DATE_WIDTH = constants.WIDTH * 0.89444444444444444444444444444444;
 export const TASK_CONTAINER_HEIGHT =
   constants.HEIGHT * 0.64 * 0.84 - //topView till lists
@@ -46,12 +43,14 @@ const Home = () => {
   const getIndexByKey = useCallback(
     (obj: Record<string, any>, key: string): number => {
       const keys = Object.keys(obj);
+
+      // console.log({keys});
       return keys.indexOf(key);
     },
     [],
   );
   const findIndexByDate = useCallback((DateToCheck: Date) => {
-    const key = DateToCheck.toLocaleDateString();
+    const key = DateToCheck.toLocaleDateString('heb');
     const index = getIndexByKey(allDates, key);
     return index;
   }, []);
@@ -106,16 +105,17 @@ const Home = () => {
   }, []);
 
   const datePress = useCallback((dateItem: DateObject) => {
+    // console.log({dateItem});
     const realDate = new Date(
-      dateItem.fullDate.getTime() -
-        dateItem.fullDate.getTimezoneOffset() * 60000,
+      new Date(dateItem.fullDate).getTime() -
+        new Date(dateItem.fullDate).getTimezoneOffset() * 60000,
     );
     findDateAndScroll(realDate);
     FetchTasks(realDate);
   }, []);
 
   const findDateAndScroll = useCallback((DateToCheck: Date) => {
-    const key = DateToCheck.toLocaleDateString();
+    const key = DateToCheck.toLocaleDateString('heb');
     const index = getIndexByKey(allDates, key);
     SetSelectedDate(DateToCheck);
     SetDateHeader(flatListData[index]);
@@ -163,12 +163,13 @@ const Home = () => {
 
   const tempGetMonthFromStringDate = useMemo(() => {
     if (!dateHeader) return 'Today';
-    const monthName = dateHeader?.fullDate.toLocaleString('eng', {
+    const monthName = new Date(dateHeader?.fullDate).toLocaleString('eng', {
       month: 'long',
     });
 
     const isToday =
-      dateHeader?.fullDate.toDateString() === CURRENT_DATE.toDateString();
+      new Date(dateHeader?.fullDate).toDateString() ===
+      CURRENT_DATE.toDateString();
     const formattedDate = `${isToday ? 'Today' : dateHeader.dayName}, ${
       dateHeader.day
     } ${monthName}`;
@@ -242,6 +243,7 @@ const Home = () => {
               selectedFinalDate={selectedDate}
               // setSelectedFinalDate={SetSelectedFinalDate}
               selectedScrollDate={selectedScrollDate}
+              //@ts-ignore
               flatListData={flatListData}
               // dateHeader={dateHeader}
               sharedX={sharedX}
@@ -273,6 +275,7 @@ const Home = () => {
               flashListRef={flashListRef}
               sharedDatesIndex={sharedDatesIndex}
               datePress={datePress}
+              //@ts-ignore
               flatListData={flatListData}
               snapToOffsets={snapToOffsets}
               openTaskModal={openTaskModal}
@@ -322,7 +325,7 @@ const Home = () => {
         </View>
       </View>
       <View style={styles.middleView}>
-        <BoardingBoxWrapper />
+        <BoardingBoxWrapper Component={PizzaBox} basicStyle={false} />
         <BoardingBoxWrapper />
         <BoardingBoxWrapper Component={NextTask} />
       </View>

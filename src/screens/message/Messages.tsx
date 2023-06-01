@@ -6,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  SafeAreaView,
 } from 'react-native';
 import React, {useRef} from 'react';
 import constants from '../../assets/constants';
@@ -32,12 +33,13 @@ import CheckBox from '../../components/CheckBox';
 import BottomSheetDeleteModal, {
   BottomSheetDeleteModalHandles,
 } from '../../components/BottomSheetDeleteModal';
+import {RFValue, RFPercentage} from 'react-native-responsive-fontsize';
 const {WIDTH, HEIGHT} = constants;
 const paddingHorizontal = WIDTH * (30.37 / 414);
+const width = WIDTH - 2 * paddingHorizontal;
 const paddingVertical = HEIGHT * (22 / 896);
 
 const height = HEIGHT - 2 * paddingVertical;
-const width = WIDTH - 2 * paddingHorizontal;
 const ICON_BACK_SIZE = HEIGHT * (29.25 / 896) * 1.2;
 const ICON_PLUS_SIZE = HEIGHT * (24.25 / 896) * 1.2;
 const msgContainerH = height - ICON_BACK_SIZE - ICON_PLUS_SIZE;
@@ -151,6 +153,7 @@ const Messages = () => {
     [],
   );
   return (
+    // <SafeAreaView style={{flex: 1}}>
     <View style={styles.container}>
       <View
         style={{
@@ -215,16 +218,20 @@ const Messages = () => {
                 data={[...data.slice(1, data.length)]}
                 renderItem={renderItem}
                 keyExtractor={keyExtractor}
-                estimatedItemSize={100}
+                estimatedItemSize={200}
                 showsVerticalScrollIndicator={false}
                 // initialScrollIndex={data.length - 2}
-                contentContainerStyle={{paddingVertical: lastMsgPaddingTop}}
+                contentContainerStyle={{
+                  paddingTop: lastMsgPaddingTop,
+                  // paddingBottom: lastMsgPaddingTop * 2,
+                }}
                 fadingEdgeLength={600}
                 extraData={{
                   isSelectOn,
                   handleSelected,
                   selected,
                   navToEditMessage,
+                  toggleSelect,
                 }}
                 inverted
               />
@@ -233,10 +240,7 @@ const Messages = () => {
               lineColor={constants.colors.OFF_WHITE}
               strength={0.5}
               lengthPercentage={110}
-              style={{
-                alignSelf: 'center',
-                //   width: WIDTH * 0.94
-              }}
+              style={{alignSelf: 'center'}}
             />
             <Animated.View
               layout={SequencedTransition}
@@ -244,85 +248,106 @@ const Messages = () => {
               exiting={FadeOutUp}
               style={styles.flashListFooter}>
               <TouchableOpacity
+                onLongPress={toggleSelect}
                 onPress={() =>
                   isSelectOn
                     ? handleSelected(lastMsg._id!)
                     : navToEditMessage(lastMsg)
                 }>
                 <Animated.View
-                  style={{height: lastMsgH, width: width * 0.9}}
+                  style={{
+                    height: lastMsgH,
+                    width: width * 0.9,
+                  }}
                   layout={SequencedTransition}
                   entering={FadeInUp}
                   exiting={FadeOutUp}>
-                  <View onLayout={onLayout} style={{alignSelf: 'flex-start'}}>
-                    <Text
-                      numberOfLines={4}
-                      // textBreakStrategy="highQuality"
-                      style={[
-                        styles.lastMsgTxt,
-                        // , {maxHeight: '30%'}
-                      ]}>
-                      {lastMsg.message}
-                      {/* An idea I had for an interactive course - to search in
+                  <View style={{flexDirection: 'row'}}>
+                    {isSelectOn && (
+                      <Animated.View
+                        entering={ZoomIn.duration(250)}
+                        exiting={ZoomOut.duration(250)}
+                        layout={SequencedTransition}
+                        style={[
+                          styles.checkBoxContainer,
+                          {height: lastMsgTxtHeight},
+                        ]}>
+                        <CheckBox
+                          size={25 / 1.05}
+                          isFilled={isLastSelected}
+                          colorFill={constants.colors.GREEN}
+                          onPress={() => handleSelected(lastMsg._id!)}
+                        />
+                      </Animated.View>
+                    )}
+                    <Animated.View
+                      layout={SequencedTransition}
+                      onLayout={onLayout}
+                      style={{alignSelf: 'flex-start'}}>
+                      <Text
+                        numberOfLines={4}
+                        // textBreakStrategy="highQuality"
+                        style={[
+                          styles.lastMsgTxt,
+                          // , {maxHeight: '30%'}
+                        ]}>
+                        {lastMsg.message}
+                        {/* An idea I had for an interactive course - to search in
                       science books */}
-                    </Text>
-                    <Text style={styles.dateTxt}>
-                      {new Date(lastMsg.createdAt!).toLocaleString('eng', {
-                        month: 'short',
-                        day: '2-digit',
-                        year: 'numeric',
-                      })}
-                    </Text>
+                      </Text>
+                      <Text style={styles.dateTxt}>
+                        {new Date(lastMsg.createdAt!).toLocaleString('eng', {
+                          month: 'short',
+                          day: '2-digit',
+                          year: 'numeric',
+                        })}
+                      </Text>
+                    </Animated.View>
                   </View>
                 </Animated.View>
               </TouchableOpacity>
-              {isSelectOn && (
-                <Animated.View
-                  entering={ZoomIn.duration(250)}
-                  exiting={ZoomOut.duration(250)}
-                  style={[
-                    styles.checkBoxContainer,
-                    {height: lastMsgTxtHeight},
-                  ]}>
-                  <CheckBox
-                    size={25 / 1.05}
-                    isFilled={isLastSelected}
-                    colorFill={constants.colors.GREEN}
-                    onPress={() => handleSelected(lastMsg._id!)}
-                  />
-                </Animated.View>
-              )}
+              <TouchableOpacity style={styles.plusIcon} onPress={navToMessage}>
+                <AntDesign
+                  name="pluscircleo"
+                  color={constants.colors.OFF_WHITE}
+                  size={ICON_PLUS_SIZE - 1}
+                />
+              </TouchableOpacity>
             </Animated.View>
           </>
         )}
       </View>
-      <TouchableOpacity style={styles.plusIcon} onPress={navToMessage}>
+      {/* <TouchableOpacity style={styles.plusIcon} onPress={navToMessage}>
         <AntDesign
           name="pluscircleo"
           color={constants.colors.OFF_WHITE}
           size={ICON_PLUS_SIZE - 1}
         />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <BottomSheetDeleteModal
         onDelete={handleDelete}
         ids={selected}
         ref={bottomSheetRef}
       />
     </View>
+    // </SafeAreaView>
   );
 };
-
+console.log(HEIGHT);
 export default Messages;
-
+const lineHeight = constants.rf(31);
+const lastMsgFontSize = constants.rf(35);
+const dateFontSize = constants.rf(11);
+// const lineHeight = RF(32);
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal,
     paddingVertical,
     backgroundColor: constants.colors.BGC,
     // alignItems: 'center',
-
+    height: HEIGHT,
     // justifyContent: 'center',
-    // backgroundColor: 'red',
+    // backgroundColor: 'blue',
   },
   backIcon: {
     height: ICON_BACK_SIZE,
@@ -332,6 +357,8 @@ const styles = StyleSheet.create({
     height: ICON_PLUS_SIZE,
     width: ICON_PLUS_SIZE,
     alignSelf: 'flex-end',
+    position: 'absolute',
+    bottom: 0,
   },
   msgContainer: {
     height: msgContainerH,
@@ -342,39 +369,40 @@ const styles = StyleSheet.create({
   flashList: {
     height: flashListH,
     width,
+    paddingTop: lastMsgPaddingTop,
 
     // elevation: 5,
-    // shadowColor: 'white',
     // backgroundColor: 'grey',
   },
   flashListFooter: {
+    // backgroundColor: 'orange',
     height: lastMsgH,
     width,
     paddingTop: lastMsgPaddingTop,
-    // backgroundColor: 'red',
   },
   lastMsgTxt: {
     fontFamily: constants.Fonts.paragraph,
-    fontSize: 32,
-    lineHeight: 32,
+    fontSize: lastMsgFontSize,
+    lineHeight: lineHeight,
     color: constants.colors.GREEN,
     width: width * 0.9,
     // backgroundColor: 'red',
   },
   dateTxt: {
     fontFamily: constants.Fonts.text,
-    fontSize: 10,
+    fontSize: dateFontSize,
     color: constants.colors.GREEN,
-    lineHeight: 32,
+    lineHeight: lineHeight,
   },
   checkBoxContainer: {
-    position: 'absolute',
+    // position: 'absolute',
     alignItems: 'center',
     justifyContent: 'center',
     height: lastMsgH,
     width: 25,
-    right: 0,
-    top: lastMsgPaddingTop,
+    // right: 0,
+    marginRight: '5%',
+    // top: lastMsgPaddingTop,
   },
   trashIcon: {
     position: 'absolute',

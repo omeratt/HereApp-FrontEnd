@@ -16,9 +16,9 @@ import DatesFlatList from '../../components/DatesFlatList';
 import CalendarModal from '../../components/CalendarModal';
 import {TaskType} from '../../app/Reducers/User/userSlice';
 import {DATE_WIDTH} from '../Home';
-
+import json from '../../../AllDates.json';
 const CURRENT_DATE = new Date();
-const allDates = getDatesForYear(CURRENT_DATE);
+const allDates = json;
 const flatListData = Object.values(allDates);
 const initialNumToRender = flatListData.length;
 const {HEIGHT, WIDTH} = constants;
@@ -39,7 +39,7 @@ const Home = () => {
     [],
   );
   const findIndexByDate = useCallback((DateToCheck: Date) => {
-    const key = DateToCheck.toLocaleDateString();
+    const key = DateToCheck.toLocaleDateString('heb');
     const index = getIndexByKey(allDates, key);
     return index;
   }, []);
@@ -55,12 +55,9 @@ const Home = () => {
   const [editTaskDetails, setEditTaskDetails] = useState<TaskType | undefined>(
     undefined,
   );
-
+  // const a = useNavig
   const goBack = useCallback(() => {
-    console.log('goBack');
-    navigation.canGoBack()
-      ? navigation.goBack()
-      : navigation.navigate('HomePage' as never);
+    navigation.navigate('HomePage' as never);
   }, [navigation]);
 
   const SetDateHeader = useCallback((header: any) => {
@@ -84,15 +81,15 @@ const Home = () => {
 
   const datePress = useCallback((dateItem: DateObject) => {
     const realDate = new Date(
-      dateItem.fullDate.getTime() -
-        dateItem.fullDate.getTimezoneOffset() * 60000,
+      new Date(dateItem.fullDate).getTime() -
+        new Date(dateItem.fullDate).getTimezoneOffset() * 60000,
     );
     findDateAndScroll(realDate);
     FetchTasks(realDate);
   }, []);
 
   const findDateAndScroll = useCallback((DateToCheck: Date) => {
-    const key = DateToCheck.toLocaleDateString();
+    const key = DateToCheck.toLocaleDateString('heb');
     const index = getIndexByKey(allDates, key);
     SetSelectedDate(DateToCheck);
     SetDateHeader(flatListData[index]);
@@ -123,12 +120,13 @@ const Home = () => {
 
   const tempGetMonthFromStringDate = useMemo(() => {
     if (!dateHeader) return 'Today';
-    const monthName = dateHeader?.fullDate.toLocaleString('eng', {
+    const monthName = new Date(dateHeader?.fullDate).toLocaleString('eng', {
       month: 'long',
     });
 
     const isToday =
-      dateHeader?.fullDate.toDateString() === CURRENT_DATE.toDateString();
+      new Date(dateHeader?.fullDate).toDateString() ===
+      CURRENT_DATE.toDateString();
     const formattedDate = `${isToday ? 'Today' : dateHeader.dayName}, ${
       dateHeader.day
     } ${monthName}`;
@@ -193,6 +191,7 @@ const Home = () => {
               selectedFinalDate={selectedDate}
               // setSelectedFinalDate={SetSelectedFinalDate}
               selectedScrollDate={selectedScrollDate}
+              //@ts-ignore
               flatListData={flatListData}
               // dateHeader={dateHeader}
               sharedX={sharedX}
@@ -216,6 +215,7 @@ const Home = () => {
               flashListRef={flashListRef}
               sharedDatesIndex={sharedDatesIndex}
               datePress={datePress}
+              //@ts-ignore
               flatListData={flatListData}
               snapToOffsets={snapToOffsets}
               openTaskModal={openTaskModal}

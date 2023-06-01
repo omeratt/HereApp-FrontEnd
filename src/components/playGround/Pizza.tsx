@@ -55,7 +55,18 @@ const CircleSegment: React.FC<circleSegmentProps> = ({
   );
 };
 
-export default function Pizza({size}: {size: number}) {
+interface pizzaProps {
+  size: number;
+  backgroundColor?: string;
+  sliceColor?: string;
+  borderColor?: string;
+}
+export default function Pizza({
+  size,
+  backgroundColor,
+  borderColor,
+  sliceColor,
+}: pizzaProps) {
   const slices = new Array(8).fill(0);
   const [selected, setSelected] = React.useState(6);
   const lastIndex = useSharedValue(selected);
@@ -112,7 +123,7 @@ export default function Pizza({size}: {size: number}) {
           }
         }),
 
-    [],
+    [size],
   );
 
   return (
@@ -121,24 +132,27 @@ export default function Pizza({size}: {size: number}) {
         entering={ZoomIn.duration(500)}
         style={{
           borderRadius: size / 2,
-          borderColor: constants.colors.OFF_WHITE,
+          borderColor: borderColor || constants.colors.OFF_WHITE,
           borderWidth: 1,
           height: size + 1,
-          width: size,
+          width: size + 1,
+          // backgroundColor: 'red',
           justifyContent: 'center',
           alignItems: 'center',
           overflow: 'visible',
         }}>
         {slices.map((_, i) => {
           const fillColor =
-            selected === i ? constants.colors.GREEN : constants.colors.BGC;
+            selected === i
+              ? sliceColor || constants.colors.GREEN
+              : backgroundColor || constants.colors.BGC;
           return (
             <CircleSegment
               size={size}
               startAngle={45 * i}
               endAngle={45 * (i + 1)}
               strokeWidth={1}
-              stroke={constants.colors.OFF_WHITE}
+              stroke={borderColor || constants.colors.OFF_WHITE}
               fill={fillColor}
               radius={size / 2}
               key={i}

@@ -7,10 +7,12 @@ type Children<P> = P & {children?: ReactNode};
 interface BoardingBoxWrapperProps {
   Component?: any;
   showPlusIcon?: boolean;
+  basicStyle?: boolean;
 }
 const BoardingBoxWrapper: React.FC<BoardingBoxWrapperProps> = ({
   Component,
   showPlusIcon,
+  basicStyle = true,
 }) => {
   const [width, setWidth] = useState<number | undefined>();
   const [height, setHeight] = useState<number | undefined>();
@@ -21,8 +23,8 @@ const BoardingBoxWrapper: React.FC<BoardingBoxWrapperProps> = ({
     setHeight(height);
   };
   const topBoxStyle = {
-    ...(height && {paddingTop: `${(24 / height) * 100}%`}),
-    ...(width && {paddingHorizontal: `${(14 / width) * 100}%`}),
+    ...(height && basicStyle && {paddingTop: `${(24 / height) * 100}%`}),
+    ...(width && basicStyle && {paddingHorizontal: `${(14 / width) * 100}%`}),
   };
   // const formattedText;
   return (
@@ -62,6 +64,7 @@ const styles = StyleSheet.create({
   },
   topBox: {
     height: '100%',
+    width: '100%',
   },
   bottomPlusBox: {
     height: '15%',

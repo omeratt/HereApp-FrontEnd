@@ -150,7 +150,7 @@ export default function MainStack() {
               options={{
                 swipeEnabled: false,
                 headerShown: false,
-                unmountOnBlur: true,
+                unmountOnBlur: false,
                 drawerLabel(props) {
                   return (
                     <Label

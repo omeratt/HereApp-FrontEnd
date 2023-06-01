@@ -39,7 +39,7 @@ const Home = () => {
     [],
   );
   const findIndexByDate = useCallback((DateToCheck: Date) => {
-    const key = DateToCheck.toLocaleDateString();
+    const key = DateToCheck.toLocaleDateString('heb');
     const index = getIndexByKey(allDates, key);
     return index;
   }, []);
@@ -57,10 +57,7 @@ const Home = () => {
   );
   // const a = useNavig
   const goBack = useCallback(() => {
-    console.log('goBack');
-    navigation.canGoBack()
-      ? navigation.goBack()
-      : navigation.navigate('HomePage' as never);
+    navigation.navigate('HomePage' as never);
   }, [navigation]);
 
   const SetDateHeader = useCallback((header: any) => {
@@ -92,7 +89,7 @@ const Home = () => {
   }, []);
 
   const findDateAndScroll = useCallback((DateToCheck: Date) => {
-    const key = DateToCheck.toLocaleDateString();
+    const key = DateToCheck.toLocaleDateString('heb');
     const index = getIndexByKey(allDates, key);
     SetSelectedDate(DateToCheck);
     SetDateHeader(flatListData[index]);

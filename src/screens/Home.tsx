@@ -27,9 +27,7 @@ import json from '../../AllDates.json';
 const CURRENT_DATE = new Date();
 const allDates = json;
 const flatListData = Object.values(allDates);
-console.log(allDates['1.1.2023']);
 const initialNumToRender = flatListData.length;
-console.log({initialNumToRender});
 
 export const DATE_WIDTH = constants.WIDTH * 0.89444444444444444444444444444444;
 export const TASK_CONTAINER_HEIGHT =
@@ -44,12 +42,14 @@ const Home = () => {
   const getIndexByKey = useCallback(
     (obj: Record<string, any>, key: string): number => {
       const keys = Object.keys(obj);
+
+      // console.log({keys});
       return keys.indexOf(key);
     },
     [],
   );
   const findIndexByDate = useCallback((DateToCheck: Date) => {
-    const key = DateToCheck.toLocaleDateString();
+    const key = DateToCheck.toLocaleDateString('heb');
     const index = getIndexByKey(allDates, key);
     return index;
   }, []);
@@ -114,9 +114,8 @@ const Home = () => {
   }, []);
 
   const findDateAndScroll = useCallback((DateToCheck: Date) => {
-    const key = DateToCheck.toLocaleDateString();
+    const key = DateToCheck.toLocaleDateString('heb');
     const index = getIndexByKey(allDates, key);
-    console.log({DateToCheck, key, index});
     SetSelectedDate(DateToCheck);
     SetDateHeader(flatListData[index]);
     scrollToIndex(index);

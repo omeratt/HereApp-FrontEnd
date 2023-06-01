@@ -38,9 +38,7 @@ const RenderMessageItem = (props: Props) => {
     const inputString = props.item.message;
     const searchString = props.item.title;
     const regex = new RegExp(searchString, 'g');
-
     const result = inputString.replace(regex, '');
-    console.log(props.item.message, props.item.title, result);
     return result.trim();
   }, [props.item.message, props.item.title]);
   const AnimatedTouchableOpacity = React.useMemo(() => {

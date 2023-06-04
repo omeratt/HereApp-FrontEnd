@@ -46,6 +46,20 @@ export const userApi = apiSlice.injectEndpoints({
       ],
       // providesTags:['Users']
     }),
+    loginWithGoogle: builder.mutation({
+      query: user => ({
+        url: 'google-login',
+        body: user,
+        credentials: 'include',
+        method: 'post',
+      }),
+      transformResponse: async (response: any, meta, arg) => {
+        store?.dispatch(
+          login({...response.data, isSignIn: response?.data.signIn}),
+        );
+        return response.data;
+      },
+    }),
     setFcmToken: builder.mutation({
       query: token => ({
         url: 'user/fcmToken',
@@ -97,6 +111,7 @@ export const userApi = apiSlice.injectEndpoints({
 export const {
   useSignupMutation,
   useLoginMutation,
+  useLoginWithGoogleMutation,
   useMyProfileQuery,
   useLogoutMutation,
   useSetFcmTokenMutation,

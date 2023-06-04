@@ -12,7 +12,20 @@
           "package_name": "com.fronend"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "372513103675-jkglti6i2t966blckj133d8jmf2j4pts.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.fronend",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "372513103675-ufj8hb6i725qb6qqeorabhpqu2jcrf3u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBUbO9ozr4GWVVmtcXIWuOu57HNdgewKQs"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "372513103675-ufj8hb6i725qb6qqeorabhpqu2jcrf3u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

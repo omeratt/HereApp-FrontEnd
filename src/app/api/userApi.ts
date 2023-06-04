@@ -46,6 +46,17 @@ export const userApi = apiSlice.injectEndpoints({
       ],
       // providesTags:['Users']
     }),
+    setFcmToken: builder.mutation({
+      query: token => ({
+        url: 'user/fcmToken',
+        body: {token},
+        credentials: 'include',
+        method: 'post',
+      }),
+      transformResponse: async (response: any, meta, arg) => {
+        return response.data;
+      },
+    }),
     myProfile: builder.query({
       query: () => ({
         url: 'user/myProfile',
@@ -88,4 +99,5 @@ export const {
   useLoginMutation,
   useMyProfileQuery,
   useLogoutMutation,
+  useSetFcmTokenMutation,
 } = userApi;

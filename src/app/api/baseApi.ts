@@ -90,6 +90,7 @@ export const apiSlice = createApi({
     'Users',
     'Tasks',
     'TasksByDate',
+    'NextTask',
     'Lists',
     'PrioritizedLists',
     'Messages',

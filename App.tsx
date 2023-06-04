@@ -19,8 +19,10 @@ import {Provider} from 'react-redux';
 import {persistor, store} from './src/app/store';
 import {PersistGate} from 'redux-persist/integration/react';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import useNotification from './src/hooks/notification/useNotification';
 
 const App = () => {
+  useNotification();
   return (
     <>
       <GestureHandlerRootView style={styles.container}>

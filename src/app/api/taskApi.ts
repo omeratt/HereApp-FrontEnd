@@ -37,7 +37,7 @@ export const tasksApi = apiSlice.injectEndpoints({
           body: {date},
         };
       },
-      // providesTags: ['TasksByDate'],
+      providesTags: ['NextTask'],
       transformResponse: (response: any, meta, arg) => {
         return response.data;
       },
@@ -48,7 +48,19 @@ export const tasksApi = apiSlice.injectEndpoints({
         method: 'DELETE',
         credentials: 'include',
       }),
-      invalidatesTags: ['TasksByDate'],
+      invalidatesTags: ['TasksByDate', 'NextTask'],
+      transformResponse: (response: any, meta, arg) => {
+        return response.data;
+      },
+    }),
+    deleteManyTasks: builder.mutation({
+      query: ids => ({
+        url: `tasks`,
+        method: 'DELETE',
+        credentials: 'include',
+        body: {ids},
+      }),
+      invalidatesTags: ['TasksByDate', 'NextTask'],
       transformResponse: (response: any, meta, arg) => {
         return response.data;
       },
@@ -60,7 +72,7 @@ export const tasksApi = apiSlice.injectEndpoints({
         body: task,
         credentials: 'include',
       }),
-      invalidatesTags: ['TasksByDate', 'Search'],
+      invalidatesTags: ['TasksByDate', 'Search', 'NextTask'],
       transformResponse: (response: any, meta, arg) => {
         return response.data;
       },
@@ -72,6 +84,7 @@ export const {
   useGetTasksQuery,
   useAddTaskMutation,
   useDeleteTaskMutation,
+  useDeleteManyTasksMutation,
   useGetTasksByDateQuery,
   useGetNextTasksByDateQuery,
 } = tasksApi;

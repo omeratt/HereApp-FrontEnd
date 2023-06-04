@@ -108,7 +108,7 @@ const Messages = () => {
   }, []);
 
   const isLastSelected = React.useMemo(() => {
-    return selected.includes(lastMsg._id!);
+    return lastMsg?._id && selected?.includes(lastMsg._id) ? true : false;
   }, [selected, lastMsg]);
 
   const goBack = React.useCallback(() => {
@@ -291,17 +291,19 @@ const Messages = () => {
                           styles.lastMsgTxt,
                           // , {maxHeight: '30%'}
                         ]}>
-                        {lastMsg.message}
+                        {lastMsg?.message}
                         {/* An idea I had for an interactive course - to search in
                       science books */}
                       </Text>
-                      <Text style={styles.dateTxt}>
-                        {new Date(lastMsg.createdAt!).toLocaleString('eng', {
-                          month: 'short',
-                          day: '2-digit',
-                          year: 'numeric',
-                        })}
-                      </Text>
+                      {lastMsg?.createdAt && (
+                        <Text style={styles.dateTxt}>
+                          {new Date(lastMsg.createdAt).toLocaleString('eng', {
+                            month: 'short',
+                            day: '2-digit',
+                            year: 'numeric',
+                          })}
+                        </Text>
+                      )}
                     </Animated.View>
                   </View>
                 </Animated.View>

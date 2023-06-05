@@ -5,13 +5,18 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useEffect} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import TextInput, {InputHandle} from '../components/TextInput';
 import constants from '../assets/constants';
 import * as Yup from 'yup';
 import {Formik, FormikProps} from 'formik';
-import {useLoginMutation} from '../app/api/userApi';
-
+import {useLoginMutation, useLoginWithGoogleMutation} from '../app/api/userApi';
+import {
+  GoogleSigninButton,
+  GoogleSignin,
+} from '@react-native-google-signin/google-signin';
+import auth from '@react-native-firebase/auth';
+import {GOOGLE_WEB_CLIENT_ID} from '@env';
 interface props {
   hideScreen: () => void;
   ErrTxt: ({txt}: any, {touched}: any) => JSX.Element | any;
@@ -24,7 +29,9 @@ const validationSchema = Yup.object({
     .min(8, 'Password must be at least 8 characters')
     .required('Password is required'),
 });
-
+GoogleSignin.configure({
+  webClientId: GOOGLE_WEB_CLIENT_ID,
+});
 export default function SignInForm({
   hideScreen,
   ErrTxt,
@@ -43,7 +50,28 @@ export default function SignInForm({
 
   const [login, {isLoading, data, isSuccess, isError, error}] =
     useLoginMutation();
+  const [GoogleLogIn, {isLoading: GLoading, isError: GIsError}] =
+    useLoginWithGoogleMutation();
 
+  const googleSignIn = useCallback(async () => {
+    try {
+      await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
+      const {idToken} = await GoogleSignin.signIn();
+      // dispatch(loadingModal(true));
+      // console.log(idToken);
+      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+      const user = await auth().signInWithCredential(googleCredential);
+      // console.log(user);
+      await GoogleLogIn(undefined);
+
+      // if (user) loginSaga();
+    } catch (error: any) {
+      // const obj = getFailedMessage(error?.message);
+      // showError(obj);
+    } finally {
+      // dispatch(loadingModal(false));
+    }
+  }, []);
   const submit = async (values: typeof userInfo) => {
     //todo submit values and hide screen with hideScreen function
     console.log(values);
@@ -133,11 +161,26 @@ export default function SignInForm({
               disabled={!isValid}
               onPress={() => handleSubmit()}>
               {isLoading ? (
-                <ActivityIndicator color={constants.colors.GREY} />
+                <ActivityIndicator color={constants.colors.GREEN} />
               ) : (
                 <Text style={[styles.text]}>Sign In</Text>
               )}
             </TouchableOpacity>
+          </View>
+          <View
+            style={{
+              width: '100%',
+              height: '20%',
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+            }}>
+            <GoogleSigninButton
+              // style={styles.button}
+              size={GoogleSigninButton.Size.Standard}
+              color={GoogleSigninButton.Color.Dark}
+              // disabled={!isValid}
+              onPress={googleSignIn}
+            />
           </View>
         </>
       )}

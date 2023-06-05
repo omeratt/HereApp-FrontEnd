@@ -5,10 +5,15 @@ import {logout} from '../Reducers/User/userSlice';
 import CookieManager from '@react-native-cookies/cookies';
 import {tasksApi} from './taskApi';
 import {listsApi} from './listApi';
-
+import auth from '@react-native-firebase/auth';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
 const baseQuery = fetchBaseQuery({
   baseUrl: constants.BASE_URL,
   credentials: 'include',
+  async prepareHeaders(headers, api) {
+    const token = await auth().currentUser?.getIdToken();
+    headers.set('Authorization', `Bearer ${token}`);
+  },
 });
 
 const baseQueryWithReAuth = async (args: any, api: any, extraOptions: any) => {
@@ -26,6 +31,8 @@ const baseQueryWithReAuth = async (args: any, api: any, extraOptions: any) => {
     // if (urlStr === 'tasks/date') console.log(result.data);
   } else if (status === 401) {
     console.log(formatError(result?.error, urlStr, 31, method!));
+    if (auth()?.currentUser) await auth().signOut();
+    if (await GoogleSignin.isSignedIn()) await GoogleSignin.signOut();
     api.dispatch(logout());
     await CookieManager.clearAll();
     api.dispatch(tasksApi.util.resetApiState());

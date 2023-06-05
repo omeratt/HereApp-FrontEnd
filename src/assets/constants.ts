@@ -109,4 +109,28 @@ const constants = {
 };
 // export const minimumDate = new Date(json['1.1.2023'].fullDate);
 // export const maximumDate = new Date(json['9.9.2031'].fullDate);
+export enum Frequency {
+  'Every day' = 1,
+  'Every 2 days',
+  'Every 3 days',
+  'Every 4 days',
+  'Every 5 days',
+  'Every 6 days',
+  'Every week' = 1,
+  'Every 2 weeks',
+  'Every 3 weeks',
+  'Every month' = 1,
+  'Every 2 months',
+  'Every 3 months',
+  'Every 4 months',
+  'Every 5 months',
+  'Every 6 months',
+  'Every 7 months',
+  'Every 8 months',
+  'Every 9 months',
+  'Every 10 months',
+  'Every 11 months',
+  'Every year' = 1,
+  'None' = -1,
+}
 export default constants;

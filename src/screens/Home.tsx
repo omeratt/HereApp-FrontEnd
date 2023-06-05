@@ -105,7 +105,6 @@ const Home = () => {
   }, []);
 
   const datePress = useCallback((dateItem: DateObject) => {
-    // console.log({dateItem});
     const realDate = new Date(
       new Date(dateItem.fullDate).getTime() -
         new Date(dateItem.fullDate).getTimezoneOffset() * 60000,
@@ -115,6 +114,7 @@ const Home = () => {
   }, []);
 
   const findDateAndScroll = useCallback((DateToCheck: Date) => {
+    DateToCheck.setUTCHours(0, 0, 0, 0);
     const key = DateToCheck.toLocaleDateString('heb');
     const index = getIndexByKey(allDates, key);
     SetSelectedDate(DateToCheck);
@@ -150,12 +150,9 @@ const Home = () => {
 
   // callbacks
   const openTaskModal = useCallback(() => {
-    console.log('opening task');
-
     bottomSheetModalRef.current?.present();
   }, []);
   const closeTaskModal = useCallback(() => {
-    console.log('closing task');
     bottomSheetModalRef.current?.dismiss();
     setEditTaskDetails(undefined);
   }, [bottomSheetModalRef.current]);

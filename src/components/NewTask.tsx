@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 import React, {useCallback, useMemo, useRef, useState} from 'react';
-import constants from '../assets/constants';
+import constants, {Frequency} from '../assets/constants';
 import SVG from '../assets/svg';
 import Line from './Line';
 import SwitchToggle from 'react-native-switch-toggle';
@@ -21,7 +21,12 @@ import FrequencyPickerModal from './FrequencyPickerModal';
 import {BottomSheetModal} from '@gorhom/bottom-sheet';
 import {useFocusEffect} from '@react-navigation/native';
 import {TaskType} from '../app/Reducers/User/userSlice';
-import {getRealDate, getTimeFromDateString} from './WeeklyCalender';
+import {
+  compareDates,
+  getRealDate,
+  getTimeFromDateString,
+} from './WeeklyCalender';
+import moment from 'moment';
 const realDate = new Date();
 const hours = getTimeFromDateString(realDate.toISOString(), true, true);
 const {min: minimumDate, max: maximumDate} = constants.Dates;
@@ -56,7 +61,7 @@ const NewTask: React.FC<props> = ({
       ? new Date(task?.targetDate)
       : getRealDate(targetDate, true),
   );
-  const [endDate, setEndDate] = useState<Date>();
+  const [endDate, setEndDate] = useState<Date>(startDate);
   const [AddTask, {isLoading, data, isSuccess, isError, error}] =
     useAddTaskMutation();
   const isEndDate = useRef<boolean>(false);
@@ -93,7 +98,10 @@ const NewTask: React.FC<props> = ({
       //   startDate.getTime() - startDate.getTimezoneOffset() * 60000,
       // );
       closeModal();
-      if (startDate !== targetDate) {
+      const areDatesEqual =
+        startDate?.toISOString().split('T')[0] ===
+        targetDate?.toISOString().split('T')[0];
+      if (!areDatesEqual) {
         findDateAndScroll?.(startDate);
       }
       // setTargetDate(startDate);
@@ -105,6 +113,7 @@ const NewTask: React.FC<props> = ({
         ...(endDate && freq !== 'None' && {endDate}),
         isSetTime: true,
         ...(task?._id && {_id: task._id}),
+        push: pushOn,
       }).unwrap();
       setDescription('');
       setTaskName('');
@@ -112,11 +121,6 @@ const NewTask: React.FC<props> = ({
       console.log('error from add Task submit', err);
     }
   };
-
-  Keyboard.addListener('keyboardDidHide', () => {
-    taskNameInputRef?.current?.blur();
-    taskDescriptionInputRef?.current?.blur();
-  });
 
   React.useEffect(() => {
     taskNameInputRef?.current?.focus();
@@ -140,6 +144,16 @@ const NewTask: React.FC<props> = ({
       return () => subscription.remove();
     }, []),
   );
+  const minimumEndDate = useMemo(() => {
+    const freqArr = freq?.split?.(' ');
+    const unit = freqArr[freqArr.length - 1];
+    const amount = Frequency[freq as any];
+    const fixedDate = moment(startDate);
+    fixedDate.add(amount as any, unit as any);
+    setEndDate(fixedDate.toDate());
+    return fixedDate.toDate();
+  }, [freq, startDate, Frequency]);
+
   const openCloseDatePicker = useCallback(
     (dateType: DateFormat = 'date', _isEndDate: boolean = false) => {
       if (datePickerOpen) bottomSheetModalRef.current?.dismiss();
@@ -208,6 +222,10 @@ const NewTask: React.FC<props> = ({
         <View style={[styles.realContainer]}>
           <View style={styles.header}>
             <TextInput
+              onPressOut={() => {
+                taskNameInputRef.current?.blur();
+                taskNameInputRef.current?.focus();
+              }}
               ref={taskNameInputRef}
               maxLength={19}
               onChangeText={setTaskName}
@@ -217,7 +235,9 @@ const NewTask: React.FC<props> = ({
               selectionColor={constants.colors.GREEN}
               cursorColor={constants.colors.GREEN}
               style={styles.newTaskTitleInput}
-              onSubmitEditing={Keyboard.dismiss}
+              onSubmitEditing={() => {
+                taskDescriptionInputRef.current?.focus();
+              }}
             />
           </View>
           <View style={{flex: 2.5}}>
@@ -317,11 +337,11 @@ const NewTask: React.FC<props> = ({
                       <SetTimeContent
                         title={'End Date'}
                         buttonTxt={formattedDate(endDate || startDate)}
-                        onPress={openCloseDatePicker}
+                        onPress={() => openCloseDatePicker('date', true)}
                       />
-                      {PushForMe}
                     </>
                   )}
+                  {PushForMe}
                 </View>
               </View>
             </View>
@@ -339,10 +359,10 @@ const NewTask: React.FC<props> = ({
         </TouchableOpacity>
         <DatePickerModal
           isOpen={datePickerOpen}
-          date={startDate}
+          date={isEndDate.current ? endDate : startDate}
           dateFormat={dateTypeRef.current}
           setDate={isEndDate.current ? SetEndDate : setStartDate}
-          minimumDate={minimumDate}
+          minimumDate={minimumEndDate || minimumDate}
           maximumDate={maximumDate}
           isSetTimeRef={isSetTime}
           targetDateHoursRef={targetDateHoursRef}

@@ -30,7 +30,6 @@ interface DatePickerProps {
   bottomSheetModalRef?: React.RefObject<BottomSheetModalMethods>;
 }
 
-const currDate = new Date();
 const DatePickerModal: React.FC<DatePickerProps> = ({
   isOpen,
   dateFormat,
@@ -45,7 +44,6 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
 }) => {
   const [currentDate, setCurrentDate] = React.useState<Date>(date);
   const [hours, setHours] = React.useState<string>('');
-
   const handleConfirm = () => {
     if (dateFormat !== 'time') {
       setDate(currentDate);

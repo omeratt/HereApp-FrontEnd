@@ -1,10 +1,20 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import constants from '../assets/constants';
 import SVG from '../assets/svg';
 import NewTask from '../components/NewTask';
 import Animated, {FlipInEasyY, useSharedValue} from 'react-native-reanimated';
-import {tasksApi, useGetTasksByDateQuery} from '../app/api/taskApi';
+import {
+  tasksApi,
+  useAddTaskMutation,
+  useGetTasksByDateQuery,
+} from '../app/api/taskApi';
 import DisplayTask from '../components/DisplayTask';
 import {useAppDispatch} from '../app/hooks';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
@@ -95,6 +105,7 @@ const Home = () => {
     error: tasksError,
     isFetching: taskFetch,
   } = useGetTasksByDateQuery(selectedDate);
+  const [AddTask, {isLoading: isMutateTaskLoading}] = useAddTaskMutation();
   const [calendarVisible, setCalendarVisible] = useState(false);
   const FetchTasks = useCallback((date: Date) => {
     const result = dispatch(tasksApi.endpoints.getTasksByDate.initiate(date))
@@ -208,19 +219,23 @@ const Home = () => {
       <View style={styles.topView}>
         <View style={styles.task}>
           <View style={styles.today}>
-            <Text style={styles.taskTitle}>{tempGetMonthFromStringDate}</Text>
+            <View style={[{width: '100%'}, styles.rowBetweenCenter]}>
+              <TouchableOpacity
+                style={styles.rowBetweenCenter}
+                onPress={toggleCalendar}>
+                <Text style={styles.taskTitle}>
+                  {tempGetMonthFromStringDate}
+                </Text>
 
-            <TouchableOpacity
-              style={{
-                // backgroundColor: 'black',
-                width: 15,
-                height: 15,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-              onPress={toggleCalendar}>
-              <SVG.ArrowDown />
-            </TouchableOpacity>
+                <SVG.ArrowDown style={styles.arrowDown} />
+              </TouchableOpacity>
+              {(listsLoading ||
+                prioritizedListsLoading ||
+                isMutateTaskLoading ||
+                tasksLoading) && (
+                <ActivityIndicator size={32} color={constants.colors.GREEN} />
+              )}
+            </View>
           </View>
           <View>
             <Line
@@ -374,6 +389,7 @@ const Home = () => {
             findDateAndScroll={findDateAndScroll}
             task={editTaskDetails}
             setTask={setEditTaskDetails}
+            AddTask={AddTask}
           />
         </BottomSheetModal>
       </BottomSheetModalProvider>
@@ -588,5 +604,16 @@ const styles = StyleSheet.create({
     borderBottomColor: 'black',
     // transform: [{rotate: '180deg'}],
     alignSelf: 'center',
+  },
+  arrowDown: {
+    width: 15,
+    height: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rowBetweenCenter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 });

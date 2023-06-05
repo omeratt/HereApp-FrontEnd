@@ -36,6 +36,9 @@ export interface RenderItemProps {
   sharedX?: SharedValue<number>;
   goToEditTask?: (_task: TaskType) => void;
   taskH: number;
+  handleSelected?: (id: string) => void;
+  selected: string[];
+  isSelectOn: boolean;
 }
 interface props {
   data: any[];
@@ -51,6 +54,9 @@ interface props {
   isRenderTaskFromAllTasks?: boolean;
   setTask: React.Dispatch<React.SetStateAction<TaskType | undefined>>;
   TASK_CONTAINER_HEIGHT: number;
+  handleSelected?: (id: string) => void;
+  selected?: string[];
+  isSelectOn?: boolean;
 }
 // const TASK_CONTAINER_HEIGHT =
 //   constants.HEIGHT * 0.64 * 0.84 - //topView till lists
@@ -74,6 +80,9 @@ const DisplayTask = ({
   setTask,
   isRenderTaskFromAllTasks,
   TASK_CONTAINER_HEIGHT,
+  handleSelected,
+  selected,
+  isSelectOn,
 }: props) => {
   const [
     DeleteTask,
@@ -283,22 +292,28 @@ const DisplayTask = ({
         }),
     [],
   );
-  const renderItem = useCallback((props: any) => {
-    if (isRenderTaskFromAllTasks) {
-      const item = {
-        ...props.item,
-        sharedX,
-        goToEditTask,
-        taskH: TASK_CONTAINER_HEIGHT,
-      };
-      return <RenderTask {...props} item={item} />;
-    }
-    return isRenderTaskFromAllTasks ? (
-      <RenderTask {...props} />
-    ) : (
-      <RenderItem {...props} />
-    );
-  }, []);
+  const renderItem = useCallback(
+    (props: any) => {
+      if (isRenderTaskFromAllTasks) {
+        const item = {
+          ...props.item,
+          sharedX,
+          goToEditTask,
+          taskH: TASK_CONTAINER_HEIGHT,
+          handleSelected,
+          selected,
+          isSelectOn,
+        };
+        return <RenderTask {...props} item={item} />;
+      }
+      return isRenderTaskFromAllTasks ? (
+        <RenderTask {...props} />
+      ) : (
+        <RenderItem {...props} />
+      );
+    },
+    [selected, isSelectOn],
+  );
   const keyExtractor: (item: RenderItemProps, index: number) => string =
     useCallback((item: RenderItemProps) => item._id!, []);
   const contentH = useMemo(() => {

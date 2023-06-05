@@ -1,10 +1,27 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ActivityIndicator,
+  Vibration,
+} from 'react-native';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import constants from '../../assets/constants';
 import SVG from '../../assets/svg';
 import NewTask from '../../components/NewTask';
-import Animated, {FlipInEasyY, useSharedValue} from 'react-native-reanimated';
-import {tasksApi, useGetTasksByDateQuery} from '../../app/api/taskApi';
+import Animated, {
+  FlipInEasyY,
+  ZoomInEasyDown,
+  ZoomOutEasyDown,
+  useSharedValue,
+} from 'react-native-reanimated';
+import {
+  tasksApi,
+  useAddTaskMutation,
+  useDeleteManyTasksMutation,
+  useGetTasksByDateQuery,
+} from '../../app/api/taskApi';
 import DisplayTask from '../../components/DisplayTask';
 import {useAppDispatch} from '../../app/hooks';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
@@ -17,6 +34,9 @@ import CalendarModal from '../../components/CalendarModal';
 import {TaskType} from '../../app/Reducers/User/userSlice';
 import {DATE_WIDTH} from '../Home';
 import json from '../../../AllDates.json';
+import BottomSheetDeleteModal, {
+  BottomSheetDeleteModalHandles,
+} from '../../components/BottomSheetDeleteModal';
 const CURRENT_DATE = new Date();
 const allDates = json;
 const flatListData = Object.values(allDates);
@@ -29,7 +49,10 @@ const contentW = WIDTH * (384 / 414);
 // const contentW = WIDTH * (384 / 414);
 const paddingVertical = HEIGHT * (23 / 896);
 const tasksH = HEIGHT * (465 / 896);
-
+const selectHeight = 0.04464285714285714285714285714286 * constants.HEIGHT;
+const selectWidth = selectHeight / 0.57746478873239436619718309859155;
+const deleteBtnHeight = constants.HEIGHT * (71 / 896);
+const deleteBtnWidth = constants.WIDTH * (71 / 414);
 const Home = () => {
   const getIndexByKey = useCallback(
     (obj: Record<string, any>, key: string): number => {
@@ -55,6 +78,9 @@ const Home = () => {
   const [editTaskDetails, setEditTaskDetails] = useState<TaskType | undefined>(
     undefined,
   );
+  const [isSelect, setIsSelect] = React.useState(false);
+  const [selected, setSelected] = React.useState<string[]>([]);
+  const bottomSheetRef = useRef<BottomSheetDeleteModalHandles>(null);
   // const a = useNavig
   const goBack = useCallback(() => {
     navigation.navigate('HomePage' as never);
@@ -70,6 +96,9 @@ const Home = () => {
 
   const {isLoading: tasksLoading, data: tasks} =
     useGetTasksByDateQuery(selectedDate);
+  const [AddTask, {isLoading: isMutateTaskLoading}] = useAddTaskMutation();
+  const [DeleteManyTasks, {isLoading: isDeleteTasksLoading}] =
+    useDeleteManyTasksMutation();
   const [calendarVisible, setCalendarVisible] = useState(false);
   const FetchTasks = useCallback((date: Date) => {
     const result = dispatch(tasksApi.endpoints.getTasksByDate.initiate(date))
@@ -78,6 +107,13 @@ const Home = () => {
         console.log('error getting tasks', err);
       });
   }, []);
+
+  const DeleteTasks = useCallback(async () => {
+    bottomSheetRef.current?.closeModal();
+    setSelected([]);
+    setIsSelect(false);
+    await DeleteManyTasks(selected);
+  }, [selected]);
 
   const datePress = useCallback((dateItem: DateObject) => {
     const realDate = new Date(
@@ -99,6 +135,12 @@ const Home = () => {
   useEffect(() => {
     findDateAndScroll(CURRENT_DATE);
   }, []);
+
+  const toggleSelect = React.useCallback(() => {
+    setIsSelect(!isSelect);
+    Vibration.vibrate(1);
+    setSelected([]);
+  }, [isSelect]);
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
@@ -154,6 +196,21 @@ const Home = () => {
   const toggleCalendar = useCallback(() => {
     setCalendarVisible(!calendarVisible);
   }, [calendarVisible]);
+
+  const handleSelected = React.useCallback((id: string) => {
+    console.log(selected);
+    setSelected(prev => {
+      if (prev.includes(id)) {
+        return prev.filter(_id => _id !== id);
+      } else {
+        return [...prev, id];
+      }
+    });
+  }, []);
+
+  const openDeleteModal = React.useCallback(() => {
+    bottomSheetRef.current?.openModal();
+  }, []);
   return (
     <Animated.View
       entering={FlipInEasyY}
@@ -161,17 +218,46 @@ const Home = () => {
       style={styles.container}>
       <View style={styles.headerContainer}>
         <Text style={styles.headerTxt}>All my tasks</Text>
-        <SVG.NotePlus height={32} onPress={openTaskModal} />
+        <View style={{flexDirection: 'row'}}>
+          <TouchableOpacity
+            style={[{height: selectHeight}]}
+            onPress={toggleSelect}>
+            {isSelect ? (
+              <SVG.GreenSelect
+                height={'100%'}
+                width={selectWidth}
+                // style={[styles.svg, styles.marginRight]}
+              />
+            ) : (
+              <SVG.Select
+                height={'100%'}
+                width={selectWidth}
+                // style={[styles.svg, styles.marginRight]}
+              />
+            )}
+          </TouchableOpacity>
+          <SVG.NotePlus height={32} onPress={openTaskModal} />
+        </View>
       </View>
       <View style={styles.topView}>
         <View style={styles.task}>
           <View style={styles.today}>
-            <Text style={styles.todayTitle}>{tempGetMonthFromStringDate}</Text>
-            <TouchableOpacity
-              style={styles.calendarBtn}
-              onPress={toggleCalendar}>
-              <SVG.ArrowDown />
-            </TouchableOpacity>
+            <View style={[{width: '100%'}, styles.rowBetweenCenter]}>
+              <TouchableOpacity
+                style={styles.rowBetweenCenter}
+                onPress={toggleCalendar}>
+                <Text style={styles.todayTitle}>
+                  {tempGetMonthFromStringDate}
+                </Text>
+
+                <SVG.ArrowDown style={styles.arrowDown} />
+              </TouchableOpacity>
+              {(isMutateTaskLoading ||
+                tasksLoading ||
+                isDeleteTasksLoading) && (
+                <ActivityIndicator size={32} color={constants.colors.GREEN} />
+              )}
+            </View>
           </View>
           <View>
             <Line
@@ -215,6 +301,9 @@ const Home = () => {
               flashListRef={flashListRef}
               sharedDatesIndex={sharedDatesIndex}
               datePress={datePress}
+              handleSelected={handleSelected}
+              selected={selected}
+              isSelectOn={isSelect}
               //@ts-ignore
               flatListData={flatListData}
               snapToOffsets={snapToOffsets}
@@ -241,8 +330,34 @@ const Home = () => {
         </View>
       </View>
       <View style={styles.doneContainer}>
-        <SVG.DoneButton fill={constants.colors.BGC} onPress={goBack} />
+        {isSelect ? (
+          <Animated.View
+            style={styles.listContainerFooter}
+            entering={ZoomInEasyDown.duration(150)}
+            exiting={ZoomOutEasyDown.duration(150)}>
+            <TouchableOpacity
+              style={[
+                styles.containerFooterBtn,
+                {height: deleteBtnHeight, width: deleteBtnWidth},
+              ]}>
+              {selected.length > 0 ? (
+                <SVG.TrashBlack onPress={openDeleteModal} />
+              ) : (
+                <SVG.Trash />
+              )}
+            </TouchableOpacity>
+          </Animated.View>
+        ) : (
+          <View>
+            <SVG.DoneButton fill={constants.colors.BGC} onPress={goBack} />
+          </View>
+        )}
       </View>
+      <BottomSheetDeleteModal
+        onDelete={DeleteTasks}
+        ids={selected}
+        ref={bottomSheetRef}
+      />
       <CalendarModal
         visible={calendarVisible}
         toggleCalendar={toggleCalendar}
@@ -267,6 +382,7 @@ const Home = () => {
             findDateAndScroll={findDateAndScroll}
             task={editTaskDetails}
             setTask={setEditTaskDetails}
+            AddTask={AddTask}
           />
         </BottomSheetModal>
       </BottomSheetModalProvider>
@@ -375,5 +491,51 @@ const styles = StyleSheet.create({
   doneContainer: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
+    // flexDirection: 'row',
+    // backgroundColor: 'red',
+    width: '100%',
+  },
+  arrowDown: {
+    width: 15,
+    height: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rowBetweenCenter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  listContainerFooter: {
+    // position: 'absolute',
+    // bottom: '3%',
+    // alignSelf: 'flex-start',
+    // right: 20,
+    // bottom: '25%',
+
+    width: deleteBtnWidth,
+    height: deleteBtnHeight,
+    // flexDirection: 'row',
+    // justifyContent: 'space-between',
+    // backgroundColor: 'cyan',
+  },
+  containerFooterBtn: {
+    borderWidth: 0.5,
+    borderRadius: 20,
+    backgroundColor: constants.colors.OFF_WHITE,
+    borderColor: constants.colors.UNDER_LINE,
+    elevation: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  innerBtnCircleCheckbox: {
+    borderColor: constants.colors.BLACK,
+    height: '15%',
+    width: '15%',
+    borderWidth: 1,
+    borderRadius: 99,
+    marginBottom: '4%',
+    marginLeft: '13%',
   },
 });

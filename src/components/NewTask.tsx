@@ -37,6 +37,7 @@ interface props {
   targetDate?: Date;
   setTargetDate?: (date: Date) => void;
   findDateAndScroll?: (DateToCheck: Date) => void;
+  AddTask?: (args: any) => any;
 }
 type DateFormat = 'datetime' | 'date' | 'time';
 const FreqData = [...constants.FreqList];
@@ -48,6 +49,7 @@ const NewTask: React.FC<props> = ({
   targetDate,
   setTargetDate,
   findDateAndScroll,
+  AddTask,
 }) => {
   const [pushOn, setPushOn] = useState(task?.push ? task.push : false);
   const [datePickerOpen, setDatePickerOpen] = useState<boolean>(false);
@@ -62,8 +64,7 @@ const NewTask: React.FC<props> = ({
       : getRealDate(targetDate, true),
   );
   const [endDate, setEndDate] = useState<Date>(startDate);
-  const [AddTask, {isLoading, data, isSuccess, isError, error}] =
-    useAddTaskMutation();
+
   const isEndDate = useRef<boolean>(false);
   const isSetTime = useRef<boolean>(false);
 
@@ -105,7 +106,7 @@ const NewTask: React.FC<props> = ({
         findDateAndScroll?.(startDate);
       }
       // setTargetDate(startDate);
-      const data = await AddTask({
+      const data = await AddTask?.({
         name: taskName,
         details: description,
         targetDate: startDate,

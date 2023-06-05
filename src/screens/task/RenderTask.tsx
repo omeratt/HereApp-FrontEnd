@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import {StyleSheet, Text} from 'react-native';
 import {TouchableOpacity} from 'react-native';
 import {View} from 'react-native';
@@ -13,6 +13,7 @@ const springConfig = {stiffness: 100, mass: 0.5};
 const TASK_WIDTH = constants.WIDTH * 0.975;
 
 const RenderTasks: ListRenderItem<RenderItemProps> = ({item, index}) => {
+  // item.handleSelect;
   const itemHours = getTimeFromDateString(item.targetDate);
   useEffect(() => {
     if (item?.sharedX && item?.sharedX.value !== undefined) {
@@ -21,17 +22,26 @@ const RenderTasks: ListRenderItem<RenderItemProps> = ({item, index}) => {
       item.sharedX.value = withSpring(0, springConfig);
     }
   }, []);
+  const isSelected = useMemo(() => {
+    return item?._id && item?.selected?.includes(item._id) ? true : false;
+  }, [item?.selected, item._id]);
+  console.log({isSelectOn: item?.isSelectOn, isSelected});
   return (
     <Animated.View
       // entering={ZoomIn.duration(500)}
       // {...(sharedX.value === 0 && {exiting: SlideOutRight})}
       style={[
         styles.taskListContainer,
+        {...(isSelected && {backgroundColor: constants.colors.GREEN})},
         {...(!index && {marginTop: 0}), height: item.taskH / 6.5},
       ]}>
       <View style={styles.taskListContent}>
         <TouchableOpacity
-          onPress={() => item?.goToEditTask?.(item as TaskType)}>
+          onPress={() => {
+            item?.isSelectOn
+              ? item?.handleSelected?.(item._id!)
+              : item?.goToEditTask?.(item as TaskType);
+          }}>
           {item.isSetTime && (
             <View style={{width: '33%'}}>
               <Text style={styles.taskContentHour}>{itemHours}</Text>
@@ -57,11 +67,17 @@ const RenderTasks: ListRenderItem<RenderItemProps> = ({item, index}) => {
         <View style={{position: 'absolute', right: '5%'}}>
           <CheckBox
             size={22}
-            isFilled={item.done}
+            // isFilled={true}
+            isFilled={item?.isSelectOn ? isSelected : item.done}
+            onPress={() => {
+              item?.isSelectOn && item?.handleSelected?.(item._id!);
+            }}
+            type={item?.isSelectOn ? 'V' : undefined}
             colorFill={constants.colors.GREEN}
           />
         </View>
       </View>
+      
     </Animated.View>
   );
 };
@@ -76,6 +92,7 @@ const styles = StyleSheet.create({
     width: '90.36%',
     height: 60,
     backgroundColor: constants.colors.OFF_WHITE,
+    borderRadius: 20,
     // height
     // backgroundColor: 'red',
   },

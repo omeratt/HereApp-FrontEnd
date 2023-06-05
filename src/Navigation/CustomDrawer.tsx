@@ -13,6 +13,8 @@ import {useLogoutMutation} from '../app/api/userApi';
 import Line from '../components/Line';
 import {DrawerActions, useNavigation} from '@react-navigation/native';
 import TextInput from '../components/TextInput';
+import auth from '@react-native-firebase/auth';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
 interface ICustomerDrawer extends DrawerContentComponentProps {
   isSignIn?: boolean;
 }
@@ -37,6 +39,9 @@ const CustomDrawer: React.FC<ICustomerDrawer> = props => {
   }, []);
   const handleLogout = async () => {
     try {
+      closeDrawer();
+      if (auth()?.currentUser) await auth().signOut();
+      if (await GoogleSignin.isSignedIn()) await GoogleSignin.signOut();
       await Logout(null).unwrap();
     } catch (err) {
       console.log('an error at logout', err);

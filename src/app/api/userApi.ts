@@ -4,7 +4,8 @@ import CookieManager from '@react-native-cookies/cookies';
 import {tasksApi} from './taskApi';
 import {apiSlice} from './baseApi';
 import {listsApi} from './listApi';
-
+import auth from '@react-native-firebase/auth';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
 export const userApi = apiSlice.injectEndpoints({
   endpoints: builder => ({
     home: builder.query({
@@ -47,9 +48,8 @@ export const userApi = apiSlice.injectEndpoints({
       // providesTags:['Users']
     }),
     loginWithGoogle: builder.mutation({
-      query: user => ({
+      query: () => ({
         url: 'google-login',
-        body: user,
         credentials: 'include',
         method: 'post',
       }),
@@ -95,6 +95,7 @@ export const userApi = apiSlice.injectEndpoints({
         await CookieManager.clearAll();
         store?.dispatch(tasksApi.util.resetApiState());
         store?.dispatch(listsApi.util.resetApiState());
+
         return response.data;
       },
       transformErrorResponse: async (response: any, meta, arg) => {
@@ -102,6 +103,8 @@ export const userApi = apiSlice.injectEndpoints({
         await CookieManager.clearAll();
         store?.dispatch(tasksApi.util.resetApiState());
         store?.dispatch(listsApi.util.resetApiState());
+        if (auth()?.currentUser) await auth().signOut();
+        if (await GoogleSignin.isSignedIn()) await GoogleSignin.signOut();
         return response;
       },
       invalidatesTags: ['Users'],

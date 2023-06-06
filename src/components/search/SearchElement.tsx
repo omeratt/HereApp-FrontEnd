@@ -83,11 +83,14 @@ const SearchElement: React.FC<ISearchElementProps> = ({
       {messageRouteProp: msg, navFromSearch: true} as never,
     );
   }, []);
-  const navToTask = React.useCallback((index: number) => {
-    const task = (items as ITaskSearchResult[])[index];
-    setSelectedTask?.(task);
-    openTaskModal?.();
-  }, []);
+  const navToTask = React.useCallback(
+    (index: number) => {
+      const task = (items as ITaskSearchResult[])[index];
+      setSelectedTask?.(task);
+      openTaskModal?.();
+    },
+    [items],
+  );
   const navigateByType = React.useCallback(
     (index: number) => {
       if (isList) {
@@ -98,7 +101,7 @@ const SearchElement: React.FC<ISearchElementProps> = ({
       }
       if (isTask) return navToTask(index);
     },
-    [isList, isMsg, isTask],
+    [isList, isMsg, isTask, items],
   );
 
   return (

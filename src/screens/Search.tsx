@@ -21,6 +21,7 @@ import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import NewTask from '../components/NewTask';
 import {ITaskSearchResult} from '../components/search/types';
 import {TaskType} from '../app/Reducers/User/userSlice';
+import {useAddOrEditTaskMutation} from '../app/api/taskApi';
 const {HEIGHT, WIDTH} = constants;
 const paddingHorizontal = WIDTH * (80 / 896);
 const paddingVertical = HEIGHT * (45 / 896);
@@ -33,6 +34,7 @@ const Search = () => {
   const [inputValue, setInputValue] = React.useState('');
   const [searchHeight, setSearchHeight] = React.useState(60);
   const navigate = useNavigation();
+  const [addOrEditTask] = useAddOrEditTaskMutation();
   const [flashListHeight, setFlashListHeight] = React.useState<
     number | undefined
   >(undefined);
@@ -139,6 +141,7 @@ const Search = () => {
           <NewTask
             closeModal={closeTaskModal}
             task={selectedTask as TaskType}
+            AddTask={addOrEditTask}
           />
         </BottomSheetModal>
       </BottomSheetModalProvider>
@@ -167,6 +170,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     // backgroundColor: 'blue',
     textAlignVertical: 'center',
+    textAlign: 'left',
     fontSize: 12,
     width: '100%',
     top: 0,

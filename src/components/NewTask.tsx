@@ -95,10 +95,6 @@ const NewTask: React.FC<props> = ({
   const submit = async () => {
     try {
       if (!description || !taskName) return;
-      // const realDate = new Date(
-      //   startDate.getTime() - startDate.getTimezoneOffset() * 60000,
-      // );
-      closeModal();
       const areDatesEqual =
         startDate?.toISOString().split('T')[0] ===
         targetDate?.toISOString().split('T')[0];
@@ -106,6 +102,8 @@ const NewTask: React.FC<props> = ({
         findDateAndScroll?.(startDate);
       }
       // setTargetDate(startDate);
+      closeModal();
+      console.log({AddTask});
       const data = await AddTask?.({
         name: taskName,
         details: description,

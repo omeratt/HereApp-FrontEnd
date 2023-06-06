@@ -15,9 +15,9 @@ import {
 
 messaging().setBackgroundMessageHandler(async remoteMessage => {
   await onDisplayNotification(remoteMessage);
-  notifee.onBackgroundEvent(handleNotification);
   // return false;
 });
+notifee.onBackgroundEvent(handleNotification);
 // messaging().setBackgroundMessageHandler(async remoteMessage => {
 //   await onDisplayNotification(remoteMessage);
 //   console.log('--------------------------------', remoteMessage);

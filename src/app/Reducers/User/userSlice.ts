@@ -47,8 +47,8 @@ export const userSlice = createSlice({
       state = {...state, ...action.payload};
       return state;
     },
-    login: (state, action: PayloadAction<UserState>) => {
-      state = {...state, ...action.payload};
+    login: (state, action: PayloadAction<any>) => {
+      state = {...state, ...action.payload, ...action.payload.user};
       return state;
     },
     logout: state => {

@@ -1,6 +1,9 @@
 import {useEffect} from 'react';
 import messaging from '@react-native-firebase/messaging';
-import notifee from '@notifee/react-native';
+import notifee, {
+  AndroidImportance,
+  AuthorizationStatus,
+} from '@notifee/react-native';
 import useFcmTokenRefresh from './useFcmTokenRefresh';
 import {handleNotification, onDisplayNotification} from './utils';
 
@@ -26,11 +29,24 @@ const useNotification = () => {
     const isHasPermission =
       (await hasPermission()) === messaging.AuthorizationStatus.AUTHORIZED;
     if (isHasPermission) return;
+    const setting = await notifee.requestPermission();
+    if (
+      setting.authorizationStatus === AuthorizationStatus.AUTHORIZED ||
+      setting.authorizationStatus === AuthorizationStatus.PROVISIONAL
+    ) {
+      await notifee.createChannel({
+        // id: store.getState().reducer.user._id || 'Here - default',
+        // name: store.getState().reducer.user._id || 'Here - default',
+        id: 'Here - default',
+        name: 'Here - default',
+        importance: AndroidImportance.HIGH,
+      });
+    }
+
     const authStatus = await messaging().requestPermission();
     const enabled =
       authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
       authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-
     if (enabled) {
       console.log('Authorization status:', authStatus);
     }

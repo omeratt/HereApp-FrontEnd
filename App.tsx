@@ -11,7 +11,7 @@
 // import {NavigationContainer} from '@react-navigation/native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import React from 'react';
-import {StyleSheet, Text} from 'react-native';
+import {LogBox, StyleSheet, Text} from 'react-native';
 
 // import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import MainStack from './src/MainStack';
@@ -19,7 +19,9 @@ import {Provider} from 'react-redux';
 import {persistor, store} from './src/app/store';
 import {PersistGate} from 'redux-persist/integration/react';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
-
+LogBox.ignoreLogs([
+  '[notifee] no background event handler has been set. Set a handler via the "onBackgroundEvent" method.',
+]);
 const App = () => {
   return (
     <>

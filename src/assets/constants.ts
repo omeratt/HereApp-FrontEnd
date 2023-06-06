@@ -33,10 +33,10 @@ const constants = {
   // DOMAIN: 'here.cyclic.app',
   // BASE_URL: 'https://here-app.onrender.com/',
   /***************** Eliran ***************/
-  BASE_URL: 'http://192.168.1.41:3000/',
+  // BASE_URL: 'http://192.168.1.41:3000/',
   //
   /***************** Omer ***************/
-  // BASE_URL: 'http://192.168.1.26:3000/',
+  BASE_URL: 'http://192.168.1.26:3000/',
   colors: {
     GREEN: '#D0FD0C',
     BLACK: '#000000',

@@ -9,6 +9,7 @@ const useFcmTokenRefresh = () => {
 
   const listenToFCMTokenRefresh = () => {
     messaging().onTokenRefresh(async newToken => {
+      console.log('@@@@@refresh fcm token work!@!@!@');
       const oldToken = store.getState().reducer.user.fcmToken;
       await store.dispatch(
         userApi.endpoints?.refreshFcmToken?.initiate({newToken, oldToken}),

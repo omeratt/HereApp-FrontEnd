@@ -4,6 +4,8 @@ import notifee, {
   EventType,
 } from '@notifee/react-native';
 import {ACTION, INotifeeHandler} from './types';
+import {tasksApi} from '../../app/api/taskApi';
+import {store} from '../../app/store';
 
 export const handleNotification = async ({type, detail}: INotifeeHandler) => {
   switch (type) {
@@ -16,34 +18,37 @@ export const handleNotification = async ({type, detail}: INotifeeHandler) => {
   }
 };
 
-const handleActionPress = (action?: string, detail?: EventDetail) => {
+const handleActionPress = async (action?: string, detail?: EventDetail) => {
+  const _id = detail?.notification?.data?.taskId;
   switch (action) {
     case ACTION.DONE:
-      //TODO: FETCH SET AS DONE:TRUE
       console.log('should trigger done action');
+      //TODO: FETCH SET AS DONE:TRUE
+      await store.dispatch(
+        tasksApi.endpoints?.addTask?.initiate({_id, done: true}),
+      );
       break;
     case ACTION.DISMISS:
       console.log('should trigger dismiss action');
       //TODO: FETCH SET AS NOTIFIED:TRUE
+      await store.dispatch(
+        tasksApi.endpoints?.addTask?.initiate({_id, notified: true}),
+      );
+
       break;
   }
 };
 
 export const onDisplayNotification = async (remoteMessage: any) => {
-  await notifee.requestPermission();
-  const channelId = await notifee.createChannel({
-    id: remoteMessage.data.channelId || 'default',
-    name: 'Default Channel',
-  });
-
   await notifee.displayNotification({
     title: remoteMessage.data?.title,
     body: remoteMessage.data?.body,
     data: remoteMessage.data,
     android: {
-      channelId,
+      channelId: 'Here - default',
       importance: AndroidImportance.HIGH,
       smallIcon: 'ic_launcher', // optional, defaults to 'ic_launcher'.
+
       actions: [
         {
           title: '✅ Done',

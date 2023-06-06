@@ -14,8 +14,6 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import constants from '../assets/constants';
-import CircleCheckBox from './CircleCheckBox';
-import {CheckBox} from '@rneui/themed';
 import {tasksApi, useDeleteTaskMutation} from '../app/api/taskApi';
 import {BottomSheetModal} from '@gorhom/bottom-sheet';
 import SVG from '../assets/svg';
@@ -24,6 +22,7 @@ import {FlashList} from '@shopify/flash-list';
 import {DateObject, getTimeFromDateString} from './WeeklyCalender';
 import {TaskType} from '../app/Reducers/User/userSlice';
 import RenderTask from '../screens/task/RenderTask';
+import CheckBox from './CheckBox';
 
 export interface RenderItemProps {
   _id?: string;
@@ -39,6 +38,7 @@ export interface RenderItemProps {
   handleSelected?: (id: string) => void;
   selected: string[];
   isSelectOn: boolean;
+  updateTask?: (taskId: string, done: boolean) => Promise<void>;
 }
 interface props {
   data: any[];
@@ -57,6 +57,7 @@ interface props {
   handleSelected?: (id: string) => void;
   selected?: string[];
   isSelectOn?: boolean;
+  updateTask?: (taskId: string, done: boolean) => Promise<void>;
 }
 // const TASK_CONTAINER_HEIGHT =
 //   constants.HEIGHT * 0.64 * 0.84 - //topView till lists
@@ -83,6 +84,7 @@ const DisplayTask = ({
   handleSelected,
   selected,
   isSelectOn,
+  updateTask,
 }: props) => {
   const [
     DeleteTask,
@@ -191,6 +193,11 @@ const DisplayTask = ({
         sharedX.value = sharedX.value < 0 ? TASK_WIDTH * 2 : -TASK_WIDTH * 2;
         sharedX.value = withSpring(0, springConfig);
       }, []);
+      const handleCheckboxPress = () => {
+        console.log({item});
+        if (!item._id) return;
+        item.updateTask?.(item._id, !item.done);
+      };
       return (
         <Animated.View
           // entering={ZoomIn.duration(500)}
@@ -212,7 +219,20 @@ const DisplayTask = ({
                 {item.details}
               </Text>
             </TouchableOpacity>
-            <CheckBox
+            <View
+              style={{
+                position: 'absolute',
+                right: '4.7%',
+                backgroundColor: 'transparent',
+              }}>
+              <CheckBox
+                size={25}
+                isFilled={item.done}
+                onPress={handleCheckboxPress}
+                colorFill={constants.colors.GREEN}
+              />
+            </View>
+            {/* <CheckBox
               checked={item.done}
               iconRight
               fontFamily={constants.Fonts.text}
@@ -238,7 +258,7 @@ const DisplayTask = ({
               textStyle={styles.taskTxt}
               titleProps={{}}
               uncheckedColor="#F00"
-            />
+            /> */}
           </View>
         </Animated.View>
       );
@@ -303,14 +323,12 @@ const DisplayTask = ({
           handleSelected,
           selected,
           isSelectOn,
+          updateTask,
         };
         return <RenderTask {...props} item={item} />;
       }
-      return isRenderTaskFromAllTasks ? (
-        <RenderTask {...props} />
-      ) : (
-        <RenderItem {...props} />
-      );
+      const item = {...props.item, updateTask};
+      return <RenderItem {...props} item={item} />;
     },
     [selected, isSelectOn],
   );

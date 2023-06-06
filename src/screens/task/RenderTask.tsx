@@ -9,12 +9,14 @@ import {RenderItemProps} from '../../components/DisplayTask';
 import constants from '../../assets/constants';
 import {TaskType} from '../../app/Reducers/User/userSlice';
 import CheckBox from '../../components/CheckBox';
+import {useAddOrEditTaskMutation} from '../../app/api/taskApi';
 const springConfig = {stiffness: 100, mass: 0.5};
 const TASK_WIDTH = constants.WIDTH * 0.975;
 
 const RenderTasks: ListRenderItem<RenderItemProps> = ({item, index}) => {
   // item.handleSelect;
   const itemHours = getTimeFromDateString(item.targetDate);
+
   useEffect(() => {
     if (item?.sharedX && item?.sharedX.value !== undefined) {
       item.sharedX.value =
@@ -22,6 +24,10 @@ const RenderTasks: ListRenderItem<RenderItemProps> = ({item, index}) => {
       item.sharedX.value = withSpring(0, springConfig);
     }
   }, []);
+  const handleCheckboxPress = () => {
+    if (!item._id) return;
+    item.updateTask?.(item._id, !item.done);
+  };
   const isSelected = useMemo(() => {
     return item?._id && item?.selected?.includes(item._id) ? true : false;
   }, [item?.selected, item._id]);
@@ -70,14 +76,15 @@ const RenderTasks: ListRenderItem<RenderItemProps> = ({item, index}) => {
             // isFilled={true}
             isFilled={item?.isSelectOn ? isSelected : item.done}
             onPress={() => {
-              item?.isSelectOn && item?.handleSelected?.(item._id!);
+              item?.isSelectOn
+                ? item?.handleSelected?.(item._id!)
+                : handleCheckboxPress();
             }}
             type={item?.isSelectOn ? 'V' : undefined}
             colorFill={constants.colors.GREEN}
           />
         </View>
       </View>
-      
     </Animated.View>
   );
 };

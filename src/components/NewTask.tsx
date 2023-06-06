@@ -13,7 +13,7 @@ import constants, {Frequency} from '../assets/constants';
 import SVG from '../assets/svg';
 import Line from './Line';
 import SwitchToggle from 'react-native-switch-toggle';
-import {useAddTaskMutation} from '../app/api/taskApi';
+import {useAddOrEditTaskMutation} from '../app/api/taskApi';
 import DatePickerModal from './DatePickerModal';
 import Notes from './Notes';
 import SetTimeContent from './SetTimeContent';

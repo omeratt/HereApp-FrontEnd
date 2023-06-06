@@ -44,6 +44,8 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
 }) => {
   const [currentDate, setCurrentDate] = React.useState<Date>(date);
   const [hours, setHours] = React.useState<string>('');
+  console.log({minimumDate});
+  minimumDate.setUTCHours(0, 0, 0, 0);
   const handleConfirm = () => {
     if (dateFormat !== 'time') {
       setDate(currentDate);
@@ -146,8 +148,8 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
             fadeToColor={constants.colors.BGC}
             style={[styles.datePicker]}
             textColor={constants.colors.OFF_WHITE}
-            minimumDate={minimumDate}
-            maximumDate={maximumDate}
+            minimumDate={dateFormat !== 'time' ? minimumDate : undefined}
+            maximumDate={dateFormat !== 'time' ? maximumDate : undefined}
           />
         </View>
       </BottomSheetModal>

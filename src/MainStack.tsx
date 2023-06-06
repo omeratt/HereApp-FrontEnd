@@ -3,7 +3,6 @@ import React, {useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import Auth from './screens/Auth';
 import Welcome from './screens/Welcome';
-import {useMyProfileQuery} from './app/api/userApi';
 import {useAppSelector} from './app/hooks';
 import {selectIsSignIn} from './app/Reducers/User/userSlice';
 import Home from './screens/Home';
@@ -21,11 +20,14 @@ import Messages from './screens/message/Messages';
 import Search from './screens/Search';
 import AllMyTasks from './screens/task/AllMyTasks';
 import IamNotStupid from './screens/IamNotStupid';
+import useNotification from './hooks/notification/useNotification';
 const ICON_SIZE = 20;
 // const Stack = createNativeStackNavigator();
 const Stack = createDrawerNavigator();
 
 export default function MainStack() {
+  useNotification();
+
   const isSignIn = useAppSelector(selectIsSignIn);
   const drawerScreenOptions = {
     gestureEnabled: true,

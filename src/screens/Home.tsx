@@ -12,7 +12,7 @@ import NewTask from '../components/NewTask';
 import Animated, {FlipInEasyY, useSharedValue} from 'react-native-reanimated';
 import {
   tasksApi,
-  useAddTaskMutation,
+  useAddOrEditTaskMutation,
   useGetTasksByDateQuery,
 } from '../app/api/taskApi';
 import DisplayTask from '../components/DisplayTask';
@@ -105,7 +105,8 @@ const Home = () => {
     error: tasksError,
     isFetching: taskFetch,
   } = useGetTasksByDateQuery(selectedDate);
-  const [AddTask, {isLoading: isMutateTaskLoading}] = useAddTaskMutation();
+  const [AddOrEditTask, {isLoading: isMutateTaskLoading}] =
+    useAddOrEditTaskMutation();
   const [calendarVisible, setCalendarVisible] = useState(false);
   const FetchTasks = useCallback((date: Date) => {
     const result = dispatch(tasksApi.endpoints.getTasksByDate.initiate(date))
@@ -201,7 +202,12 @@ const Home = () => {
     [snapToOffsets],
   );
   //  -------------------------------------------------------- flat list callbacks --------------------------------------------------------
-
+  const updateTask = useCallback(
+    async (taskId: string, done: boolean) => {
+      await AddOrEditTask({_id: taskId, done});
+    },
+    [AddOrEditTask],
+  );
   const toggleCalendar = useCallback(() => {
     setCalendarVisible(!calendarVisible);
   }, [calendarVisible]);
@@ -293,6 +299,7 @@ const Home = () => {
               openTaskModal={openTaskModal}
               task={editTaskDetails}
               setTask={setEditTaskDetails}
+              updateTask={updateTask}
               TASK_CONTAINER_HEIGHT={TASK_CONTAINER_HEIGHT * 1.18}
             />
 
@@ -389,7 +396,7 @@ const Home = () => {
             findDateAndScroll={findDateAndScroll}
             task={editTaskDetails}
             setTask={setEditTaskDetails}
-            AddTask={AddTask}
+            AddTask={AddOrEditTask}
           />
         </BottomSheetModal>
       </BottomSheetModalProvider>

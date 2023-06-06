@@ -65,7 +65,7 @@ export const tasksApi = apiSlice.injectEndpoints({
         return response.data;
       },
     }),
-    addTask: builder.mutation({
+    addOrEditTask: builder.mutation({
       query: task => ({
         url: 'task',
         method: 'POST',
@@ -82,7 +82,8 @@ export const tasksApi = apiSlice.injectEndpoints({
 
 export const {
   useGetTasksQuery,
-  useAddTaskMutation,
+  useAddOrEditTaskMutation,
+  // useAddOrEditTaskMutation,
   useDeleteTaskMutation,
   useDeleteManyTasksMutation,
   useGetTasksByDateQuery,

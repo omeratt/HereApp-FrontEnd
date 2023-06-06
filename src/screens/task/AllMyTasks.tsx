@@ -18,7 +18,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import {
   tasksApi,
-  useAddTaskMutation,
+  useAddOrEditTaskMutation,
   useDeleteManyTasksMutation,
   useGetTasksByDateQuery,
 } from '../../app/api/taskApi';
@@ -96,7 +96,8 @@ const Home = () => {
 
   const {isLoading: tasksLoading, data: tasks} =
     useGetTasksByDateQuery(selectedDate);
-  const [AddTask, {isLoading: isMutateTaskLoading}] = useAddTaskMutation();
+  const [AddOrEditTask, {isLoading: isMutateTaskLoading}] =
+    useAddOrEditTaskMutation();
   const [DeleteManyTasks, {isLoading: isDeleteTasksLoading}] =
     useDeleteManyTasksMutation();
   const [calendarVisible, setCalendarVisible] = useState(false);
@@ -208,6 +209,13 @@ const Home = () => {
     });
   }, []);
 
+  const updateTask = useCallback(
+    async (taskId: string, done: boolean) => {
+      await AddOrEditTask({_id: taskId, done});
+    },
+    [AddOrEditTask],
+  );
+
   const openDeleteModal = React.useCallback(() => {
     bottomSheetRef.current?.openModal();
   }, []);
@@ -304,6 +312,7 @@ const Home = () => {
               handleSelected={handleSelected}
               selected={selected}
               isSelectOn={isSelect}
+              updateTask={updateTask}
               //@ts-ignore
               flatListData={flatListData}
               snapToOffsets={snapToOffsets}
@@ -382,7 +391,7 @@ const Home = () => {
             findDateAndScroll={findDateAndScroll}
             task={editTaskDetails}
             setTask={setEditTaskDetails}
-            AddTask={AddTask}
+            AddTask={AddOrEditTask}
           />
         </BottomSheetModal>
       </BottomSheetModalProvider>

@@ -71,6 +71,17 @@ export const userApi = apiSlice.injectEndpoints({
         return response.data;
       },
     }),
+    refreshFcmToken: builder.mutation({
+      query: token => ({
+        url: 'user/refreshFcm',
+        body: token,
+        credentials: 'include',
+        method: 'post',
+      }),
+      transformResponse: async (response: any, meta, arg) => {
+        return response.data;
+      },
+    }),
     myProfile: builder.query({
       query: () => ({
         url: 'user/myProfile',
@@ -89,6 +100,7 @@ export const userApi = apiSlice.injectEndpoints({
         url: 'logout',
         credentials: 'include',
         method: 'post',
+        Headers: {'x-fcmtoken': store.getState().reducer.user.fcmToken},
       }),
       transformResponse: async (response: any, meta, arg) => {
         store?.dispatch(logout());
@@ -118,4 +130,5 @@ export const {
   useMyProfileQuery,
   useLogoutMutation,
   useSetFcmTokenMutation,
+  useRefreshFcmTokenMutation,
 } = userApi;

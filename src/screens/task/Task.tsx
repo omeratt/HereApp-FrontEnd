@@ -12,7 +12,7 @@ import React, {useCallback, useMemo, useRef, useState} from 'react';
 import constants from '../../assets/constants';
 import SVG from '../../assets/svg';
 import SwitchToggle from 'react-native-switch-toggle';
-import {useAddTaskMutation} from '../../app/api/taskApi';
+import {useAddOrEditTaskMutation} from '../../app/api/taskApi';
 
 import {BottomSheetModal} from '@gorhom/bottom-sheet';
 import {useFocusEffect} from '@react-navigation/native';
@@ -61,7 +61,7 @@ const Task: React.FC<props> = ({
   );
   const [endDate, setEndDate] = useState<Date>();
   const [AddTask, {isLoading, data, isSuccess, isError, error}] =
-    useAddTaskMutation();
+    useAddOrEditTaskMutation();
   const isEndDate = useRef<boolean>(false);
   const isSetTime = useRef<boolean>(false);
 

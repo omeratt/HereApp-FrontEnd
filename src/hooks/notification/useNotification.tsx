@@ -10,7 +10,7 @@ import {handleNotification, onDisplayNotification} from './utils';
 const useNotification = () => {
   useFcmTokenRefresh();
   useEffect(() => {
-    requestPushNotificationsPermission();
+    createChannel();
     const unsubscribe = messaging().onMessage(onDisplayNotification);
     handleNotificationFromForegroundState();
     return () => {
@@ -18,6 +18,19 @@ const useNotification = () => {
     };
   }, []);
 
+  const createChannel = async () => {
+    const isHasPermission = await requestPushNotificationsPermission();
+    if (!isHasPermission) return;
+
+    const isAlreadyCreated = await notifee.isChannelCreated('Here - default');
+    if (isAlreadyCreated) return;
+
+    await notifee.createChannel({
+      id: 'Here - default',
+      name: 'Here - default',
+      importance: AndroidImportance.HIGH,
+    });
+  };
   const hasPermission = async () => {
     return await messaging().hasPermission();
   };
@@ -28,28 +41,22 @@ const useNotification = () => {
   const requestPushNotificationsPermission = async () => {
     const isHasPermission =
       (await hasPermission()) === messaging.AuthorizationStatus.AUTHORIZED;
-    if (isHasPermission) return;
+    if (isHasPermission) return true;
     const setting = await notifee.requestPermission();
     if (
       setting.authorizationStatus === AuthorizationStatus.AUTHORIZED ||
       setting.authorizationStatus === AuthorizationStatus.PROVISIONAL
     ) {
-      await notifee.createChannel({
-        // id: store.getState().reducer.user._id || 'Here - default',
-        // name: store.getState().reducer.user._id || 'Here - default',
-        id: 'Here - default',
-        name: 'Here - default',
-        importance: AndroidImportance.HIGH,
-      });
+      return true;
     }
 
     const authStatus = await messaging().requestPermission();
     const enabled =
       authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
       authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-    if (enabled) {
-      console.log('Authorization status:', authStatus);
-    }
+
+    console.log('Authorization status:', authStatus);
+    return enabled;
   };
 };
 

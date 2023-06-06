@@ -1,4 +1,8 @@
-import notifee, {EventDetail, EventType} from '@notifee/react-native';
+import notifee, {
+  AndroidImportance,
+  EventDetail,
+  EventType,
+} from '@notifee/react-native';
 import {ACTION, INotifeeHandler} from './types';
 
 export const handleNotification = async ({type, detail}: INotifeeHandler) => {
@@ -26,32 +30,32 @@ const handleActionPress = (action?: string, detail?: EventDetail) => {
 };
 
 export const onDisplayNotification = async (remoteMessage: any) => {
-  console.log('onDisplayNotification');
   await notifee.requestPermission();
   const channelId = await notifee.createChannel({
-    id: remoteMessage.data?.userRef || 'default',
+    id: remoteMessage.data.channelId || 'default',
     name: 'Default Channel',
   });
 
   await notifee.displayNotification({
-    title: remoteMessage.notification?.title,
-    body: remoteMessage.notification?.body,
+    title: remoteMessage.data?.title,
+    body: remoteMessage.data?.body,
     data: remoteMessage.data,
     android: {
       channelId,
+      importance: AndroidImportance.HIGH,
       smallIcon: 'ic_launcher', // optional, defaults to 'ic_launcher'.
       actions: [
         {
           title: '✅ Done',
-          pressAction: {id: 'done', launchActivity: 'default'},
+          pressAction: {id: 'done'},
         },
         {
           title: '❌ Dismiss',
-          pressAction: {id: 'dismiss', launchActivity: 'default'},
+          pressAction: {id: 'dismiss'},
         },
         {
           title: '⏰ Remind me later',
-          pressAction: {id: 'remind me later', launchActivity: 'default'},
+          pressAction: {id: 'remind me later'},
         },
       ],
     },

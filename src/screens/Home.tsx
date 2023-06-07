@@ -355,7 +355,8 @@ const Home = () => {
         <BoardingBoxWrapper Component={PizzaBox} basicStyle={false} />
         <BoardingBoxWrapper
           Component={NextTask}
-          navToTask={navToTaskFromNextTask}
+          nextTaskProps={{navToTask: navToTaskFromNextTask, updateTask}}
+          basicStyle={false}
         />
       </View>
       <View style={styles.bottomView}>

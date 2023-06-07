@@ -5,17 +5,21 @@ import constants from '../../assets/constants';
 import {TaskType} from '../../app/Reducers/User/userSlice';
 type Children<P> = P & {children?: ReactNode};
 
+interface INextTaskProps {
+  navToTask?: (task: TaskType) => void;
+  updateTask?: (taskId: string, done: boolean) => Promise<void>;
+}
 interface BoardingBoxWrapperProps {
   Component?: any;
   showPlusIcon?: boolean;
   basicStyle?: boolean;
-  navToTask?: (task: TaskType) => void;
+  nextTaskProps?: INextTaskProps;
 }
 const BoardingBoxWrapper: React.FC<BoardingBoxWrapperProps> = ({
   Component,
   showPlusIcon,
   basicStyle = true,
-  navToTask,
+  nextTaskProps = {},
 }) => {
   const [width, setWidth] = useState<number | undefined>();
   const [height, setHeight] = useState<number | undefined>();
@@ -34,7 +38,7 @@ const BoardingBoxWrapper: React.FC<BoardingBoxWrapperProps> = ({
     <View style={styles.box} onLayout={handleLayout}>
       {Component && width && height && (
         <View style={[styles.topBox, topBoxStyle]}>
-          <Component width={width} height={height} navToTask={navToTask} />
+          <Component width={width} height={height} {...nextTaskProps} />
         </View>
       )}
       {showPlusIcon && (

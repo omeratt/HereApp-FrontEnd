@@ -56,11 +56,7 @@ const NextTask: React.FC<NextTaskProps> = ({
       <View style={styles.header}>
         <View style={{justifyContent: 'center'}}>
           <Text style={[styles.font, styles.title]}>Next task</Text>
-          {nextTask[0]?.isSetTime && (
-            <View style={[styles.hours]}>
-              <Text style={[styles.font, styles.details]}>{hours}</Text>
-            </View>
-          )}
+          {nextTask[0]?.isSetTime && <Text style={[styles.font]}>{hours}</Text>}
         </View>
         <CheckBox
           size={25}
@@ -71,17 +67,14 @@ const NextTask: React.FC<NextTaskProps> = ({
       </View>
       <View style={{marginTop: '15.8%'}}>
         <Text style={[styles.font, styles.title]}>{nextTask[0]?.name}</Text>
-        <Text numberOfLines={3} style={[styles.font, styles.details]}>
+        <Text numberOfLines={3} style={styles.font}>
           {nextTask[0]?.details}
         </Text>
       </View>
       <View style={styles.footerContainer}>
         <View style={styles.footer}>
           <View style={[styles.textFooter, {width: `${(49 / width) * 100}%`}]}>
-            <Text
-              adjustsFontSizeToFit
-              numberOfLines={1}
-              style={[styles.font, styles.targetDate]}>
+            <Text adjustsFontSizeToFit numberOfLines={1} style={styles.font}>
               {formattedDate}
             </Text>
           </View>
@@ -116,24 +109,10 @@ const styles = StyleSheet.create({
     fontFamily: constants.Fonts.text,
     textAlign: 'left',
     fontSize: rf(12),
+    color: constants.colors.BLACK,
   },
   title: {
     fontFamily: constants.Fonts.text_medium,
-    color: constants.colors.BLACK,
-  },
-  hours: {
-    alignSelf: 'flex-start',
-    // borderBottomColor: constants.colors.UNDER_LINE,
-    // borderBottomWidth: 1,
-  },
-  details: {
-    color: constants.colors.BLACK,
-  },
-  targetDate: {
-    // flex: 1,
-    // height: '100%',
-    fontSize: constants.rf(12),
-    // textAlignVertical: 'bottom',
     color: constants.colors.BLACK,
   },
   footerContainer: {flex: 1, justifyContent: 'flex-end'},

@@ -19,7 +19,11 @@ import DisplayTask from '../components/DisplayTask';
 import {useAppDispatch} from '../app/hooks';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {DrawerActions, useNavigation} from '@react-navigation/native';
-import {DateObject, getDatesForYear} from '../components/WeeklyCalender';
+import {
+  DateObject,
+  getDatesForYear,
+  getRealDate,
+} from '../components/WeeklyCalender';
 import Line from '../components/Line';
 import {FlashList} from '@shopify/flash-list';
 import DatesFlatList from '../components/DatesFlatList';
@@ -35,7 +39,10 @@ import NextTask from '../components/boardingBox/NextTask';
 import {TaskType, setCategoriesList} from '../app/Reducers/User/userSlice';
 import json from '../../AllDates.json';
 import PizzaBox from '../components/boardingBox/PizzaBox';
+import FloatHERE from '../components/FloatHERE';
+
 const CURRENT_DATE = new Date();
+// const CURRENT_DATE = getRealDate(new Date(), true);
 const allDates = json;
 const flatListData = Object.values(allDates);
 const initialNumToRender = flatListData.length;
@@ -126,10 +133,11 @@ const Home = () => {
   }, []);
 
   const findDateAndScroll = useCallback((DateToCheck: Date) => {
-    DateToCheck.setUTCHours(0, 0, 0, 0);
-    const key = DateToCheck.toLocaleDateString('heb');
+    const dateToCheck = new Date(DateToCheck);
+    dateToCheck.setUTCHours(0, 0, 0, 0);
+    const key = dateToCheck.toLocaleDateString('heb');
     const index = getIndexByKey(allDates, key);
-    SetSelectedDate(DateToCheck);
+    SetSelectedDate(dateToCheck);
     SetDateHeader(flatListData[index]);
     scrollToIndex(index);
   }, []);
@@ -233,7 +241,11 @@ const Home = () => {
       <View style={styles.topView}>
         <View style={styles.task}>
           <View style={styles.today}>
-            <View style={[{width: '100%'}, styles.rowBetweenCenter]}>
+            <View
+              style={[
+                {width: '100%', height: '100%'},
+                styles.rowBetweenCenter,
+              ]}>
               <TouchableOpacity
                 style={styles.rowBetweenCenter}
                 onPress={toggleCalendar}>
@@ -243,11 +255,13 @@ const Home = () => {
 
                 <SVG.ArrowDown style={styles.arrowDown} />
               </TouchableOpacity>
-              {(listsLoading ||
-                prioritizedListsLoading ||
-                isMutateTaskLoading ||
-                tasksLoading) && (
+              {listsLoading ||
+              prioritizedListsLoading ||
+              isMutateTaskLoading ||
+              tasksLoading ? (
                 <ActivityIndicator size={32} color={constants.colors.GREEN} />
+              ) : (
+                <FloatHERE />
               )}
             </View>
           </View>

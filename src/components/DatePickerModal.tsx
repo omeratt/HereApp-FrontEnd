@@ -44,8 +44,8 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
 }) => {
   const [currentDate, setCurrentDate] = React.useState<Date>(date);
   const [hours, setHours] = React.useState<string>('');
-  console.log({minimumDate});
-  minimumDate.setUTCHours(0, 0, 0, 0);
+  // console.log({minimumDate});
+  // minimumDate.setUTCHours(0, 0, 0, 0);
   const handleConfirm = () => {
     if (dateFormat !== 'time') {
       setDate(currentDate);
@@ -58,12 +58,13 @@ const DatePickerModal: React.FC<DatePickerProps> = ({
   };
   const handleChange = (date1: Date) => {
     let date = date1;
-
+    // console.log({date1});
     if (dateFormat !== 'time' && hours) {
       const [_hours, minutes] = hours.split(':');
 
       date.setUTCHours(+_hours, +minutes);
     }
+    // console.log({date});
     dateFormat === 'time' ? handleHoursChange(date) : setCurrentDate(date);
   };
 

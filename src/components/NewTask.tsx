@@ -68,7 +68,8 @@ const NewTask: React.FC<props> = ({
   );
   const [endDate, setEndDate] = useState<Date>(startDate);
 
-  const isEndDate = useRef<boolean>(false);
+  // const isEndDate = useRef<boolean>(false);
+  const [isEndDate, setIsEndDate] = useState<boolean>(false);
   const isSetTime = useRef<boolean>(false);
 
   const targetDateHoursRef = useRef<string>(
@@ -93,7 +94,21 @@ const NewTask: React.FC<props> = ({
   const SetEndDate = useCallback((date: Date) => {
     setEndDate(date);
   }, []);
+  const SetEndDate2 = (date: Date) => {
+    setEndDate(date);
+    console.log('SetEndDate');
+  };
+  const setStartDate2 = (date: Date) => {
+    setStartDate(date);
+    console.log('setStartDate2', date);
+  };
 
+  React.useEffect(() => {
+    console.log({endDate});
+  }, [endDate]);
+  React.useEffect(() => {
+    console.log('useeffect startdate', {startDate});
+  }, [startDate]);
   React.useEffect(() => {
     return () => {
       setTask?.(undefined);
@@ -108,9 +123,7 @@ const NewTask: React.FC<props> = ({
       if (!areDatesEqual) {
         findDateAndScroll?.(startDate);
       }
-      // setTargetDate(startDate);
       closeModal();
-      console.log({AddTask});
       const data = await AddTask?.({
         name: taskName,
         details: description,
@@ -156,6 +169,8 @@ const NewTask: React.FC<props> = ({
     const amount = Frequency[freq as any];
     const fixedDate = moment(startDate);
     fixedDate.add(amount as any, unit as any);
+    const diff = moment(endDate).diff(startDate, unit as any);
+    if (diff >= +amount) return;
     setEndDate(fixedDate.toDate());
     return fixedDate.toDate();
   }, [freq, startDate, Frequency]);
@@ -170,9 +185,11 @@ const NewTask: React.FC<props> = ({
       else bottomSheetModalRef.current?.present();
       setDatePickerOpen(prev => !prev);
       dateTypeRef.current = dateType;
-      isEndDate.current = _isEndDate;
+      setIsEndDate(_isEndDate);
+      // isEndDate.current = _isEndDate;
+      console.log({_isEndDate});
     },
-    [setDatePickerOpen, dateTypeRef, datePickerOpen],
+    [setDatePickerOpen, dateTypeRef, datePickerOpen, setIsEndDate],
   );
   const openCloseFreqPicker = useCallback(
     (dateType: DateFormat = 'datetime') => {
@@ -186,6 +203,7 @@ const NewTask: React.FC<props> = ({
     closeModal();
     // bottomSheetModalRef.current?.dismiss();
   }, []);
+
   const pushOnPress = useCallback(() => {
     setPushOn(prev => !prev);
   }, []);
@@ -387,10 +405,11 @@ const NewTask: React.FC<props> = ({
 
           <DatePickerModal
             isOpen={datePickerOpen}
-            date={isEndDate.current ? endDate : startDate}
+            date={isEndDate ? endDate : startDate}
             dateFormat={dateTypeRef.current}
-            setDate={isEndDate.current ? SetEndDate : setStartDate}
-            minimumDate={minimumEndDate || minimumDate}
+            setDate={isEndDate ? SetEndDate2 : setStartDate2}
+            // setDate={isEndDate ? SetEndDate : setStartDate}
+            minimumDate={isEndDate ? minimumEndDate : minimumDate}
             maximumDate={maximumDate}
             isSetTimeRef={isSetTime}
             targetDateHoursRef={targetDateHoursRef}

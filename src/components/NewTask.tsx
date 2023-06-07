@@ -13,7 +13,7 @@ import constants, {Frequency} from '../assets/constants';
 import SVG from '../assets/svg';
 import Line from './Line';
 import SwitchToggle from 'react-native-switch-toggle';
-import {useAddOrEditTaskMutation} from '../app/api/taskApi';
+import {useDeleteTaskMutation} from '../app/api/taskApi';
 import DatePickerModal from './DatePickerModal';
 import Notes from './Notes';
 import SetTimeContent from './SetTimeContent';
@@ -27,6 +27,9 @@ import {
   getTimeFromDateString,
 } from './WeeklyCalender';
 import moment from 'moment';
+import BottomSheetDeleteModal, {
+  BottomSheetDeleteModalHandles,
+} from './BottomSheetDeleteModal';
 const realDate = new Date();
 const hours = getTimeFromDateString(realDate.toISOString(), true, true);
 const {min: minimumDate, max: maximumDate} = constants.Dates;
@@ -77,6 +80,10 @@ const NewTask: React.FC<props> = ({
   const taskNameInputRef = React.useRef<TextInput>(null);
   const taskDescriptionInputRef = React.useRef<TextInput>(null);
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const bottomDeleteSheetRef = useRef<BottomSheetDeleteModalHandles>(null);
+
+  const [deleteTask] = useDeleteTaskMutation();
+
   const SetFreqPickerOpen = useCallback((state: boolean) => {
     setFreqPickerOpen(state);
   }, []);
@@ -153,6 +160,10 @@ const NewTask: React.FC<props> = ({
     return fixedDate.toDate();
   }, [freq, startDate, Frequency]);
 
+  const openDeleteModal = React.useCallback(() => {
+    bottomDeleteSheetRef.current?.openModal();
+  }, []);
+
   const openCloseDatePicker = useCallback(
     (dateType: DateFormat = 'date', _isEndDate: boolean = false) => {
       if (datePickerOpen) bottomSheetModalRef.current?.dismiss();
@@ -169,6 +180,12 @@ const NewTask: React.FC<props> = ({
     },
     [],
   );
+  const handleDeletePress = useCallback(() => {
+    task?._id && deleteTask(task._id);
+    bottomDeleteSheetRef.current?.closeModal();
+    closeModal();
+    // bottomSheetModalRef.current?.dismiss();
+  }, []);
   const pushOnPress = useCallback(() => {
     setPushOn(prev => !prev);
   }, []);
@@ -216,167 +233,188 @@ const NewTask: React.FC<props> = ({
   }, []);
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={styles.container}>
-        <View style={[styles.realContainer]}>
-          <View style={styles.header}>
-            <TextInput
-              onPressOut={() => {
-                taskNameInputRef.current?.blur();
-                taskNameInputRef.current?.focus();
-              }}
-              ref={taskNameInputRef}
-              maxLength={19}
-              onChangeText={setTaskName}
-              defaultValue={taskName}
-              placeholder="New task"
-              placeholderTextColor={constants.colors.UNDER_LINE}
-              selectionColor={constants.colors.GREEN}
-              cursorColor={constants.colors.GREEN}
-              style={styles.newTaskTitleInput}
-              onSubmitEditing={() => {
-                taskDescriptionInputRef.current?.focus();
-              }}
-            />
-          </View>
-          <View style={{flex: 2.5}}>
-            <View style={[styles.descriptionContainer]}>
-              <Line
-                strength={1}
-                lengthPercentage={100}
-                lineColor={constants.colors.UNDER_LINE}
-                rotate180
-                style={{elevation: 1}}
+    <>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View style={styles.container}>
+          <View style={[styles.realContainer]}>
+            <View
+              style={[
+                styles.header,
+                {flexDirection: 'row', alignItems: 'center'},
+              ]}>
+              <TextInput
+                onPressOut={() => {
+                  taskNameInputRef.current?.blur();
+                  taskNameInputRef.current?.focus();
+                }}
+                ref={taskNameInputRef}
+                maxLength={19}
+                onChangeText={setTaskName}
+                defaultValue={taskName}
+                placeholder="New task"
+                placeholderTextColor={constants.colors.UNDER_LINE}
+                selectionColor={constants.colors.GREEN}
+                cursorColor={constants.colors.GREEN}
+                style={styles.newTaskTitleInput}
+                onSubmitEditing={() => {
+                  taskDescriptionInputRef.current?.focus();
+                }}
               />
-              <View style={[styles.descriptionContent]}>
-                <View style={[styles.description]}>
-                  <TouchableOpacity
-                    onPress={() => taskDescriptionInputRef?.current?.focus()}
-                    style={{marginVertical: '2%'}}>
-                    <Text style={[styles.sectionTxt]}>Description</Text>
-                  </TouchableOpacity>
-                  <Line
-                    strength={0.5}
-                    lengthPercentage={100}
-                    lineColor={constants.colors.UNDER_LINE}
-                    rotate180
-                  />
-                </View>
-                <View style={[styles.EveryContainer]}>
-                  <View style={[styles.descriptionInputContainer]}>
-                    <TextInput
-                      numberOfLines={4}
-                      multiline
-                      onChangeText={setDescription}
-                      selectionColor={constants.colors.GREEN}
-                      cursorColor={constants.colors.GREEN}
-                      style={styles.descriptionInput}
-                      defaultValue={description}
-                      ref={taskDescriptionInputRef}
+            </View>
+            <View style={{flex: 2.5}}>
+              <View style={[styles.descriptionContainer]}>
+                <Line
+                  strength={1}
+                  lengthPercentage={100}
+                  lineColor={constants.colors.UNDER_LINE}
+                  rotate180
+                  style={{elevation: 1}}
+                />
+                <View style={[styles.descriptionContent]}>
+                  <View style={[styles.description]}>
+                    <TouchableOpacity
+                      onPress={() => taskDescriptionInputRef?.current?.focus()}
+                      style={{marginVertical: '2%'}}>
+                      <Text style={[styles.sectionTxt]}>Description</Text>
+                    </TouchableOpacity>
+                    <Line
+                      strength={0.5}
+                      lengthPercentage={100}
+                      lineColor={constants.colors.UNDER_LINE}
+                      rotate180
                     />
+                  </View>
+                  <View style={[styles.EveryContainer]}>
+                    <View style={[styles.descriptionInputContainer]}>
+                      <TextInput
+                        numberOfLines={4}
+                        multiline
+                        onChangeText={setDescription}
+                        selectionColor={constants.colors.GREEN}
+                        cursorColor={constants.colors.GREEN}
+                        style={styles.descriptionInput}
+                        defaultValue={description}
+                        ref={taskDescriptionInputRef}
+                      />
+                    </View>
+                  </View>
+                </View>
+              </View>
+              <View style={[styles.flexOneAndJustifyCenter, {flex: 2}]}>
+                <Line
+                  strength={1}
+                  lengthPercentage={100}
+                  rotate180
+                  lineColor={constants.colors.UNDER_LINE}
+                  style={{elevation: 1}}
+                />
+                <View
+                  style={[
+                    styles.textAndToggleContainer,
+                    {justifyContent: 'flex-start'},
+                  ]}>
+                  <View
+                    style={[
+                      styles.textAndToggle,
+                      {
+                        alignItems: 'flex-start',
+                      },
+                    ]}>
+                    <Text style={[styles.sectionTxt, {marginVertical: '2%'}]}>
+                      Set Time
+                    </Text>
+                    <Line
+                      strength={0.5}
+                      lengthPercentage={100}
+                      rotate180
+                      lineColor={constants.colors.UNDER_LINE}
+                    />
+                  </View>
+                </View>
+                <View
+                  style={[
+                    styles.EveryContainer,
+                    {paddingHorizontal: 0, paddingLeft: '6%', flex: 1},
+                  ]}>
+                  <View style={[styles.setTimeSubContainer]}>
+                    <SetTimeContent
+                      title={'Frequency'}
+                      buttonTxt={freq}
+                      onPress={openCloseFreqPicker}
+                    />
+                    <SetTimeContent
+                      title={'Time of day'}
+                      buttonTxt={targetDateHoursRef.current}
+                      onPress={openCloseDatePicker}
+                      dateFormat={'time'}
+                    />
+                    <SetTimeContent
+                      title={'Start date'}
+                      buttonTxt={formattedDate(startDate)}
+                      onPress={openCloseDatePicker}
+                    />
+                    {freq !== 'None' && (
+                      <>
+                        <SetTimeContent
+                          title={'End Date'}
+                          buttonTxt={formattedDate(endDate || startDate)}
+                          onPress={() => openCloseDatePicker('date', true)}
+                        />
+                      </>
+                    )}
+                    {PushForMe}
                   </View>
                 </View>
               </View>
             </View>
-            <View style={[styles.flexOneAndJustifyCenter, {flex: 2}]}>
-              <Line
-                strength={1}
-                lengthPercentage={100}
-                rotate180
-                lineColor={constants.colors.UNDER_LINE}
-                style={{elevation: 1}}
-              />
-              <View
-                style={[
-                  styles.textAndToggleContainer,
-                  {justifyContent: 'flex-start'},
-                ]}>
-                <View
-                  style={[
-                    styles.textAndToggle,
-                    {
-                      alignItems: 'flex-start',
-                    },
-                  ]}>
-                  <Text style={[styles.sectionTxt, {marginVertical: '2%'}]}>
-                    Set Time
-                  </Text>
-                  <Line
-                    strength={0.5}
-                    lengthPercentage={100}
-                    rotate180
-                    lineColor={constants.colors.UNDER_LINE}
-                  />
-                </View>
-              </View>
-              <View
-                style={[
-                  styles.EveryContainer,
-                  {paddingHorizontal: 0, paddingLeft: '6%', flex: 1},
-                ]}>
-                <View style={[styles.setTimeSubContainer]}>
-                  <SetTimeContent
-                    title={'Frequency'}
-                    buttonTxt={freq}
-                    onPress={openCloseFreqPicker}
-                  />
-                  <SetTimeContent
-                    title={'Time of day'}
-                    buttonTxt={targetDateHoursRef.current}
-                    onPress={openCloseDatePicker}
-                    dateFormat={'time'}
-                  />
-                  <SetTimeContent
-                    title={'Start date'}
-                    buttonTxt={formattedDate(startDate)}
-                    onPress={openCloseDatePicker}
-                  />
-                  {freq !== 'None' && (
-                    <>
-                      <SetTimeContent
-                        title={'End Date'}
-                        buttonTxt={formattedDate(endDate || startDate)}
-                        onPress={() => openCloseDatePicker('date', true)}
-                      />
-                    </>
-                  )}
-                  {PushForMe}
-                </View>
-              </View>
-            </View>
           </View>
-        </View>
-        <View style={{flex: 1, width: '100%'}}>
-          <Notes />
-        </View>
-        <TouchableOpacity onPress={submit} style={styles.buttonContainer}>
-          <SVG.DoneButton
-            fill={constants.colors.BLACK}
-            width="100%"
-            height="100%"
+          <View style={{flex: 1, width: '100%'}}>
+            <Notes />
+          </View>
+          {/* <View style={{flexDirection: 'row', flex: 1}}> */}
+          <TouchableOpacity onPress={submit} style={styles.buttonContainer}>
+            <SVG.DoneButton
+              fill={constants.colors.BLACK}
+              width="100%"
+              height="100%"
+            />
+          </TouchableOpacity>
+          {task?._id && (
+            <TouchableOpacity style={styles.trashBtn}>
+              <SVG.Trash height={35} onPress={openDeleteModal} />
+            </TouchableOpacity>
+          )}
+
+          <DatePickerModal
+            isOpen={datePickerOpen}
+            date={isEndDate.current ? endDate : startDate}
+            dateFormat={dateTypeRef.current}
+            setDate={isEndDate.current ? SetEndDate : setStartDate}
+            minimumDate={minimumEndDate || minimumDate}
+            maximumDate={maximumDate}
+            isSetTimeRef={isSetTime}
+            targetDateHoursRef={targetDateHoursRef}
+            bottomSheetModalRef={bottomSheetModalRef}
+            setIsOpen={setDatePickerOpen}
           />
-        </TouchableOpacity>
-        <DatePickerModal
-          isOpen={datePickerOpen}
-          date={isEndDate.current ? endDate : startDate}
-          dateFormat={dateTypeRef.current}
-          setDate={isEndDate.current ? SetEndDate : setStartDate}
-          minimumDate={minimumEndDate || minimumDate}
-          maximumDate={maximumDate}
-          isSetTimeRef={isSetTime}
-          targetDateHoursRef={targetDateHoursRef}
-          bottomSheetModalRef={bottomSheetModalRef}
-          setIsOpen={setDatePickerOpen}
-        />
-        <FrequencyPickerModal
-          isOpen={freqPickerOpen}
-          setFreq={SetFreq}
-          data={FreqData}
-          freq={freq}
-          setIsOpen={SetFreqPickerOpen}
-        />
-      </View>
-    </TouchableWithoutFeedback>
+          <FrequencyPickerModal
+            isOpen={freqPickerOpen}
+            setFreq={SetFreq}
+            data={FreqData}
+            freq={freq}
+            setIsOpen={SetFreqPickerOpen}
+          />
+          {task?._id && (
+            <BottomSheetDeleteModal
+              onDelete={handleDeletePress}
+              ids={[task._id]}
+              ref={bottomDeleteSheetRef}
+              behavior="push"
+            />
+          )}
+        </View>
+      </TouchableWithoutFeedback>
+    </>
   );
 };
 
@@ -452,6 +490,7 @@ const styles = StyleSheet.create({
     width: '35%',
     height: '11.6%',
   },
+  trashBtn: {position: 'absolute', left: '10%', bottom: '4%'},
   EveryContainer: {
     flex: 1.5,
     paddingHorizontal: '5.2%',

@@ -25,14 +25,14 @@ const handleActionPress = async (action?: string, detail?: EventDetail) => {
       console.log('should trigger done action');
       //TODO: FETCH SET AS DONE:TRUE
       await store.dispatch(
-        tasksApi.endpoints?.addTask?.initiate({_id, done: true}),
+        tasksApi.endpoints?.addOrEditTask?.initiate({_id, done: true}),
       );
       break;
     case ACTION.DISMISS:
       console.log('should trigger dismiss action');
       //TODO: FETCH SET AS NOTIFIED:TRUE
       await store.dispatch(
-        tasksApi.endpoints?.addTask?.initiate({_id, notified: true}),
+        tasksApi.endpoints?.addOrEditTask?.initiate({_id, notified: true}),
       );
 
       break;
@@ -40,6 +40,7 @@ const handleActionPress = async (action?: string, detail?: EventDetail) => {
 };
 
 export const onDisplayNotification = async (remoteMessage: any) => {
+  
   await notifee.displayNotification({
     title: remoteMessage.data?.title,
     body: remoteMessage.data?.body,

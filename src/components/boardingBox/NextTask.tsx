@@ -1,5 +1,11 @@
-import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
-import React, {useMemo} from 'react';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import React from 'react';
 import {useGetNextTasksByDateQuery} from '../../app/api/taskApi';
 import constants from '../../assets/constants';
 import moment from 'moment';
@@ -8,13 +14,15 @@ import {
   getShortName,
   getTimeFromDateString,
 } from '../WeeklyCalender';
+import {TaskType} from '../../app/Reducers/User/userSlice';
 
 const realDate = getRealDate(new Date());
 interface NextTaskProps {
   width: number;
   height: number;
+  navToTask?: (task: TaskType) => void;
 }
-const NextTask: React.FC<NextTaskProps> = ({width, height}) => {
+const NextTask: React.FC<NextTaskProps> = ({width, height, navToTask}) => {
   const {data: nextTask, isLoading} = useGetNextTasksByDateQuery(realDate);
   if (!nextTask || isLoading) {
     return isLoading ? (
@@ -26,9 +34,12 @@ const NextTask: React.FC<NextTaskProps> = ({width, height}) => {
   const date = moment(nextTask.targetDate);
   const hours = getTimeFromDateString(date.toDate().toISOString());
   const formattedDate = getShortName(date.day()) + ' ' + date.date();
+  const handlePress = () => {
+    navToTask?.(nextTask);
+  };
 
   return (
-    <View style={{flex: 1}}>
+    <TouchableOpacity style={{flex: 1}} onPress={handlePress}>
       <Text
         style={[
           styles.font,
@@ -68,7 +79,7 @@ const NextTask: React.FC<NextTaskProps> = ({width, height}) => {
           {formattedDate}
         </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

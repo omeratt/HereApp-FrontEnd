@@ -22,9 +22,6 @@ const useNotification = () => {
     const isHasPermission = await requestPushNotificationsPermission();
     if (!isHasPermission) return;
 
-    const isAlreadyCreated = await notifee.isChannelCreated('Here - default');
-    if (isAlreadyCreated) return;
-
     await notifee.createChannel({
       id: 'Here - default',
       name: 'Here - default',

@@ -2,17 +2,20 @@ import {LayoutChangeEvent, StyleSheet, Text, View} from 'react-native';
 import React, {ReactElement, ReactNode, cloneElement, useState} from 'react';
 import SVG from '../../assets/svg';
 import constants from '../../assets/constants';
+import {TaskType} from '../../app/Reducers/User/userSlice';
 type Children<P> = P & {children?: ReactNode};
 
 interface BoardingBoxWrapperProps {
   Component?: any;
   showPlusIcon?: boolean;
   basicStyle?: boolean;
+  navToTask?: (task: TaskType) => void;
 }
 const BoardingBoxWrapper: React.FC<BoardingBoxWrapperProps> = ({
   Component,
   showPlusIcon,
   basicStyle = true,
+  navToTask,
 }) => {
   const [width, setWidth] = useState<number | undefined>();
   const [height, setHeight] = useState<number | undefined>();
@@ -31,7 +34,7 @@ const BoardingBoxWrapper: React.FC<BoardingBoxWrapperProps> = ({
     <View style={styles.box} onLayout={handleLayout}>
       {Component && width && height && (
         <View style={[styles.topBox, topBoxStyle]}>
-          <Component width={width} height={height} />
+          <Component width={width} height={height} navToTask={navToTask} />
         </View>
       )}
       {showPlusIcon && (

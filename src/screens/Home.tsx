@@ -185,6 +185,14 @@ const Home = () => {
     return formattedDate;
   }, [dateHeader, CURRENT_DATE]);
 
+  const navToTaskFromNextTask = useCallback(
+    (task: TaskType) => {
+      setEditTaskDetails(task);
+      openTaskModal();
+    },
+    [openTaskModal, setEditTaskDetails],
+  );
+
   //  -------------------------------------------------------- flat list callbacks --------------------------------------------------------
   const snapToOffsets = useMemo(() => {
     return Array.from({length: initialNumToRender}, (_, index) => {
@@ -345,8 +353,10 @@ const Home = () => {
       </View>
       <View style={styles.middleView}>
         <BoardingBoxWrapper Component={PizzaBox} basicStyle={false} />
-        <BoardingBoxWrapper />
-        <BoardingBoxWrapper Component={NextTask} />
+        <BoardingBoxWrapper
+          Component={NextTask}
+          navToTask={navToTaskFromNextTask}
+        />
       </View>
       <View style={styles.bottomView}>
         <View style={{width: '35.33%'}}>
@@ -374,17 +384,8 @@ const Home = () => {
           ref={bottomSheetModalRef}
           index={0}
           snapPoints={snapPoints}
-          // onDismiss={}
           keyboardBlurBehavior="restore"
           handleIndicatorStyle={{backgroundColor: constants.colors.UNDER_LINE}}
-          // onAnimate={(fromIndex, toIndex) => {
-          //   if (fromIndex === 0) {
-          //     // closeTaskModal();
-          //     // setTimeout(() => {
-          //     //   setEditTaskDetails(undefined);
-          //     // }, 300);
-          //   }
-          // }}
           handleStyle={{
             backgroundColor: constants.colors.OFF_WHITE,
           }}

@@ -13,6 +13,7 @@ import Line from './Line';
 interface Props {
   ids?: string[];
   onDelete?: () => void;
+  behavior?: 'replace' | 'push';
 }
 
 export interface BottomSheetDeleteModalHandles {
@@ -30,7 +31,7 @@ const paddingHorizontal = (87 / 414) * constants.WIDTH;
 // const txtHeight = bottomSheetHeight * (90 / bottomSheetHeight);
 const txtHeight = bottomSheetHeight * 0.26627218934911242603550295857988;
 const BottomSheetDeleteModal = forwardRef<BottomSheetDeleteModalHandles, Props>(
-  ({onDelete, ids}, ref) => {
+  ({onDelete, ids, behavior}, ref) => {
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
     const closeModal = useCallback(() => {
@@ -55,7 +56,7 @@ const BottomSheetDeleteModal = forwardRef<BottomSheetDeleteModalHandles, Props>(
         index={0}
         snapPoints={snapPoints}
         backgroundStyle={{backgroundColor: constants.colors.BGC}}
-        stackBehavior="replace">
+        stackBehavior={behavior || 'replace'}>
         <View style={styles.container}>
           <View
             style={[

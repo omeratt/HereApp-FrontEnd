@@ -31,7 +31,6 @@ const RenderTasks: ListRenderItem<RenderItemProps> = ({item, index}) => {
   const isSelected = useMemo(() => {
     return item?._id && item?.selected?.includes(item._id) ? true : false;
   }, [item?.selected, item._id]);
-  console.log({isSelectOn: item?.isSelectOn, isSelected});
   return (
     <Animated.View
       // entering={ZoomIn.duration(500)}

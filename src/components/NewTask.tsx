@@ -94,21 +94,7 @@ const NewTask: React.FC<props> = ({
   const SetEndDate = useCallback((date: Date) => {
     setEndDate(date);
   }, []);
-  const SetEndDate2 = (date: Date) => {
-    setEndDate(date);
-    console.log('SetEndDate');
-  };
-  const setStartDate2 = (date: Date) => {
-    setStartDate(date);
-    console.log('setStartDate2', date);
-  };
 
-  React.useEffect(() => {
-    console.log({endDate});
-  }, [endDate]);
-  React.useEffect(() => {
-    console.log('useeffect startdate', {startDate});
-  }, [startDate]);
   React.useEffect(() => {
     return () => {
       setTask?.(undefined);
@@ -187,7 +173,6 @@ const NewTask: React.FC<props> = ({
       dateTypeRef.current = dateType;
       setIsEndDate(_isEndDate);
       // isEndDate.current = _isEndDate;
-      console.log({_isEndDate});
     },
     [setDatePickerOpen, dateTypeRef, datePickerOpen, setIsEndDate],
   );
@@ -407,9 +392,11 @@ const NewTask: React.FC<props> = ({
             isOpen={datePickerOpen}
             date={isEndDate ? endDate : startDate}
             dateFormat={dateTypeRef.current}
-            setDate={isEndDate ? SetEndDate2 : setStartDate2}
+            setDate={isEndDate ? SetEndDate : setStartDate}
             // setDate={isEndDate ? SetEndDate : setStartDate}
-            minimumDate={isEndDate ? minimumEndDate : minimumDate}
+            minimumDate={
+              isEndDate && minimumEndDate ? minimumEndDate : minimumDate
+            }
             maximumDate={maximumDate}
             isSetTimeRef={isSetTime}
             targetDateHoursRef={targetDateHoursRef}

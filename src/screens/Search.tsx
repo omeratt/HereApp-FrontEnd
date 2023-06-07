@@ -8,7 +8,7 @@ import {
   ScrollView,
 } from 'react-native';
 import React, {useCallback, useEffect, useMemo, useRef} from 'react';
-import constants, {searchTasksData} from '../assets/constants';
+import constants from '../assets/constants';
 import SVG from '../assets/svg';
 import {Keyboard} from 'react-native';
 import {LayoutChangeEvent} from 'react-native';
@@ -16,7 +16,12 @@ import SearchElement from '../components/search/SearchElement';
 import Line from '../components/Line';
 import {useNavigation} from '@react-navigation/core';
 import {useSearchQuery} from '../app/api/searchApi';
-import Animated, {SequencedTransition} from 'react-native-reanimated';
+import Animated, {
+  FadeIn,
+  FadeInUp,
+  FadeOut,
+  FadeOutUp,
+} from 'react-native-reanimated';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import NewTask from '../components/NewTask';
 import {ITaskSearchResult} from '../components/search/types';
@@ -57,20 +62,24 @@ const Search = () => {
     setFlashListHeight(realHeight - searchHeight - xBtnSize);
   }, []);
   const openTaskModal = useCallback(() => {
-    console.log('opening task');
-
     bottomSheetModalRef.current?.present();
   }, []);
   const closeTaskModal = useCallback(() => {
-    console.log('closing task');
     bottomSheetModalRef.current?.dismiss();
     // setEditTaskDetails?.(undefined);
   }, [bottomSheetModalRef.current]);
   const handleSheetChanges = useCallback((index: number) => {}, []);
   return (
     <>
-      <View style={styles.container}>
-        <View onLayout={onLayout} style={styles.searchContainer}>
+      <Animated.View
+        entering={FadeIn}
+        exiting={FadeOut}
+        style={styles.container}>
+        <Animated.View
+          entering={FadeInUp}
+          exiting={FadeOutUp}
+          onLayout={onLayout}
+          style={styles.searchContainer}>
           <SVG.SearchBtn height={18} style={{top: 21, alignSelf: 'flex-end'}} />
           <TextInput
             value={inputValue}
@@ -85,11 +94,11 @@ const Search = () => {
             placeholderTextColor={constants.colors.UNDER_LINE}
             onChangeText={setInputValue}
           />
-        </View>
+        </Animated.View>
 
         <View style={[styles.searchContent, {height: flashListHeight}]}>
           <Animated.ScrollView
-            contentContainerStyle={{flex: 1}}
+            contentContainerStyle={{flexGrow: 1}}
             style={{flex: 1}}
             fadingEdgeLength={150}
             showsVerticalScrollIndicator={false}
@@ -126,7 +135,7 @@ const Search = () => {
             alignSelf: 'center',
           }}
         />
-      </View>
+      </Animated.View>
       <BottomSheetModalProvider>
         <BottomSheetModal
           ref={bottomSheetModalRef}

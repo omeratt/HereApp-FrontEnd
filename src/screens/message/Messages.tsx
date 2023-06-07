@@ -335,7 +335,6 @@ const Messages = () => {
     // </SafeAreaView>
   );
 };
-console.log(HEIGHT);
 export default Messages;
 const lineHeight = constants.rf(31);
 const lastMsgFontSize = constants.rf(35);

@@ -150,12 +150,9 @@ const Home = () => {
 
   // callbacks
   const openTaskModal = useCallback(() => {
-    console.log('opening task');
-
     bottomSheetModalRef.current?.present();
   }, []);
   const closeTaskModal = useCallback(() => {
-    console.log('closing task');
     bottomSheetModalRef.current?.dismiss();
     setEditTaskDetails(undefined);
   }, [bottomSheetModalRef.current]);
@@ -199,7 +196,6 @@ const Home = () => {
   }, [calendarVisible]);
 
   const handleSelected = React.useCallback((id: string) => {
-    console.log(selected);
     setSelected(prev => {
       if (prev.includes(id)) {
         return prev.filter(_id => _id !== id);

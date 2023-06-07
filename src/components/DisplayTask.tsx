@@ -194,7 +194,6 @@ const DisplayTask = ({
         sharedX.value = withSpring(0, springConfig);
       }, []);
       const handleCheckboxPress = () => {
-        console.log({item});
         if (!item._id) return;
         item.updateTask?.(item._id, !item.done);
       };

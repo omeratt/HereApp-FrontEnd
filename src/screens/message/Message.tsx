@@ -76,7 +76,6 @@ const Message: React.FC<IMessagesProps> = () => {
   }, []);
 
   const handleSubmit = async () => {
-    console.log('submit', {values});
     goBack();
     await addMsg(values);
     if (flashListRef?.current) {

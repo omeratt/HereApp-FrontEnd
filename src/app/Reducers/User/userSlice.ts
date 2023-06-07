@@ -60,7 +60,6 @@ export const userSlice = createSlice({
       return state;
     },
     setFcm: (state, action: PayloadAction<string>) => {
-      console.log('in set fcm reducer', action.payload);
       state = {...state, fcmToken: action.payload};
       return state;
     },

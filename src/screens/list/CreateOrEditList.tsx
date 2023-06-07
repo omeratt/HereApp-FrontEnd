@@ -178,7 +178,6 @@ const CreateOrEditList = () => {
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
-        console.log('first');
         if (navFromHome) {
           nav.navigate('HomePage' as never);
         } else {

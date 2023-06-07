@@ -65,7 +65,6 @@ const SearchElement: React.FC<ISearchElementProps> = ({
       const listId = (items as IListSearchResult[])[indexOfSearch]._id;
       const categoryIndex = findCategoryIndex(categoryId);
       const listIndex = findListIndexInCategory(categoryIndex, listId);
-      console.log({categoryId, categoryIndex, listIndex});
       navigation.navigate(
         'ListAndNotesStack' as never,
         {

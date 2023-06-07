@@ -22,15 +22,11 @@ const handleActionPress = async (action?: string, detail?: EventDetail) => {
   const _id = detail?.notification?.data?.taskId;
   switch (action) {
     case ACTION.DONE:
-      console.log('should trigger done action');
-      //TODO: FETCH SET AS DONE:TRUE
       await store.dispatch(
         tasksApi.endpoints?.addOrEditTask?.initiate({_id, done: true}),
       );
       break;
     case ACTION.DISMISS:
-      console.log('should trigger dismiss action');
-      //TODO: FETCH SET AS NOTIFIED:TRUE
       await store.dispatch(
         tasksApi.endpoints?.addOrEditTask?.initiate({_id, notified: true}),
       );
@@ -40,7 +36,6 @@ const handleActionPress = async (action?: string, detail?: EventDetail) => {
 };
 
 export const onDisplayNotification = async (remoteMessage: any) => {
-  
   await notifee.displayNotification({
     title: remoteMessage.data?.title,
     body: remoteMessage.data?.body,

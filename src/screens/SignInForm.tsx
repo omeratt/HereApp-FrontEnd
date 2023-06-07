@@ -74,7 +74,6 @@ export default function SignInForm({
   }, []);
   const submit = async (values: typeof userInfo) => {
     //todo submit values and hide screen with hideScreen function
-    console.log(values);
     const x = await login(values);
     // console.log('xxx', x);
   };
@@ -82,18 +81,7 @@ export default function SignInForm({
     EmailInputRef.current &&
       EmailInputRef.current?.setFieldValue('email', emailFromSignUp);
   }, [emailFromSignUp]);
-  useEffect(() => {
-    // if (isLoading) {
-    if (isSuccess) {
-      console.log('login success', data);
-      // console.log(data);
-    }
-    if (isError) {
-      console.log('login error', error);
-      // console.log(data);
-    }
-    // }
-  }, [isLoading, isError, isSuccess, data]);
+
   return (
     <Formik
       innerRef={EmailInputRef}

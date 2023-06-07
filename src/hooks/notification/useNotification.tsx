@@ -32,7 +32,6 @@ const useNotification = () => {
     return await messaging().hasPermission();
   };
   const handleNotificationFromForegroundState = () => {
-    console.log('handleNotificationFromForegroundState');
     notifee.onForegroundEvent(handleNotification);
   };
   const requestPushNotificationsPermission = async () => {

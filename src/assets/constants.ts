@@ -30,7 +30,7 @@ const fontScale = PixelRatio.getFontScale();
 const rf = (size: number) => size / fontScale;
 const constants = {
   BASE_URL: 'https://here.cyclic.app/',
-  // DOMAIN: 'here.cyclic.app',
+  DOMAIN: 'here.cyclic.app',
   // BASE_URL: 'https://here-app.onrender.com/',
   /***************** Eliran ***************/
   // BASE_URL: 'http://192.168.1.41:3000/',
@@ -38,12 +38,13 @@ const constants = {
   /***************** Omer ***************/
   // BASE_URL: 'http://192.168.1.26:3000/',
   colors: {
-    GREEN: '#D0FD0C',
+    GREEN: '#E5FF00',
     BLACK: '#000000',
     BGC: '#242424',
     GREY: '#707070',
-    OFF_WHITE: '#F5F1E6',
-    UNDER_LINE: '#B9AB85',
+    OFF_WHITE: '#F2F1ED',
+    UNDER_LINE: '#787664',
+    // UNDER_LINE: '#B9AB85',
   },
   Fonts: {
     paragraph: 'Report-Regular',

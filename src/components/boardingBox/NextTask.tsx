@@ -31,11 +31,11 @@ const NextTask: React.FC<NextTaskProps> = ({width, height, navToTask}) => {
       <React.Fragment />
     );
   }
-  const date = moment(nextTask.targetDate);
+  const date = moment(nextTask[0].targetDate);
   const hours = getTimeFromDateString(date.toDate().toISOString());
   const formattedDate = getShortName(date.day()) + ' ' + date.date();
   const handlePress = () => {
-    navToTask?.(nextTask);
+    navToTask?.(nextTask[0]);
   };
 
   return (
@@ -48,12 +48,12 @@ const NextTask: React.FC<NextTaskProps> = ({width, height, navToTask}) => {
         ]}>
         Next task
       </Text>
-      {nextTask.isSetTime && (
+      {nextTask[0].isSetTime && (
         <View style={[styles.hours, {marginBottom: `${(17 / height) * 100}%`}]}>
           <Text style={[styles.font, styles.title]}>{hours}</Text>
         </View>
       )}
-      <Text style={[styles.font, styles.details]}>{nextTask.name}</Text>
+      <Text style={[styles.font, styles.details]}>{nextTask[0].name}</Text>
       <View
         style={{
           width: `${(49 / width) * 100}%`,
@@ -63,17 +63,12 @@ const NextTask: React.FC<NextTaskProps> = ({width, height, navToTask}) => {
         }}>
         <Text
           adjustsFontSizeToFit
-          // allowFontScaling
-          // ellipsizeMode="tail"
           numberOfLines={1}
           style={[
             styles.font,
             styles.targetDate,
             {
-              // width: `50%`,
               fontSize: 12,
-              // paddingBottom: `${(18 / height) * 100}%`,
-              // backgroundColor: 'white',
             },
           ]}>
           {formattedDate}

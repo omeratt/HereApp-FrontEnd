@@ -58,17 +58,21 @@ const NextTask: React.FC<NextTaskProps> = ({
           <Text style={[styles.font, styles.title]}>Next task</Text>
           {nextTask[0]?.isSetTime && <Text style={[styles.font]}>{hours}</Text>}
         </View>
-        <CheckBox
-          size={25}
-          isFilled={nextTask[0]?.done}
-          colorFill={constants.colors.GREEN}
-          onPress={handleCheckboxPress}
-        />
+        {nextTask[0]?._id && (
+          <CheckBox
+            size={25}
+            isFilled={nextTask[0]?.done}
+            colorFill={constants.colors.GREEN}
+            onPress={handleCheckboxPress}
+          />
+        )}
       </View>
       <View style={{marginTop: '15.8%'}}>
-        <Text style={[styles.font, styles.title]}>{nextTask[0]?.name}</Text>
+        <Text style={[styles.font, styles.title]}>
+          {nextTask[0]?.name?.trim()}
+        </Text>
         <Text numberOfLines={3} style={styles.font}>
-          {nextTask[0]?.details}
+          {nextTask[0]?.details?.trim()}
         </Text>
       </View>
       <View style={styles.footerContainer}>

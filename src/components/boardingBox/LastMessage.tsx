@@ -8,17 +8,10 @@ import {
 import React from 'react';
 import constants from '../../assets/constants';
 import moment from 'moment';
-import {
-  getRealDate,
-  getShortName,
-  getTimeFromDateString,
-} from '../WeeklyCalender';
-import {TaskType} from '../../app/Reducers/User/userSlice';
+import {getShortName, getTimeFromDateString} from '../WeeklyCalender';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import CheckBox from '../CheckBox';
 import SVG from '../../assets/svg';
 import {useNavigation} from '@react-navigation/native';
-const realDate = getRealDate(new Date());
 const {rf} = constants;
 interface LastMessageProps {
   width: number;
@@ -33,7 +26,6 @@ const LastMessage: React.FC<LastMessageProps> = ({
   message,
   isLoading,
 }) => {
-  const navigation = useNavigation();
   if (!message || isLoading) {
     return isLoading ? (
       <View
@@ -48,18 +40,11 @@ const LastMessage: React.FC<LastMessageProps> = ({
       <React.Fragment />
     );
   }
+  const navigation = useNavigation();
   const date = moment(message?.createdAt);
   const hours = getTimeFromDateString(date.toDate().toISOString());
   const formattedDate = getShortName(date.day()) + ' ' + date.date();
-  const handlePress = () => {
-    // navToMsg?.(nextTask[0]);
-    console.log('handlePress');
-  };
-  // const handleCheckboxPress = () => {
-  //   // const {_id, done} = nextTask[0] || {};
-  //   // if (!_id) return;
-  //   // updateTask?.(_id, !done);
-  // };
+
   const navToNewMessage = React.useCallback(() => {
     navigation.navigate('Message' as never, {navFromHome: true} as never);
   }, [message]);

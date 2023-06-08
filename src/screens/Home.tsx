@@ -44,6 +44,8 @@ import PizzaBox from '../components/boardingBox/PizzaBox';
 import FloatHERE from '../components/FloatHERE';
 import IamNotStupid from './IamNotStupid';
 import NotStupid from '../components/boardingBox/NotStupid';
+import {useGetMessagesQuery} from '../app/api/messageApi';
+import LastMessage from '../components/boardingBox/LastMessage';
 
 const CURRENT_DATE = new Date();
 // const CURRENT_DATE = getRealDate(new Date(), true);
@@ -120,6 +122,11 @@ const Home = () => {
     error: tasksError,
     isFetching: taskFetch,
   } = useGetTasksByDateQuery(selectedDate);
+  const {
+    isLoading: isMessageLoading,
+    data: messages,
+    isFetching: isMsgFetching,
+  } = useGetMessagesQuery(null);
   const [AddOrEditTask, {isLoading: isMutateTaskLoading}] =
     useAddOrEditTaskMutation();
   const [calendarVisible, setCalendarVisible] = useState(false);
@@ -379,13 +386,21 @@ const Home = () => {
         </View>
       </View>
       <View style={styles.middleView}>
-        <BoardingBoxWrapper Component={PizzaBox} basicStyle={false} />
-        <BoardingBoxWrapper Component={NotStupid} basicStyle={false} />
-        {/* <BoardingBoxWrapper
+        {/* <BoardingBoxWrapper Component={PizzaBox} basicStyle={false} /> */}
+        {/* <BoardingBoxWrapper Component={NotStupid} basicStyle={false} /> */}
+        <BoardingBoxWrapper
+          Component={LastMessage}
+          basicStyle={false}
+          LastMessageProps={{
+            message: messages?.[0] as any,
+            isLoading: isMsgFetching || isMessageLoading,
+          }}
+        />
+        <BoardingBoxWrapper
           Component={NextTask}
           nextTaskProps={{navToTask: navToTaskFromNextTask, updateTask}}
           basicStyle={false}
-        /> */}
+        />
       </View>
       <View style={styles.bottomView}>
         <Pressable

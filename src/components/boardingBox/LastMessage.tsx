@@ -6,7 +6,6 @@ import {
   View,
 } from 'react-native';
 import React from 'react';
-import {useGetNextTasksByDateQuery} from '../../app/api/taskApi';
 import constants from '../../assets/constants';
 import moment from 'moment';
 import {
@@ -17,27 +16,26 @@ import {
 import {TaskType} from '../../app/Reducers/User/userSlice';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import CheckBox from '../CheckBox';
+import SVG from '../../assets/svg';
+import {useNavigation} from '@react-navigation/native';
 const realDate = getRealDate(new Date());
 const {rf} = constants;
-interface NextTaskProps {
+interface LastMessageProps {
   width: number;
   height: number;
-  navToTask?: (task: TaskType) => void;
-  updateTask?: any;
+  navToMsg?: (msg?: IMessageValues) => void;
+  message: IMessageValues;
+  isLoading?: boolean;
 }
-const NextTask: React.FC<NextTaskProps> = ({
+const LastMessage: React.FC<LastMessageProps> = ({
   width,
   height,
-  navToTask,
-  updateTask,
+  message,
+  isLoading,
 }) => {
-  const {
-    data: nextTask,
-    isLoading,
-    isFetching,
-  } = useGetNextTasksByDateQuery(realDate);
-  if (!nextTask || isLoading || isFetching) {
-    return nextTask ? (
+  const navigation = useNavigation();
+  if (!message || isLoading) {
+    return isLoading ? (
       <View
         style={{
           flex: 1,
@@ -50,40 +48,52 @@ const NextTask: React.FC<NextTaskProps> = ({
       <React.Fragment />
     );
   }
-  const date = moment(nextTask[0]?.targetDate);
+  const date = moment(message?.createdAt);
   const hours = getTimeFromDateString(date.toDate().toISOString());
   const formattedDate = getShortName(date.day()) + ' ' + date.date();
   const handlePress = () => {
-    navToTask?.(nextTask[0]);
+    // navToMsg?.(nextTask[0]);
+    console.log('handlePress');
   };
-  const handleCheckboxPress = () => {
-    const {_id, done} = nextTask[0] || {};
-    if (!_id) return;
-    updateTask?.(_id, !done);
-  };
+  // const handleCheckboxPress = () => {
+  //   // const {_id, done} = nextTask[0] || {};
+  //   // if (!_id) return;
+  //   // updateTask?.(_id, !done);
+  // };
+  const navToNewMessage = React.useCallback(() => {
+    navigation.navigate('Message' as never, {navFromHome: true} as never);
+  }, [message]);
+  const navToEditMessage = React.useCallback(() => {
+    navigation.navigate(
+      'Message' as never,
+      {messageRouteProp: message, navFromHome: true} as never,
+    );
+  }, [message]);
+  const messageSubString = React.useMemo(() => {
+    const inputString = message.message;
+    const searchString = message.title;
+    const regex = new RegExp(searchString, 'g');
+    const result = inputString.replace(regex, '');
+    return result.trim();
+  }, [message.message, message.title]);
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={{justifyContent: 'center'}}>
-          <Text style={[styles.font, styles.title]}>Next task</Text>
-          {nextTask[0]?.isSetTime && <Text style={[styles.font]}>{hours}</Text>}
+          <Text style={[styles.font, styles.title]}>Message</Text>
+          {message && <Text style={[styles.font]}>{hours}</Text>}
         </View>
-        {nextTask[0]?._id && (
-          <CheckBox
-            size={25}
-            isFilled={nextTask[0]?.done}
-            colorFill={constants.colors.GREEN}
-            onPress={handleCheckboxPress}
-          />
+        {message._id && (
+          <TouchableOpacity onPress={navToNewMessage}>
+            <SVG.NotePlus height={23.75} width={23.75} />
+          </TouchableOpacity>
         )}
       </View>
       <View style={{marginTop: height * 0.1}}>
-        <Text style={[styles.font, styles.title]}>
-          {nextTask[0]?.name?.trim()}
-        </Text>
+        <Text style={[styles.font, styles.title]}>{message.title?.trim()}</Text>
         <Text numberOfLines={3} style={styles.font}>
-          {nextTask[0]?.details?.trim()}
+          {messageSubString?.trim()}
         </Text>
       </View>
       <View style={styles.footerContainer}>
@@ -93,7 +103,7 @@ const NextTask: React.FC<NextTaskProps> = ({
               {formattedDate}
             </Text>
           </View>
-          <TouchableOpacity onPress={handlePress}>
+          <TouchableOpacity onPress={navToEditMessage}>
             <AntDesign
               name="rightcircleo"
               color={constants.colors.BLACK}
@@ -106,7 +116,7 @@ const NextTask: React.FC<NextTaskProps> = ({
   );
 };
 
-export default React.memo(NextTask);
+export default React.memo(LastMessage);
 
 const styles = StyleSheet.create({
   container: {
@@ -117,7 +127,6 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    // backgroundColor: 'grey',
     alignItems: 'center',
   },
   font: {

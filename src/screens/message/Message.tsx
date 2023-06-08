@@ -42,6 +42,7 @@ type RootStackParamList = {
     messageRouteProp: IMessageValues | undefined;
     flashListRef: React.RefObject<FlashList<IMessageValues>> | undefined;
     navFromSearch: boolean | undefined;
+    navFromHome: boolean | undefined;
   };
 };
 type MessageRouteProp = RouteProp<RootStackParamList, 'Message'>;
@@ -56,6 +57,7 @@ const Message: React.FC<IMessagesProps> = () => {
   const messageRouteProp =
     useRoute<MessageRouteProp>().params?.messageRouteProp;
   const navFromSearch = useRoute<MessageRouteProp>().params?.navFromSearch;
+  const navFromHome = useRoute<MessageRouteProp>().params?.navFromHome;
   const flashListRef = useRoute<MessageRouteProp>().params?.flashListRef;
   const [addMsg, {isLoading: addLoading}] = useAddOrEditMessageMutation();
   const navigation = useNavigation();
@@ -71,6 +73,9 @@ const Message: React.FC<IMessagesProps> = () => {
   const goBack = React.useCallback(() => {
     if (navFromSearch) {
       return navigation.navigate('Search' as never);
+    }
+    if (navFromHome) {
+      return navigation.navigate('HomePage' as never);
     }
     navigation.navigate('Messages' as never);
   }, []);

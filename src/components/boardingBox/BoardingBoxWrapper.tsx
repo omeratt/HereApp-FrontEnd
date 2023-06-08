@@ -9,17 +9,23 @@ interface INextTaskProps {
   navToTask?: (task: TaskType) => void;
   updateTask?: (taskId: string, done: boolean) => Promise<void>;
 }
+interface LastMessageProps {
+  message?: IMessagesProps;
+  isLoading?: boolean;
+}
 interface BoardingBoxWrapperProps {
   Component?: any;
   showPlusIcon?: boolean;
   basicStyle?: boolean;
   nextTaskProps?: INextTaskProps;
+  LastMessageProps?: LastMessageProps;
 }
 const BoardingBoxWrapper: React.FC<BoardingBoxWrapperProps> = ({
   Component,
   showPlusIcon,
   basicStyle = true,
   nextTaskProps = {},
+  LastMessageProps = {},
 }) => {
   const [width, setWidth] = useState<number | undefined>();
   const [height, setHeight] = useState<number | undefined>();
@@ -38,7 +44,12 @@ const BoardingBoxWrapper: React.FC<BoardingBoxWrapperProps> = ({
     <View style={styles.box} onLayout={handleLayout}>
       {Component && width && height && (
         <View style={[styles.topBox, topBoxStyle]}>
-          <Component width={width} height={height} {...nextTaskProps} />
+          <Component
+            width={width}
+            height={height}
+            {...nextTaskProps}
+            {...LastMessageProps}
+          />
         </View>
       )}
       {showPlusIcon && (

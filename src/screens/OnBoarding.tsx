@@ -70,7 +70,7 @@ export default function OnBoarding() {
       return [...prev, item];
     });
   }, []);
-  
+
   const goHome = useCallback(() => {
     nav.navigate('HomePage' as never);
   }, [nav]);
@@ -188,7 +188,8 @@ export default function OnBoarding() {
           showsVerticalScrollIndicator={false}
         />
       </View>
-      <View
+      <TouchableOpacity
+        onPress={goHome}
         style={{
           flex: 1, //wtf
           alignItems: 'center',
@@ -197,8 +198,8 @@ export default function OnBoarding() {
           // height: constants.HEIGHT * 0.12,
           // marginTop: 12,
         }}>
-        <SVG.Continue onPress={goHome} />
-      </View>
+        <SVG.Continue />
+      </TouchableOpacity>
     </View>
   );
 }

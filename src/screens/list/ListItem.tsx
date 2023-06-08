@@ -18,6 +18,10 @@ import TextInput, {InputHandle} from '../../components/TextInput';
 import {PADDING_HORIZONTAL} from './MyListsWrapper';
 import {Action, CheckBoxListType, ListItemType} from './CreateOrEditList';
 import Animated, {
+  FadeInLeft,
+  FadeInRight,
+  FadeOutLeft,
+  SequencedTransition,
   ZoomIn,
   ZoomInLeft,
   ZoomInRight,
@@ -144,7 +148,10 @@ const ListItem: React.FC<ListItemProps> = ({
     [inputTxt, index, isLast],
   );
   return (
-    <View
+    <Animated.View
+      entering={FadeInLeft}
+      exiting={FadeOutLeft}
+      layout={SequencedTransition}
       style={{
         marginBottom: '4%',
         height: 40,
@@ -153,6 +160,7 @@ const ListItem: React.FC<ListItemProps> = ({
         {(isCheckBox || extraData?.isSelect) && (
           <Animated.View
             entering={ZoomInLeft.duration(250)}
+            layout={SequencedTransition}
             exiting={ZoomOutLeft.duration(600)}>
             <CheckBox
               size={iconSize / 1.05}
@@ -196,7 +204,8 @@ const ListItem: React.FC<ListItemProps> = ({
                 ? () => handleSelect?.(item._id)
                 : textPress && (() => textPress(index))
             }>
-            <Text
+            <Animated.Text
+              layout={SequencedTransition}
               style={[
                 styles.input,
                 {
@@ -206,7 +215,7 @@ const ListItem: React.FC<ListItemProps> = ({
                 },
               ]}>
               {description}
-            </Text>
+            </Animated.Text>
           </TouchableOpacity>
         )}
         <Ionicons
@@ -224,7 +233,7 @@ const ListItem: React.FC<ListItemProps> = ({
           lineColor={constants.colors.UNDER_LINE}
         />
       )}
-    </View>
+    </Animated.View>
   );
 };
 

@@ -1,22 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="89" height="87" viewBox="0 0 89 87">
-  <defs>
-    <filter id="Rectangle_71" x="0" y="0" width="89" height="87" filterUnits="userSpaceOnUse">
-      <feOffset dy="3" input="SourceAlpha"/>
-      <feGaussianBlur stdDeviation="3" result="blur"/>
-      <feFlood flood-opacity="0.161"/>
-      <feComposite operator="in" in2="blur"/>
-      <feComposite in="SourceGraphic"/>
-    </filter>
-  </defs>
-  <g id="Group_135" data-name="Group 135" transform="translate(-162 -800)">
-    <path id="Path_60" data-name="Path 60" d="M4.905,10.44,18,18.015,31.095,10.44" transform="translate(189 822.438)" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/>
-    <path id="Path_61" data-name="Path 61" d="M18,33.12V18" transform="translate(189 822.438)" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/>
-    <g transform="matrix(1, 0, 0, 1, 162, 800)" filter="url(#Rectangle_71)">
-      <g id="Rectangle_71-2" data-name="Rectangle 71" transform="translate(80 6) rotate(90)" fill="none" stroke="#cec3a6" stroke-width="1">
-        <rect width="69" height="71" rx="23" stroke="none"/>
-        <rect x="0.5" y="0.5" width="68" height="70" rx="22.5" fill="none"/>
-      </g>
-    </g>
-    <path id="Path_59" data-name="Path 59" d="M31.5,24V12A3,3,0,0,0,30,9.4l-10.5-6a3,3,0,0,0-3,0L6,9.4A3,3,0,0,0,4.5,12V24A3,3,0,0,0,6,26.595l10.5,6a3,3,0,0,0,3,0l10.5-6A3,3,0,0,0,31.5,24Z" transform="translate(189 822.438)" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/>
-  </g>
+<svg width="71" height="69" viewBox="0 0 71 69" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M23 0.5H48C60.4264 0.5 70.5 10.5736 70.5 23V46C70.5 58.4264 60.4264 68.5 48 68.5H23C10.5736 68.5 0.5 58.4264 0.5 46V23C0.5 10.5736 10.5736 0.5 23 0.5Z" fill="#F2F1ED" stroke="#787664"/>
+<path d="M49 39.9969V27.9969C48.9989 26.9262 48.4273 25.9373 47.5 25.4019L37 19.4019C36.0718 18.866 34.9282 18.866 34 19.4019L23.5 25.4019C22.5727 25.9373 22.0011 26.9262 22 27.9969V39.9969C22.0011 41.0676 22.5727 42.0566 23.5 42.5919L34 48.5919C34.9282 49.1278 36.0718 49.1278 37 48.5919L47.5 42.5919C48.4273 42.0566 48.9989 41.0676 49 39.9969Z" stroke="#242424" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M22.4043 26.4369L35.4993 34.0119L48.5943 26.4369" stroke="#242424" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M35.5 49.1169V33.9969" stroke="#242424" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

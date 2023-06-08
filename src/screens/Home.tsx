@@ -50,8 +50,8 @@ const initialNumToRender = flatListData.length;
 export const DATE_WIDTH = constants.WIDTH * 0.89444444444444444444444444444444;
 export const TASK_CONTAINER_HEIGHT =
   constants.HEIGHT * 0.64 * 0.84 - //topView till lists
-  constants.HEIGHT * 0.64 * 0.84 * 0.2 - //date header
-  constants.HEIGHT * 0.64 * 0.84 * 0.2 - //dates list
+  constants.HEIGHT * 0.64 * 0.84 * 0.17 - //date header
+  constants.HEIGHT * 0.64 * 0.84 * 0.17 - //dates list
   8.7 - //triangle
   constants.WIDTH * 0.025; //container padding
 
@@ -311,7 +311,7 @@ const Home = () => {
               <TouchableOpacity
                 onPress={openTaskModal}
                 style={[styles.PlusIcon, {zIndex: 1}]}>
-                <SVG.plusIconOutlined fill={constants.colors.BGC} />
+                <SVG.NotePlus height={'100%'} width={'100%'} />
               </TouchableOpacity>
               <Text style={styles.taskHeaderTitle}>Tasks</Text>
             </View>
@@ -343,21 +343,19 @@ const Home = () => {
           <View style={styles.myList}>
             <TouchableOpacity
               onPress={handleListPlusIcon}
-              style={[
-                {
-                  zIndex: 1,
-                },
-              ]}>
-              <SVG.plusIconOutlined
-                style={[styles.plusIcon]}
-                fill={constants.colors.BGC}
+              style={[styles.PlusIcon, {zIndex: 1}]}>
+              <SVG.NotePlus
+                height={'100%'}
+                width={'100%'}
+                // fill={constants.colors.BGC}
               />
             </TouchableOpacity>
             <Text style={styles.myListTitle}>Lists</Text>
           </View>
-          <View style={styles.categoryContainer}>
+          <View style={[styles.categoryContainer]}>
             {prioritizedLists && lists && (
               <FlashList
+                fadingEdgeLength={150}
                 contentContainerStyle={{
                   paddingHorizontal: constants.WIDTH * 0.0444,
                 }}
@@ -381,21 +379,15 @@ const Home = () => {
         />
       </View>
       <View style={styles.bottomView}>
-        <View style={{width: '35.33%'}}>
-          <SVG.Search onPress={goToSearch} height="100%" width="100%" />
-        </View>
-        <View style={{width: '35.33%'}}>
-          <SVG.BoxIcon
-            onPress={goToPlayGround}
-            fill={constants.colors.BLACK}
-            height="100%"
-            width="100%"
-          />
-        </View>
-
-        <TouchableOpacity onPress={openDrawer} style={{width: '35.33%'}}>
+        <TouchableOpacity onPress={goToSearch} style={{width: '28.33%'}}>
+          <SVG.Search height="100%" width="100%" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={goToPlayGround} style={{width: '28.33%'}}>
+          <SVG.BoxIcon height="100%" width="100%" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={openDrawer} style={{width: '28.33%'}}>
           <SVG.MenuIcon
-            fill={constants.colors.BLACK}
+            // fill={constants.colors.BLACK}
             height="100%"
             width="100%"
           />
@@ -435,7 +427,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: constants.colors.OFF_WHITE,
     padding: constants.WIDTH * 0.025,
-    justifyContent: 'space-evenly',
+    // justifyContent: 'space-evenly',
     alignItems: 'center',
   },
   topView: {
@@ -448,9 +440,11 @@ const styles = StyleSheet.create({
     backgroundColor: constants.colors.OFF_WHITE,
     elevation: 2,
     overflow: 'hidden',
+    marginBottom: 7,
   },
   middleView: {
-    height: '22.5%',
+    // marginTop: 5,
+    height: '25.5%',
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -488,7 +482,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     padding: '5%',
-    height: '20%',
+    height: '17%',
   },
   taskTitle: {
     fontFamily: constants.Fonts.paragraph,
@@ -500,23 +494,15 @@ const styles = StyleSheet.create({
   plusIcon: {
     position: 'absolute',
     color: constants.colors.BLACK,
-    right: 0,
+    right: '4%',
     top: 0,
     borderRadius: 9999,
     backgroundColor: constants.colors.OFF_WHITE,
     elevation: 6,
   },
-  myListPlusIcon: {
-    position: 'absolute',
-    color: constants.colors.BLACK,
-    right: '6.5%',
-    borderRadius: 9999,
 
-    backgroundColor: constants.colors.OFF_WHITE,
-    elevation: 5,
-  },
   date: {
-    height: '20%',
+    height: '18%',
     // width: '100%',
     // backgroundColor: 'blue',
 
@@ -526,7 +512,7 @@ const styles = StyleSheet.create({
     // width: constants.WIDTH * 0.95,
     justifyContent: 'center',
     alignSelf: 'center',
-    paddingTop: '2.5%',
+    paddingTop: '2%',
     // alignItems: 'center',
   },
   taskListColumnContainer: {
@@ -552,10 +538,13 @@ const styles = StyleSheet.create({
   PlusIcon: {
     position: 'absolute',
     color: constants.colors.BLACK,
-    right: '6.5%',
+    right: '10%',
     borderRadius: 9999,
     backgroundColor: constants.colors.OFF_WHITE,
-    elevation: 5,
+    // backgroundColor: constants.colors.GREEN,
+    width: 23.75,
+    height: 23.75,
+    elevation: 2,
   },
   taskHeaderTitle: {
     fontFamily: constants.Fonts.paragraph,
@@ -570,11 +559,16 @@ const styles = StyleSheet.create({
     // backgroundColor: 'blue',
     // borderColor: 'brown',
     // borderWidth: 2,
+    width: '100%',
   },
   myList: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 6,
     paddingLeft: '5%',
     paddingRight: '5%',
+    // backgroundColor: 'red',
   },
   myListTitle: {
     fontFamily: constants.Fonts.paragraph,
@@ -587,9 +581,9 @@ const styles = StyleSheet.create({
     minWidth: 2,
     width: constants.WIDTH * 0.9444444444444444,
     height: constants.HEIGHT * 0.03201422854602046 + 2,
-    alignContent: 'center',
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
+    // alignContent: 'center',
+    // justifyContent: 'space-evenly',
+    // alignItems: 'center',
     overflow: 'hidden',
     // backgroundColor: constants.colors.BLACK,
   },
@@ -613,7 +607,7 @@ const styles = StyleSheet.create({
   },
   bottomView: {
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-evenly',
     height: '10.7%',
     width: '65%',
     flexDirection: 'row',

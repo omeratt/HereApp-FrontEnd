@@ -17,6 +17,7 @@ interface Props {
   onRightBtnPress?: () => void;
   children?: Children<ReactNode>;
   title?: string;
+  subtitle?: string;
   numberOfLines?: number;
   rightBtn?: boolean;
   isLoading?: boolean;
@@ -35,6 +36,7 @@ const MyListsWrapper: FC<Props> = ({
   isLoading = false,
   isSelected = undefined,
   onSelectPress,
+  subtitle,
 }) => {
   const onPress = useCallback(() => {
     console.log('click on done');
@@ -42,55 +44,74 @@ const MyListsWrapper: FC<Props> = ({
   return (
     <View style={styles.container}>
       {title && (
-        <View style={styles.topContainer}>
-          <View style={styles.titleContainer}>
-            <Text
-              style={styles.title}
-              numberOfLines={numberOfLines}
-              textBreakStrategy="balanced">
-              {title}
-            </Text>
-          </View>
-          {rightBtn && (
-            <View
-              style={{
-                flexDirection: 'row',
-                height: '100%',
-              }}>
-              {isSelected !== undefined && (
+        <View style={[styles.topContainer]}>
+          <View style={styles.txtHeaderContainer}>
+            <View style={styles.titleContainer}>
+              <Text
+                style={styles.title}
+                numberOfLines={numberOfLines}
+                textBreakStrategy="balanced">
+                {title}
+              </Text>
+            </View>
+            {/* {subtitle && (
+              <Text
+                style={styles.subtitle}
+                numberOfLines={1}
+                textBreakStrategy="balanced">
+                {subtitle}
+              </Text>
+            )} */}
+            {rightBtn && (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  height: '100%',
+                }}>
+                {isSelected !== undefined && (
+                  <TouchableOpacity
+                    style={[{height: selectHeight}]}
+                    onPress={onSelectPress}>
+                    {isSelected ? (
+                      <SVG.GreenSelect
+                        height={'100%'}
+                        width={selectWidth}
+                        style={[styles.svg, styles.marginRight]}
+                      />
+                    ) : (
+                      <SVG.Select
+                        height={'100%'}
+                        width={selectWidth}
+                        style={[styles.svg, styles.marginRight]}
+                      />
+                    )}
+                  </TouchableOpacity>
+                )}
                 <TouchableOpacity
                   style={[{height: selectHeight}]}
-                  onPress={onSelectPress}>
-                  {isSelected ? (
-                    <SVG.GreenSelect
-                      height={'100%'}
-                      width={selectWidth}
-                      style={[styles.svg, styles.marginRight]}
-                    />
-                  ) : (
-                    <SVG.Select
-                      height={'100%'}
-                      width={selectWidth}
-                      style={[styles.svg, styles.marginRight]}
-                    />
-                  )}
+                  onPress={onRightBtnPress}>
+                  <SVG.NotePlus
+                    height={'100%'}
+                    width={selectHeight}
+                    style={styles.svg}
+                  />
                 </TouchableOpacity>
-              )}
-              <TouchableOpacity
-                style={[{height: selectHeight}]}
-                onPress={onRightBtnPress}>
-                <SVG.NotePlus
-                  height={'100%'}
-                  width={selectHeight}
-                  style={styles.svg}
-                />
-              </TouchableOpacity>
-            </View>
-          )}
-          {isLoading && (
-            <View style={{height: '100%'}}>
-              <ActivityIndicator size={32} color={constants.colors.GREEN} />
-            </View>
+              </View>
+            )}
+            {isLoading && (
+              <View style={{height: '100%'}}>
+                <ActivityIndicator size={32} color={constants.colors.GREEN} />
+              </View>
+            )}
+          </View>
+
+          {subtitle && (
+            <Text
+              style={styles.subtitle}
+              numberOfLines={1}
+              textBreakStrategy="balanced">
+              {subtitle}
+            </Text>
           )}
         </View>
       )}
@@ -124,18 +145,36 @@ const styles = StyleSheet.create({
   },
   topContainer: {
     flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    // flexDirection: 'row',
+
     paddingTop: '11%',
     width: '100%',
     alignItems: 'center',
     paddingHorizontal: PADDING_HORIZONTAL,
   },
-  titleContainer: {width: '65%', height: '100%'},
+  titleContainer: {maxWidth: '65%', alignSelf: 'flex-start'},
+  txtHeaderContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
   title: {
     fontFamily: constants.Fonts.paragraph,
     color: constants.colors.BLACK,
-    fontSize: 32,
+    fontSize: constants.rf(34),
+    textAlign: 'left',
+    textAlignVertical: 'top',
+    // width: '100%',
+    lineHeight: constants.rf(34),
+    borderColor: constants.colors.UNDER_LINE,
+    borderBottomWidth: 1,
+    // width:'50%'
+  },
+  subtitle: {
+    fontFamily: constants.Fonts.paragraph,
+    color: constants.colors.BLACK,
+    fontSize: constants.rf(32),
+    textAlign: 'left',
     width: '100%',
     lineHeight: 32,
     // borderColor: 'black',

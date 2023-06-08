@@ -127,13 +127,14 @@ const CreateOrEditList = () => {
       ? [...lists[categoryIndex].lists[listIndex].listItems, {...newItem}]
       : [],
   );
-  const title = lists?.[categoryIndex].name
-    ? '' +
-      lists![categoryIndex].name +
-      ' ' +
-      lists![categoryIndex].lists[listIndex].title
-    : 'loading...';
+  const title = lists?.[categoryIndex].name;
+  // ? '' +
+  //   lists![categoryIndex].name +
+  //   ' ' +
+  //   lists![categoryIndex].lists[listIndex].title
+  // : 'loading...';
 
+  const subtitle = lists?.[categoryIndex].lists[listIndex].title;
   const [checkboxType, setCheckboxType] = useState<CheckBoxListType>('V');
   const [currentFocusIndex, setCurrentFocusIndex] = useState(-1);
   const nav = useNavigation();
@@ -219,6 +220,7 @@ const CreateOrEditList = () => {
   return (
     <MyListsWrapper
       title={title}
+      subtitle={subtitle}
       isLoading={isLoading}
       onDonePress={handleSubmit}>
       <View style={{height: '82%'}}>

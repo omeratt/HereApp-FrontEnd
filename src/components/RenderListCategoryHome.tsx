@@ -36,7 +36,9 @@ const RenderListCategoryHome:
   }, [props.index]);
   return (
     <Pressable onPress={navigateToList} style={styles.myListCategory}>
-      <Text style={styles.listTxt}>{props.item.title}</Text>
+      <Text numberOfLines={1} style={styles.listTxt}>
+        {props.item.title}
+      </Text>
     </Pressable>
   );
 };
@@ -46,7 +48,7 @@ export default React.memo(RenderListCategoryHome);
 const styles = StyleSheet.create({
   myListCategory: {
     width: ListCategoryWidth + 5,
-    // height: 50,
+    height: '100%',
     padding: '0.1%',
     marginRight: 5,
     borderRadius: 40,
@@ -55,12 +57,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignContent: 'center',
     backgroundColor: 'white',
+
     elevation: 2,
   },
   listTxt: {
     color: constants.colors.BGC,
     textAlign: 'center',
-    fontSize: constants.WIDTH * 0.033,
+    fontSize: constants.rf(13),
     fontFamily: constants.Fonts.text,
   },
 });

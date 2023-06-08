@@ -193,6 +193,12 @@ const Home = () => {
     return formattedDate;
   }, [dateHeader, CURRENT_DATE]);
 
+  // const isToday = useMemo(
+  //   () =>
+  //     new Date(dateHeader?.fullDate).toDateString() ===
+  //     CURRENT_DATE.toDateString(),
+  //   [dateHeader],
+  // );
   const navToTaskFromNextTask = useCallback(
     (task: TaskType) => {
       setEditTaskDetails(task);
@@ -261,7 +267,8 @@ const Home = () => {
               tasksLoading ? (
                 <ActivityIndicator size={32} color={constants.colors.GREEN} />
               ) : (
-                <FloatHERE />
+                <React.Fragment />
+                // !isToday && <FloatHERE />
               )}
             </View>
           </View>

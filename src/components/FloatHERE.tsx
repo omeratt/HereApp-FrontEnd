@@ -5,6 +5,8 @@ import constants from '../assets/constants';
 import Animated, {
   FadeIn,
   FadeOut,
+  runOnJS,
+  runOnUI,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
@@ -25,28 +27,36 @@ interface IFloatHERE {
 const FloatHERE: React.FC<IFloatHERE> = ({onPress}) => {
   const sharedYValue = useSharedValue(0);
   const sharedXValue = useSharedValue(7);
+  const sharedOpacity = useSharedValue(2);
+
   useEffect(() => {
-    sharedYValue.value = withRepeat(withSpring(-5, config), -1, true);
-    sharedXValue.value = withRepeat(withSpring(15, config), -1, true);
-  }, [config]);
+    // sharedYValue.value = withRepeat(withSpring(-5, config), -1, true);
+    // sharedYValue.value = withRepeat(withTiming(-5, {duration: 1000}), -1, true);
+    // sharedXValue.value = withRepeat(withSpring(15, config), -1, true);
+    sharedOpacity.value = withRepeat(
+      withTiming(0.5, {duration: 800}),
+      -1,
+      true,
+    );
+  }, []);
   return (
     <Animated.View
       style={[styles.container, {transform: [{translateY: sharedYValue}]}]}
       entering={FadeIn}
       exiting={FadeOut}>
       <TouchableOpacity onPress={onPress}>
-        <Text style={styles.text}>
+        <Animated.Text style={[styles.text, {opacity: sharedOpacity}]}>
           H
           <Animated.Text
             style={{
               color: colors.GREEN,
-              textShadowRadius: sharedXValue,
+              textShadowRadius: 15,
               textShadowColor: colors.BGC,
             }}>
             E
           </Animated.Text>
           RE
-        </Text>
+        </Animated.Text>
       </TouchableOpacity>
     </Animated.View>
   );
@@ -62,7 +72,8 @@ const styles = StyleSheet.create({
   text: {
     fontFamily: Fonts.text_medium,
     color: colors.BGC,
-    fontSize: rf(32),
+    fontSize: rf(28),
     textAlign: 'right',
+    // textAlignVertical: 'bottom',
   },
 });

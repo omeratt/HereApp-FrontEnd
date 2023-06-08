@@ -1,5 +1,11 @@
-import {Pressable, StyleSheet, Text, View} from 'react-native';
-import React from 'react';
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableHighlight,
+  View,
+} from 'react-native';
+import React, {useState} from 'react';
 import {ListRenderItem} from '@shopify/flash-list';
 import constants, {CategoryListType, ListType} from '../assets/constants';
 import {useNavigation} from '@react-navigation/native';
@@ -10,6 +16,7 @@ const RenderListCategoryHome:
   | ListRenderItem<ListType>
   | null
   | undefined = props => {
+  const [borderWidth, setBorderWidth] = useState<number>(1);
   const navigation = useNavigation();
   const findCategoryIndex = () => {
     const listIndex = (props.extraData.lists as CategoryListType[]).findIndex(
@@ -35,11 +42,16 @@ const RenderListCategoryHome:
     );
   }, [props.index]);
   return (
-    <Pressable onPress={navigateToList} style={styles.myListCategory}>
+    <TouchableHighlight
+      underlayColor={constants.colors.GREEN}
+      onPress={navigateToList}
+      onPressIn={() => setBorderWidth(0)}
+      onPressOut={() => setBorderWidth(1)}
+      style={[styles.myListCategory, {borderWidth}]}>
       <Text numberOfLines={1} style={styles.listTxt}>
         {props.item.title}
       </Text>
-    </Pressable>
+    </TouchableHighlight>
   );
 };
 
@@ -53,12 +65,11 @@ const styles = StyleSheet.create({
     marginRight: 5,
     borderRadius: 40,
     borderWidth: 1,
-    borderColor: constants.colors.UNDER_LINE,
+    borderColor: constants.colors.BLACK,
     justifyContent: 'center',
     alignContent: 'center',
-    backgroundColor: 'white',
-
-    elevation: 2,
+    backgroundColor: constants.colors.OFF_WHITE,
+    elevation: 1,
   },
   listTxt: {
     color: constants.colors.BGC,

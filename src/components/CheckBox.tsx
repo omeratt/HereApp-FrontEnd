@@ -64,7 +64,7 @@ export default React.memo(CheckBox);
 const styles = StyleSheet.create({
   circle: {
     // borderRadius: 9999,
-    borderWidth: 1.2,
+    borderWidth: 0.7,
     borderColor: constants.colors.BGC,
     alignItems: 'center',
     justifyContent: 'center',

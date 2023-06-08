@@ -1,7 +1,9 @@
 import {
   ActivityIndicator,
+  Pressable,
   StyleSheet,
   Text,
+  TouchableHighlight,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -53,7 +55,8 @@ export const TASK_CONTAINER_HEIGHT =
   constants.HEIGHT * 0.64 * 0.84 * 0.17 - //date header
   constants.HEIGHT * 0.64 * 0.84 * 0.17 - //dates list
   8.7 - //triangle
-  constants.WIDTH * 0.025; //container padding
+  constants.WIDTH * 0.025 -
+  3; //container padding
 
 export const ListCategoryWidth = constants.WIDTH * 0.2925925996568468;
 const Home = () => {
@@ -79,6 +82,9 @@ const Home = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(CURRENT_DATE); // target date
   const sharedDatesIndex = useSharedValue(findIndexByDate(CURRENT_DATE));
   const [dateHeader, setDateHeader] = useState<DateObject>();
+  const [touchSearch, setTouchSearch] = useState<boolean>(false);
+  const [touchBox, setTouchBox] = useState<boolean>(false);
+  const [touchMenu, setTouchMenu] = useState<boolean>(false);
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const [editTaskDetails, setEditTaskDetails] = useState<TaskType | undefined>(
@@ -343,7 +349,7 @@ const Home = () => {
           <View style={styles.myList}>
             <TouchableOpacity
               onPress={handleListPlusIcon}
-              style={[styles.PlusIcon, {zIndex: 1}]}>
+              style={[styles.PlusIcon, {zIndex: 1, right: '9.4%'}]}>
               <SVG.NotePlus
                 height={'100%'}
                 width={'100%'}
@@ -379,19 +385,39 @@ const Home = () => {
         />
       </View>
       <View style={styles.bottomView}>
-        <TouchableOpacity onPress={goToSearch} style={{width: '28.33%'}}>
-          <SVG.Search height="100%" width="100%" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={goToPlayGround} style={{width: '28.33%'}}>
-          <SVG.BoxIcon height="100%" width="100%" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={openDrawer} style={{width: '28.33%'}}>
-          <SVG.MenuIcon
-            // fill={constants.colors.BLACK}
-            height="100%"
-            width="100%"
-          />
-        </TouchableOpacity>
+        <Pressable
+          onPress={goToSearch}
+          onPressIn={() => setTouchSearch(true)}
+          onPressOut={() => setTouchSearch(false)}
+          style={{width: '28.33%'}}>
+          {!touchSearch ? (
+            <SVG.Search height="100%" width="100%" />
+          ) : (
+            <SVG.SearchGreen height="100%" width="100%" />
+          )}
+        </Pressable>
+        <Pressable
+          onPress={goToPlayGround}
+          style={{width: '28.33%'}}
+          onPressIn={() => setTouchBox(true)}
+          onPressOut={() => setTouchBox(false)}>
+          {!touchBox ? (
+            <SVG.BoxIcon height="100%" width="100%" />
+          ) : (
+            <SVG.BoxIconGreen height="100%" width="100%" />
+          )}
+        </Pressable>
+        <Pressable
+          onPress={openDrawer}
+          style={{width: '28.33%'}}
+          onPressIn={() => setTouchMenu(true)}
+          onPressOut={() => setTouchMenu(false)}>
+          {!touchMenu ? (
+            <SVG.MenuIcon height="100%" width="100%" />
+          ) : (
+            <SVG.MenuIconGreen height="100%" width="100%" />
+          )}
+        </Pressable>
       </View>
       <BottomSheetModalProvider>
         <BottomSheetModal

@@ -1,6 +1,6 @@
 import {StyleSheet, Text} from 'react-native';
 
-import React from 'react';
+import React, {useCallback} from 'react';
 import constants from '../../assets/constants';
 import {
   IListSearchResult,
@@ -86,6 +86,10 @@ const SearchElement: React.FC<ISearchElementProps> = ({
     },
     [isList, isMsg, isTask, items],
   );
+  const keyExtractor = useCallback(
+    (item: unknown, index: number) => index.toString(),
+    [],
+  );
   const renderItem = React.useCallback(
     (props: any) => {
       const item = {...props.item, navigateByType, isMsg, isTask};
@@ -103,6 +107,8 @@ const SearchElement: React.FC<ISearchElementProps> = ({
       {items && (
         <FlashList
           data={items as any}
+          keyExtractor={keyExtractor}
+          
           renderItem={renderItem}
           estimatedItemSize={200}
         />

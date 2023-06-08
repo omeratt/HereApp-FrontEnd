@@ -1,44 +1,28 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {StyleSheet, Text} from 'react-native';
 
-import React, {useCallback, useMemo, useRef} from 'react';
-import constants, {CategoryListType} from '../../assets/constants';
+import React from 'react';
+import constants from '../../assets/constants';
 import {
   IListSearchResult,
   IMessageSearchResult,
   ISearchElementProps,
   ITaskSearchResult,
 } from './types';
-import {getTimeFromDateString} from '../WeeklyCalender';
 import Animated, {
   FadeInUp,
-  FadeOutDown,
   FadeOutUp,
   SequencedTransition,
 } from 'react-native-reanimated';
 import {useNavigation} from '@react-navigation/core';
 import {useAppSelector} from '../../app/hooks';
-import {
-  TaskType,
-  selectCategoriesList,
-} from '../../app/Reducers/User/userSlice';
-import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
-import NewTask from '../NewTask';
-const {HEIGHT, WIDTH} = constants;
+import {selectCategoriesList} from '../../app/Reducers/User/userSlice';
+import {FlashList} from '@shopify/flash-list';
+import RenderSearchElement from './RenderSearchElement';
+const {HEIGHT} = constants;
 const paddingVertical = HEIGHT * (45 / 896);
 
-const options: Intl.DateTimeFormatOptions = {
-  day: '2-digit',
-  month: '2-digit',
-  year: '2-digit',
-};
-const formatDate = (date: Date) =>
-  date
-    .toLocaleDateString('en', options)
-    .replace(/\./g, '/')
-    .replace(/(\d{2})(\/)(\d{2})(\/)(\d{2})/g, '$1 / $3 / $5');
-
 const SearchElement: React.FC<ISearchElementProps> = ({
-  items,
+  items = [],
   title,
   setSelectedTask,
   openTaskModal,
@@ -102,7 +86,13 @@ const SearchElement: React.FC<ISearchElementProps> = ({
     },
     [isList, isMsg, isTask, items],
   );
-
+  const renderItem = React.useCallback(
+    (props: any) => {
+      const item = {...props.item, navigateByType, isMsg, isTask};
+      return <RenderSearchElement {...props} item={item} />;
+    },
+    [items],
+  );
   return (
     <Animated.View
       style={styles.container}
@@ -110,90 +100,28 @@ const SearchElement: React.FC<ISearchElementProps> = ({
       entering={FadeInUp}
       exiting={FadeOutUp}>
       <Text style={styles.titleTxt}>{title}</Text>
-      {items?.map(({data: {description, name}}, index) => {
-        return (
-          <TouchableOpacity key={index} onPress={() => navigateByType(index)}>
-            <Animated.View
-              layout={SequencedTransition}
-              entering={FadeInUp}
-              exiting={FadeOutUp}
-              style={styles.txtContainer}>
-              <Text numberOfLines={1} style={styles.dataName}>
-                {isMsg ? formatDate(new Date(name)) : name}
-              </Text>
-              {!isTask ? (
-                <Text numberOfLines={1} style={styles.dataDesc}>
-                  {description}
-                </Text>
-              ) : (
-                <View style={styles.taskDateContainer}>
-                  <Text numberOfLines={1} style={styles.taskDate}>
-                    {formatDate(new Date(description))}
-                  </Text>
-                  <Text numberOfLines={1} style={styles.taskDate}>
-                    {getTimeFromDateString(description, false, true)}
-                  </Text>
-                </View>
-              )}
-            </Animated.View>
-          </TouchableOpacity>
-        );
-      })}
-      {/* Task Modal */}
+      {items && (
+        <FlashList
+          data={items as any}
+          renderItem={renderItem}
+          estimatedItemSize={200}
+        />
+      )}
     </Animated.View>
   );
 };
 
 export default SearchElement;
 const lineHeight = 24;
-const maxWidth = '45%';
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
     paddingVertical,
   },
   titleTxt: {
     fontFamily: constants.Fonts.text,
-    // fontWeight: '800',
     color: constants.colors.UNDER_LINE,
     fontSize: 12,
     lineHeight,
-    // backgroundColor: 'cyan',
     textAlign: 'left',
-  },
-  dataName: {
-    fontFamily: constants.Fonts.text,
-    fontWeight: '800',
-    color: constants.colors.OFF_WHITE,
-    fontSize: 12,
-    lineHeight,
-    maxWidth,
-    paddingLeft: 1.5,
-  },
-  dataDesc: {
-    fontFamily: constants.Fonts.text,
-    color: constants.colors.OFF_WHITE,
-    fontSize: 12,
-    lineHeight,
-    maxWidth,
-    textAlign: 'left',
-    width: maxWidth,
-  },
-  taskDateContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '45%',
-  },
-  taskDate: {
-    fontFamily: constants.Fonts.text,
-    color: constants.colors.OFF_WHITE,
-    fontSize: 12,
-    lineHeight,
-    textAlign: 'left',
-  },
-  txtContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
   },
 });

@@ -30,15 +30,17 @@ const CheckBox = ({
 
       return isFilled ? colorFill : constants.colors.OFF_WHITE;
     } else return constants.colors.OFF_WHITE;
-  }, [isFilled]);
+  }, [isFilled, type]);
+
+  const checkBoxSize = type === 'DOTS' ? size / 1.5 : size;
   return (
     <TouchableOpacity
       onPress={onPress}
       style={[
         styles.circle,
         {
-          width: size,
-          height: size,
+          width: checkBoxSize,
+          height: checkBoxSize,
           borderColor: isNumber ? 'transparent' : constants.colors.BLACK,
           backgroundColor,
           borderRadius: size / 2,
@@ -53,6 +55,7 @@ const CheckBox = ({
             fontFamily: constants.Fonts.text,
             color: constants.colors.BLACK,
             fontSize: size / 1.4,
+            // textAlignVertical: 'bottom',
           }}>
           {`${index}.`}
         </Text>

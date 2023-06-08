@@ -42,6 +42,8 @@ import {TaskType, setCategoriesList} from '../app/Reducers/User/userSlice';
 import json from '../../AllDates.json';
 import PizzaBox from '../components/boardingBox/PizzaBox';
 import FloatHERE from '../components/FloatHERE';
+import IamNotStupid from './IamNotStupid';
+import NotStupid from '../components/boardingBox/NotStupid';
 
 const CURRENT_DATE = new Date();
 // const CURRENT_DATE = getRealDate(new Date(), true);
@@ -378,11 +380,12 @@ const Home = () => {
       </View>
       <View style={styles.middleView}>
         <BoardingBoxWrapper Component={PizzaBox} basicStyle={false} />
-        <BoardingBoxWrapper
+        <BoardingBoxWrapper Component={NotStupid} basicStyle={false} />
+        {/* <BoardingBoxWrapper
           Component={NextTask}
           nextTaskProps={{navToTask: navToTaskFromNextTask, updateTask}}
           basicStyle={false}
-        />
+        /> */}
       </View>
       <View style={styles.bottomView}>
         <Pressable

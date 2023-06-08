@@ -186,7 +186,7 @@ const ListItem: React.FC<ListItemProps> = ({
               {
                 width,
                 fontSize: iconSize / 1.1,
-                height: iconSize + 12,
+                height: iconSize / 1.05,
                 color: constants.colors.GREY,
               },
             ]}
@@ -212,6 +212,7 @@ const ListItem: React.FC<ListItemProps> = ({
                   width,
                   fontSize: iconSize,
                   height: iconSize + 12,
+                  // height: iconSize / 1.05,
                 },
               ]}>
               {description}
@@ -245,14 +246,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: '1%',
   },
   input: {
     marginTop: 0,
     padding: 0,
     borderBottomWidth: 0,
-    textAlignVertical: 'top',
+    textAlignVertical: 'center',
     textAlign: 'left',
-    height: '100%',
     fontFamily: constants.Fonts.text,
     color: constants.colors.BGC,
   },

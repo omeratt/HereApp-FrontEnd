@@ -46,6 +46,8 @@ import IamNotStupid from './IamNotStupid';
 import NotStupid from '../components/boardingBox/NotStupid';
 import {useGetMessagesQuery} from '../app/api/messageApi';
 import LastMessage from '../components/boardingBox/LastMessage';
+import ToggleButton from '../components/playGround/ToggleButton';
+import ToggleBtn from '../components/boardingBox/ToggleBtn';
 
 const CURRENT_DATE = new Date();
 // const CURRENT_DATE = getRealDate(new Date(), true);
@@ -387,20 +389,21 @@ const Home = () => {
       </View>
       <View style={styles.middleView}>
         {/* <BoardingBoxWrapper Component={PizzaBox} basicStyle={false} /> */}
-        {/* <BoardingBoxWrapper Component={NotStupid} basicStyle={false} /> */}
-        <BoardingBoxWrapper
+        <BoardingBoxWrapper Component={NotStupid} basicStyle={false} />
+        <BoardingBoxWrapper Component={ToggleBtn} basicStyle={false} />
+        {/* <BoardingBoxWrapper
           Component={LastMessage}
           basicStyle={false}
           LastMessageProps={{
             message: messages?.[0] as any,
             isLoading: isMsgFetching || isMessageLoading,
           }}
-        />
-        <BoardingBoxWrapper
+        /> */}
+        {/* <BoardingBoxWrapper
           Component={NextTask}
           nextTaskProps={{navToTask: navToTaskFromNextTask, updateTask}}
           basicStyle={false}
-        />
+        /> */}
       </View>
       <View style={styles.bottomView}>
         <Pressable

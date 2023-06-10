@@ -39,9 +39,6 @@ const RenderSearchElement: ListRenderItem<SearchElementProps> = ({
   const {name, description} = data || {name: '', description: ''};
   return (
     <TouchableOpacity
-      onLayout={e => {
-        console.log(e.nativeEvent.layout.height);
-      }}
       //   style={{minHeight: 13, minWidth: 13}}
       key={index}
       onPress={() => navigateByType(index)}>

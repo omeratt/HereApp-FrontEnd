@@ -389,16 +389,16 @@ const Home = () => {
       </View>
       <View style={styles.middleView}>
         {/* <BoardingBoxWrapper Component={PizzaBox} basicStyle={false} /> */}
-        <BoardingBoxWrapper Component={NotStupid} basicStyle={false} />
+        {/* <BoardingBoxWrapper Component={NotStupid} basicStyle={false} /> */}
         <BoardingBoxWrapper Component={ToggleBtn} basicStyle={false} />
-        {/* <BoardingBoxWrapper
+        <BoardingBoxWrapper
           Component={LastMessage}
           basicStyle={false}
           LastMessageProps={{
             message: messages?.[0] as any,
             isLoading: isMsgFetching || isMessageLoading,
           }}
-        /> */}
+        />
         {/* <BoardingBoxWrapper
           Component={NextTask}
           nextTaskProps={{navToTask: navToTaskFromNextTask, updateTask}}

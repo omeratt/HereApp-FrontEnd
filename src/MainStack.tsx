@@ -21,6 +21,7 @@ import Search from './screens/Search';
 import AllMyTasks from './screens/task/AllMyTasks';
 import IamNotStupid from './screens/IamNotStupid';
 import useNotification from './hooks/notification/useNotification';
+import Menu from './screens/Menu';
 const ICON_SIZE = 20;
 // const Stack = createNativeStackNavigator();
 const Stack = createDrawerNavigator();
@@ -209,6 +210,17 @@ export default function MainStack() {
                 },
               }}
             />
+            <Stack.Screen
+              name="Menu"
+              component={Menu}
+              options={{
+                swipeEnabled: false,
+                headerShown: false,
+                drawerLabel(props) {
+                  return <Label label={'Menu'} isFocused={props.focused} />;
+                },
+              }}
+            />
           </>
         ) : (
           <>
@@ -240,6 +252,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginTop: -constants.HEIGHT * 0.015 - constants.HEIGHT * 0.015 * 0.2,
     color: constants.colors.OFF_WHITE,
+    textAlign: 'center',
+    backgroundColor: 'red',
+    // alignSelf: 'center',
+    width: constants.WIDTH,
+    marginLeft: 10,
+
+    // flex: 1,
     // fontWeight: 'bold',
   },
 });

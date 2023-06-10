@@ -39,13 +39,16 @@ const RenderSearchElement: ListRenderItem<SearchElementProps> = ({
   const {name, description} = data || {name: '', description: ''};
   return (
     <TouchableOpacity
+      onLayout={e => {
+        console.log(e.nativeEvent.layout.height);
+      }}
       //   style={{minHeight: 13, minWidth: 13}}
       key={index}
       onPress={() => navigateByType(index)}>
       <Animated.View
-        layout={SequencedTransition}
-        entering={FadeInUp}
-        exiting={FadeOutUp}
+        // layout={SequencedTransition}
+        // entering={FadeInUp}
+        // exiting={FadeOutUp}
         style={styles.txtContainer}>
         <Text numberOfLines={1} style={styles.dataName}>
           {isMsg ? formatDate(new Date(name)) : name}

@@ -13,6 +13,7 @@ export interface ISearchElementProps {
   setSelectedTask?: React.Dispatch<
     React.SetStateAction<ITaskSearchResult | undefined>
   >;
+  flashListHeight?: number;
   openTaskModal?: () => void;
 }
 export interface ISearchResult {

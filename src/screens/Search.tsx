@@ -109,13 +109,18 @@ const Search = () => {
                 items={searchResult?.tasks}
                 setSelectedTask={setSelectedTask}
                 openTaskModal={openTaskModal}
+                flashListHeight={flashListHeight}
               />
             )}
             {shouldDisplayTask && (shouldDisplayList || shouldDisplayMsg) && (
               <Line strength={1} lineColor={constants.colors.UNDER_LINE} />
             )}
             {shouldDisplayList && (
-              <SearchElement title="LIST & NOTES" items={searchResult?.lists} />
+              <SearchElement
+                title="LIST & NOTES"
+                items={searchResult?.lists}
+                flashListHeight={flashListHeight}
+              />
             )}
             {shouldDisplayMsg && (shouldDisplayTask || shouldDisplayList) && (
               <Line strength={1} lineColor={constants.colors.UNDER_LINE} />
@@ -124,6 +129,7 @@ const Search = () => {
               <SearchElement
                 title="MESSAGE TO MYSELF"
                 items={searchResult?.messages}
+                flashListHeight={flashListHeight}
               />
             )}
           </Animated.ScrollView>

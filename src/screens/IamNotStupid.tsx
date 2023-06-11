@@ -27,12 +27,11 @@ import {
   LiquidLike,
   SlidingDot,
 } from 'react-native-animated-pagination-dots';
-import {FlashList} from '@shopify/flash-list';
-import TypeWriter from 'react-native-typewriter';
-
-const {colors} = constants;
+import {FlashList, ListRenderItemInfo} from '@shopify/flash-list';
+import AnimatedTyping from '../components/TypeWriter';
+const {colors, rf, Fonts} = constants;
 const ICON_SIZE = constants.HEIGHT * (29.25 / 896);
-const paddingHorizontal = constants.WIDTH * (30.37 / 414);
+const paddingHorizontal = constants.WIDTH * (20.37 / 414);
 const paddingVertical = constants.HEIGHT * (22 / 896);
 const stupidSvgWidth = constants.WIDTH * (299 / 414);
 const stupidSvgTxtWidth = constants.WIDTH * (347 / 414);
@@ -45,7 +44,7 @@ const PAGINATION_SIZE = 16;
 const IamNotStupid = () => {
   const navigation = useNavigation();
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const prevIndexValue = useSharedValue(0);
+  const opacityValue = useSharedValue(1);
   const bgcSharedValue = useSharedValue(0);
   const borderWidthSharedValue = useSharedValue(0);
   const scrollX = React.useRef(new rnAnimated.Value(0)).current;
@@ -56,21 +55,13 @@ const IamNotStupid = () => {
   const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const {nativeEvent} = e;
     const {x} = nativeEvent.contentOffset;
-    // const index = Math.round(x / (constants.WIDTH - paddingHorizontal * 2));
     const index = x / (constants.WIDTH - paddingHorizontal * 2);
     scrollX.setValue(x);
 
-    // if (index === 0) {
-    //   borderWidthSharedValue.value = withSpring(0);
-    //   bgcSharedValue.value = withSpring(0);
-    //   // setCurrentIndex(0);
-    // } else {
-    //   borderWidthSharedValue.value = withSpring(1);
-    //   bgcSharedValue.value = withSpring(1);
-    // }
     borderWidthSharedValue.value = index;
     bgcSharedValue.value = index;
-    setCurrentIndex(index);
+    opacityValue.value = 1 - index;
+    setCurrentIndex(Math.round(index));
   };
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -89,7 +80,12 @@ const IamNotStupid = () => {
   );
   return (
     <Animated.View style={[styles.container, animatedStyle]}>
-      <TouchableOpacity onPress={goBack} style={{alignItems: 'flex-end'}}>
+      <TouchableOpacity
+        onPress={goBack}
+        style={{
+          // backgroundColor: 'red',
+          alignSelf: 'flex-end',
+        }}>
         <SVG.HamburgerFixed
           stroke={constants.colors.BLACK}
           width={constants.WIDTH * 0.115}
@@ -103,22 +99,35 @@ const IamNotStupid = () => {
           borderRadius: 30,
           borderColor: colors.UNDER_LINE,
           width: '100%',
-          height: constants.HEIGHT * (670 / 896),
-          backgroundColor: 'yellow',
+          height: constants.HEIGHT * (680 / 896),
+          marginTop: '3%',
         }}>
         <FlashList
           data={[{component: Intro}, {component: Content}, {component: Intro}]}
           renderItem={props => {
-            return <props.item.component />;
+            return <props.item.component {...props} />;
           }}
           keyExtractor={keyExtractor}
           onScroll={handleScroll}
           horizontal
           initialScrollIndex={0}
           pagingEnabled
+          extraData={{currentIndex}}
           estimatedItemSize={constants.WIDTH - paddingHorizontal * 2}
         />
         {/* <View style={{backgroundColor: 'blue', height: 16}}> */}
+        <Animated.Text
+          style={[
+            styles.swipeText,
+            {
+              position: 'absolute',
+              bottom: PAGINATION_SIZE * 2.5,
+              alignSelf: 'center',
+              opacity: opacityValue,
+            },
+          ]}>
+          Swipe for reading
+        </Animated.Text>
         <ExpandingDot
           data={[1, 2, 3]}
           activeDotColor={colors.GREEN}
@@ -168,44 +177,54 @@ const Intro = () => {
     </View>
   );
 };
-const Content = () => {
+const Content = ({item, index, extraData}: ListRenderItemInfo<any>) => {
+  const {currentIndex} = extraData;
   return (
     <View style={styles.contentView}>
       <Animated.View entering={SlideInLeft.duration(1200)}>
-        <View style={{flexDirection: 'row'}}>
-          <TypeWriter
-            typing={1}
-            // loop
-            // speed={200}
-            // delay={40}
-            // textArray={[string]}
-            // textStyle={styles.typeWriterText}
-            // cursorStyle={styles.typeWriterCursorText}
-          >
-            <Text style={styles.typeWriterText}>{string}</Text>
-          </TypeWriter>
-          <Text style={styles.typeWriterCursorText}>|</Text>
-        </View>
-      </Animated.View>
-      <Animated.View
-        entering={
-          SlideInLeft.duration(1200)
-          //   .delay(500)
-        }>
-        <SVG.StupidSubTitle width={stupidSvgSubtitleWidth} />
+        {/* <View style={{flexDirection: 'row'}}> */}
+        <Text
+          style={[
+            styles.typeWriterText,
+            {
+              fontFamily: Fonts.text_medium,
+              marginBottom: '6.5%',
+            },
+          ]}>
+          Im not stupid
+        </Text>
+
+        {/* <Text style={[styles.typeWriterText]} textBreakStrategy="simple">
+          {string}
+        </Text> */}
+
+        {currentIndex > 0 && (
+          <AnimatedTyping
+            text={[string]}
+            style={styles.typeWriterText}
+            cursorStyle={styles.typeWriterCursorText}
+            cursorColor={colors.GREEN}
+          />
+        )}
       </Animated.View>
     </View>
   );
 };
 export default IamNotStupid;
-
 const styles = StyleSheet.create({
   typeWriterText: {
-    color: 'black',
-    fontSize: 24,
+    fontFamily: Fonts.text,
+    fontSize: rf(14),
+    color: colors.BLACK,
+    lineHeight: rf(23),
+  },
+  swipeText: {
+    fontFamily: Fonts.text,
+    fontSize: rf(15),
+    color: colors.BLACK,
   },
   typeWriterCursorText: {
-    color: 'green',
+    color: colors.GREEN,
     fontSize: 24,
   },
   container: {
@@ -226,20 +245,21 @@ const styles = StyleSheet.create({
     width: constants.WIDTH - paddingHorizontal * 2,
     // backgroundColor: 'red',
     height: constants.HEIGHT * (670 / 896) - PAGINATION_SIZE * 2,
-    paddingHorizontal: constants.HEIGHT * (40 / 896),
-    paddingVertical: constants.WIDTH * (31 / 414),
+    paddingHorizontal: constants.WIDTH * (40 / 896),
+    paddingVertical: constants.HEIGHT * (11 / 414),
+    // backgroundColor: 'yellow',
   },
 });
 
 const string =
-  "Attention deficit disorder(ADD) is a term \
+  'Attention deficit disorder(ADD) is a term \
 that is sometimes used for one of the \
 presentations of attention-deficit \
 hyperactivity disorder (ADHD). Attention deficit disorder(ADD) is a term \
 that is sometimes used for one of the \
 presentations of attention-deficit \
 hyperactivity disorder (ADHD). \
-.Attention deficit disorder(ADD) is a term that is sometimes used for one of the presentations of attention-deficit \
+Attention deficit disorder(ADD) is a term that is sometimes used for one of the presentations of attention-deficit \
 hyperactivity disorder (ADHD). Attention deficit disorder(ADD) is a term \
 that is sometimes used for one of the \
 presentations of attention-deficit \
@@ -247,5 +267,5 @@ hyperactivity disorder (ADHD). Attention deficit disorder(ADD) is a term \
 that is sometimes used for one of the \
 presentations of attention-deficit \
 hyperactivity disorder (ADHD). \
-.Attention deficit disorder(ADD) \
-.'.";
+Attention deficit disorder(ADD) \
+.';

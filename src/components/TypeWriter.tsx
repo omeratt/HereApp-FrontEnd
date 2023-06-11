@@ -4,6 +4,9 @@ import {StyleSheet, Text, TextStyle} from 'react-native';
 interface AnimatedTypingProps {
   text: string[];
   onComplete?: () => void;
+  style?: TextStyle;
+  cursorStyle?: TextStyle;
+  cursorColor?: string;
 }
 
 export default function AnimatedTyping(props: AnimatedTypingProps) {
@@ -12,10 +15,10 @@ export default function AnimatedTyping(props: AnimatedTypingProps) {
   const [messageIndex, setMessageIndex] = useState(0);
   const [textIndex, setTextIndex] = useState(0);
   const [timeouts, setTimeouts] = useState<{
-    cursorTimeout?: NodeJS.Timeout;
-    typingTimeout?: NodeJS.Timeout;
-    firstNewLineTimeout?: NodeJS.Timeout;
-    secondNewLineTimeout?: NodeJS.Timeout;
+    cursorTimeout?: number;
+    typingTimeout?: number;
+    firstNewLineTimeout?: number;
+    secondNewLineTimeout?: number;
   }>({});
 
   const textRef = useRef<string>(text);
@@ -31,10 +34,10 @@ export default function AnimatedTyping(props: AnimatedTypingProps) {
   textIndexRef.current = textIndex;
 
   const timeoutsRef = useRef<{
-    cursorTimeout?: NodeJS.Timeout;
-    typingTimeout?: NodeJS.Timeout;
-    firstNewLineTimeout?: NodeJS.Timeout;
-    secondNewLineTimeout?: NodeJS.Timeout;
+    cursorTimeout?: number;
+    typingTimeout?: number;
+    firstNewLineTimeout?: number;
+    secondNewLineTimeout?: number;
   }>({});
   timeoutsRef.current = timeouts;
 
@@ -47,7 +50,7 @@ export default function AnimatedTyping(props: AnimatedTypingProps) {
       setTextIndex(textIndexRef.current + 1);
 
       const updatedTimeouts = {...timeoutsRef.current};
-      updatedTimeouts.typingTimeout = setTimeout(typingAnimation, 50);
+      updatedTimeouts.typingTimeout = setTimeout(typingAnimation, 20);
       setTimeouts(updatedTimeouts);
     } else if (messageIndexRef.current + 1 < props.text.length) {
       setMessageIndex(messageIndexRef.current + 1);
@@ -59,7 +62,8 @@ export default function AnimatedTyping(props: AnimatedTypingProps) {
       updatedTimeouts.typingTimeout = setTimeout(typingAnimation, 280);
       setTimeouts(updatedTimeouts);
     } else {
-      clearInterval(timeoutsRef.current.cursorTimeout);
+      timeoutsRef.current?.cursorTimeout &&
+        clearInterval(timeoutsRef.current.cursorTimeout);
       setCursorColor('transparent');
 
       if (props.onComplete) {
@@ -74,7 +78,7 @@ export default function AnimatedTyping(props: AnimatedTypingProps) {
 
   const cursorAnimation = () => {
     if (cursorColorRef.current === 'transparent') {
-      setCursorColor('#8EA960');
+      setCursorColor(props.cursorColor || '#fffff');
     } else {
       setCursorColor('transparent');
     }
@@ -82,22 +86,26 @@ export default function AnimatedTyping(props: AnimatedTypingProps) {
 
   useEffect(() => {
     const updatedTimeouts = {...timeoutsRef.current};
-    updatedTimeouts.typingTimeout = setTimeout(typingAnimation, 500);
-    updatedTimeouts.cursorTimeout = setInterval(cursorAnimation, 250);
+    updatedTimeouts.typingTimeout = setTimeout(typingAnimation, 100);
+    updatedTimeouts.cursorTimeout = setInterval(cursorAnimation, 50);
     setTimeouts(updatedTimeouts);
 
     return () => {
-      clearTimeout(timeoutsRef.current.typingTimeout);
-      clearTimeout(timeoutsRef.current.firstNewLineTimeout);
-      clearTimeout(timeoutsRef.current.secondNewLineTimeout);
-      clearInterval(timeoutsRef.current.cursorTimeout);
+      timeoutsRef.current.typingTimeout &&
+        clearTimeout(timeoutsRef.current.typingTimeout);
+      timeoutsRef.current.firstNewLineTimeout &&
+        clearTimeout(timeoutsRef.current.firstNewLineTimeout);
+      timeoutsRef.current.secondNewLineTimeout &&
+        clearTimeout(timeoutsRef.current.secondNewLineTimeout);
+      timeoutsRef.current.cursorTimeout &&
+        clearInterval(timeoutsRef.current.cursorTimeout);
     };
   }, []);
 
   return (
-    <Text style={styles.text}>
+    <Text style={[props.style]} textBreakStrategy="simple">
       {text}
-      <Text style={{color: cursorColor, fontSize: 35}}>|</Text>
+      <Text style={[props.cursorStyle, {color: cursorColor}]}>|</Text>
     </Text>
   );
 }
@@ -106,6 +114,6 @@ const styles = StyleSheet.create({
   text: {
     color: '#B76D68',
     fontSize: 30,
-    alignSelf: 'stretch',
+    // alignSelf: 'stretch',
   } as TextStyle,
 });

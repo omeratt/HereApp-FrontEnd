@@ -164,6 +164,7 @@ const Home = () => {
   }, []);
 
   const openDrawer = useCallback(() => {
+    navigation.navigate('Menu');
     // navigation.dispatch(DrawerActions.openDrawer());
   }, []);
   const goToPlayGround = useCallback(() => {

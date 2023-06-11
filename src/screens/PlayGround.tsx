@@ -29,7 +29,7 @@ const sliderWidth = pizzaAndCubeViewWidth * 0.6;
 const PlayGround = () => {
   const nav = useNavigation();
   const openDrawer = React.useCallback(() => {
-    // nav.dispatch(DrawerActions.openDrawer());
+    nav.navigate('Menu' as never);
   }, []);
   const goHome = React.useCallback(() => {
     nav.navigate('HomePage' as never);
@@ -52,7 +52,9 @@ const PlayGround = () => {
         onBackPress,
       );
 
-      return () => subscription.remove();
+      return () => {
+        subscription.remove();
+      };
     }, []),
   );
   return (

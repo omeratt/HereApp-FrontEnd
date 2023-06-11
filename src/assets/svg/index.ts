@@ -14,7 +14,9 @@ import NumCheckbox from './NumCheckBox.svg';
 import VIcon from './vIcon.svg';
 import PlayHere from './PlayHere.svg';
 import XBtn from './XBtn.svg';
+import XBtnFixed from './XBtnFixed.svg';
 import HamburgerBtn from './HamburgerBtn.svg';
+import HamburgerFixed from './HamburgerFixed.svg';
 import SearchBtn from './SearchBtn.svg';
 import Continue from './Continue.svg';
 import Select from './Select.svg';
@@ -27,8 +29,10 @@ import TrashGreen from './TrashGreen.svg';
 import SendBtn from './SendBtn.svg';
 import IAmNotStupidTxt from './IAmNotStupidTxt.svg';
 import IAmNotStupid from './IAmNotStupid.svg';
+import StupidSubTitle from './StupidSubTitle.svg';
 const SVG = {
   IAmNotStupid,
+  StupidSubTitle,
   IAmNotStupidTxt,
   TrashWhite,
   TrashGreen,
@@ -40,8 +44,10 @@ const SVG = {
   Select,
   Continue,
   XBtn,
+  XBtnFixed,
   SearchBtn,
   HamburgerBtn,
+  HamburgerFixed,
   PlayHere,
   HereLogo,
   DoneButton,

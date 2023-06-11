@@ -103,7 +103,7 @@ export default function AnimatedTyping(props: AnimatedTypingProps) {
   }, []);
 
   return (
-    <Text style={[props.style]} textBreakStrategy="simple">
+    <Text style={[props.style]} textBreakStrategy="simple" adjustsFontSizeToFit>
       {text}
       <Text style={[props.cursorStyle, {color: cursorColor}]}>|</Text>
     </Text>

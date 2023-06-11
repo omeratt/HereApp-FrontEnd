@@ -48,6 +48,7 @@ import {useGetMessagesQuery} from '../app/api/messageApi';
 import LastMessage from '../components/boardingBox/LastMessage';
 import ToggleButton from '../components/playGround/ToggleButton';
 import ToggleBtn from '../components/boardingBox/ToggleBtn';
+import TimeManage from '../components/boardingBox/TimeManage';
 
 const CURRENT_DATE = new Date();
 // const CURRENT_DATE = getRealDate(new Date(), true);
@@ -164,8 +165,7 @@ const Home = () => {
   }, []);
 
   const openDrawer = useCallback(() => {
-    navigation.navigate('Menu');
-    // navigation.dispatch(DrawerActions.openDrawer());
+    navigation.navigate('Menu' as never);
   }, []);
   const goToPlayGround = useCallback(() => {
     navigation.navigate('PlayGround' as never);
@@ -390,16 +390,17 @@ const Home = () => {
       </View>
       <View style={styles.middleView}>
         {/* <BoardingBoxWrapper Component={PizzaBox} basicStyle={false} /> */}
-        {/* <BoardingBoxWrapper Component={NotStupid} basicStyle={false} /> */}
-        <BoardingBoxWrapper Component={ToggleBtn} basicStyle={false} />
-        <BoardingBoxWrapper
+        <BoardingBoxWrapper Component={NotStupid} basicStyle={false} />
+        {/* <BoardingBoxWrapper Component={TimeManage} basicStyle={false} /> */}
+        {/* <BoardingBoxWrapper Component={ToggleBtn} basicStyle={false} /> */}
+        {/* <BoardingBoxWrapper
           Component={LastMessage}
           basicStyle={false}
           LastMessageProps={{
             message: messages?.[0] as any,
             isLoading: isMsgFetching || isMessageLoading,
           }}
-        />
+        /> */}
         {/* <BoardingBoxWrapper
           Component={NextTask}
           nextTaskProps={{navToTask: navToTaskFromNextTask, updateTask}}

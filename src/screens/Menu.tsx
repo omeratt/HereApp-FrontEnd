@@ -54,7 +54,9 @@ const Menu = () => {
           onPress={navigateTo('Messages')}>
           <Text style={styles.listTxt}>Chat</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.listItem}>
+        <TouchableOpacity
+          style={styles.listItem}
+          onPress={navigateTo('TimeTips')}>
           <Text style={styles.listTxt}>Time tips</Text>
         </TouchableOpacity>
         <TouchableOpacity

@@ -30,6 +30,8 @@ import SendBtn from './SendBtn.svg';
 import IAmNotStupidTxt from './IAmNotStupidTxt.svg';
 import IAmNotStupid from './IAmNotStupid.svg';
 import StupidSubTitle from './StupidSubTitle.svg';
+import TimeTips from './TimeTips.svg';
+
 const SVG = {
   IAmNotStupid,
   StupidSubTitle,
@@ -63,5 +65,6 @@ const SVG = {
   SearchGreen,
   MenuIconGreen,
   BoxIconGreen,
+  TimeTips,
 };
 export default SVG;

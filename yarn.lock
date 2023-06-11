@@ -2411,11 +2411,6 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@sucho/react-native-typewriter@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@sucho/react-native-typewriter/-/react-native-typewriter-1.0.0.tgz#0d2678a311c4a5d220f2d306a9fefa5aceb10bf3"
-  integrity sha512-+GcxPd0GpGXIXExe5Got8OuRjPdwDmAaayFXvDtnmJ8enFmzijujKSe1IGx8ZNf3MZs+hhz5Xx7tvx4QhMhBaA==
-
 "@svgr/babel-plugin-add-jsx-attribute@^6.5.1":
   version "6.5.1"
   resolved "https://registry.npmjs.org/@svgr/babel-plugin-add-jsx-attribute/-/babel-plugin-add-jsx-attribute-6.5.1.tgz"
@@ -8349,7 +8344,7 @@ prop-types@15.5.8:
   dependencies:
     fbjs "^0.8.9"
 
-prop-types@15.8.1, prop-types@^15.5.10, prop-types@^15.5.7, prop-types@^15.6.0, prop-types@^15.6.2, prop-types@^15.7.2, prop-types@^15.8.1:
+prop-types@15.8.1, prop-types@^15.5.10, prop-types@^15.6.0, prop-types@^15.6.2, prop-types@^15.7.2, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.npmjs.org/prop-types/-/prop-types-15.8.1.tgz"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -8534,13 +8529,6 @@ react-native-dotenv@^3.4.8:
   dependencies:
     dotenv "^16.0.3"
 
-react-native-dots-pagination@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/react-native-dots-pagination/-/react-native-dots-pagination-0.3.0.tgz#a2b0f4f15243931e1c9b7bedc6562345b1b3a12b"
-  integrity sha512-ExdSCyO78NQ02V9CDphVv0tUNwwX60MaHOAcPE7GCTM83GSNvf9LaEY8Btth3F/IZuGnnFUC4kFIim1rZDlA1w==
-  dependencies:
-    prop-types "^15.7.2"
-
 react-native-flipper-performance-plugin@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/react-native-flipper-performance-plugin/-/react-native-flipper-performance-plugin-0.4.0.tgz#961ff2f9ccc942d2a4cabd4f6d401034c5402007"
@@ -8653,13 +8641,6 @@ react-native-switch-toggle@^2.2.1:
   integrity sha512-Y/RQ1Pb/KDVZhBSNjc16LKtUi7MGZb0MYxouZLj/THpiSQLsy5pUyTwbIKRjNuZDNSxmMDXyRX1QfLt+oup4Uw==
   dependencies:
     dooboolab-welcome "^1.3.0"
-
-react-native-typewriter@^0.7.0:
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/react-native-typewriter/-/react-native-typewriter-0.7.0.tgz#b370794f45366a9e9a47bdd40666198ebdce3bf2"
-  integrity sha512-lwlo8TemtZHgYH/EctYaCT5xMkgIk9ZQVyFm7qaY5b3MxveOd1v5g58oHNAkC9+vRJfdef+3dZoTJ9bM/+75/w==
-  dependencies:
-    prop-types "^15.5.7"
 
 react-native-uuid@^2.0.1:
   version "2.0.1"

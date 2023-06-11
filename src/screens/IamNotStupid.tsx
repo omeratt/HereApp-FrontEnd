@@ -193,11 +193,6 @@ const Content = ({item, index, extraData}: ListRenderItemInfo<any>) => {
           ]}>
           Im not stupid
         </Text>
-
-        {/* <Text style={[styles.typeWriterText]} textBreakStrategy="simple">
-          {string}
-        </Text> */}
-
         {currentIndex > 0 && (
           <AnimatedTyping
             text={[string]}

@@ -35,7 +35,7 @@ const {colors, rf, Fonts} = constants;
 const ICON_SIZE = constants.HEIGHT * (29.25 / 896);
 const paddingHorizontal = constants.WIDTH * (20.37 / 414);
 const paddingVertical = constants.HEIGHT * (22 / 896);
-const stupidSvgWidth = constants.WIDTH * (299 / 414);
+const stupidSvgSize = constants.HEIGHT * (353 / 896);
 const stupidSvgTxtWidth = constants.WIDTH * (347 / 414);
 const stupidSvgSubtitleWidth = constants.WIDTH * (236 / 414);
 const marginDownFromBackToTxt = constants.HEIGHT * (90 / 896);
@@ -43,7 +43,7 @@ const marginDownFromTxtToTxt = constants.HEIGHT * (30 / 896);
 const StupidAspectRatio = 224 / 299;
 const StupidTxtAspectRatio = 347 / 235;
 const PAGINATION_SIZE = 16;
-const IamNotStupid = () => {
+const TimeTips = () => {
   const navigation = useNavigation();
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const opacityValue = useSharedValue(1);
@@ -109,8 +109,8 @@ const IamNotStupid = () => {
         <FlashList
           data={[
             {component: Intro},
-            {component: Content},
-            {component: Content},
+            {component: Content, content: textPart1},
+            {component: Content, content: textPart2},
           ]}
           renderItem={props => {
             return <props.item.component {...props} />;
@@ -170,20 +170,20 @@ const Intro = () => {
   return (
     <View style={{width: constants.WIDTH - paddingHorizontal * 2}}>
       <Animated.View entering={SlideInLeft.duration(1200)}>
-        <SVG.IAmNotStupid
+        <SVG.TimeTips
           style={styles.svgMargins}
-          height={stupidSvgWidth * StupidAspectRatio}
-          width={stupidSvgWidth}
+          // height={353}
+          // width={stupidSvgWidth}
+          height={stupidSvgSize}
+          // width={stupidSvgWidth}
         />
-      </Animated.View>
-      <Animated.View entering={SlideInLeft.duration(1200)}>
-        <SVG.StupidSubTitle width={stupidSvgSubtitleWidth} />
       </Animated.View>
     </View>
   );
 };
 const Content = ({item, index, extraData}: ListRenderItemInfo<any>) => {
   const {currentIndex} = extraData;
+  const {content} = item;
   return (
     <View style={styles.contentView}>
       {currentIndex > 0 && (
@@ -196,12 +196,14 @@ const Content = ({item, index, extraData}: ListRenderItemInfo<any>) => {
                 fontFamily: Fonts.text_medium,
                 marginBottom: '6.5%',
               },
-            ]}>
-            Im not stupid
+            ]}
+            adjustsFontSizeToFit
+            textBreakStrategy="balanced">
+            About time and how can we use it better
           </Text>
 
           <AnimatedTyping
-            text={[string]}
+            text={[content]}
             style={styles.typeWriterText}
             cursorStyle={styles.typeWriterCursorText}
             cursorColor={colors.GREEN}
@@ -211,7 +213,7 @@ const Content = ({item, index, extraData}: ListRenderItemInfo<any>) => {
     </View>
   );
 };
-export default IamNotStupid;
+export default TimeTips;
 const styles = StyleSheet.create({
   typeWriterText: {
     fontFamily: Fonts.text,
@@ -238,35 +240,17 @@ const styles = StyleSheet.create({
   svgMargins: {
     marginTop: marginDownFromBackToTxt,
     marginBottom: marginDownFromTxtToTxt,
-    // backgroundColor: 'red',
-    // color: constants.colors.BGC,
-    // fill: constants.colors.BGC,
   },
   contentView: {
     width: constants.WIDTH - paddingHorizontal * 2,
-    // backgroundColor: 'red',
     height: constants.HEIGHT * (670 / 896) - PAGINATION_SIZE * 2,
     paddingHorizontal: constants.WIDTH * (40 / 896),
     paddingVertical: constants.HEIGHT * (11 / 414),
-    // backgroundColor: 'yellow',
   },
 });
 
-const string =
-  'Attention deficit disorder(ADD) is a term \
-that is sometimes used for one of the \
-presentations of attention-deficit \
-hyperactivity disorder (ADHD). Attention deficit disorder(ADD) is a term \
-that is sometimes used for one of the \
-presentations of attention-deficit \
-hyperactivity disorder (ADHD). \
-Attention deficit disorder(ADD) is a term that is sometimes used for one of the presentations of attention-deficit \
-hyperactivity disorder (ADHD). Attention deficit disorder(ADD) is a term \
-that is sometimes used for one of the \
-presentations of attention-deficit \
-hyperactivity disorder (ADHD). Attention deficit disorder(ADD) is a term \
-that is sometimes used for one of the \
-presentations of attention-deficit \
-hyperactivity disorder (ADHD). \
-Attention deficit disorder(ADD) \
-.';
+const textPart1 =
+  'Time is a valuable resource that often slips away unnoticed. Just like attention deficit disorder (ADD) can hinder focus, poor time management leads to inefficiency. Prioritize tasks, set clear goals, and create a schedule. Minimize distractions to optimize productivity and make the most of your time. Time can feel subjective, either rushing by or dragging on. Practice mindfulness to ground yourself in the present moment. Incorporate breaks and leisure activities for balance. Reflect on past time usage, set goals, and take actionable steps to improve time management. Make each moment count';
+
+const textPart2 =
+  "By consciously managing your time, you gain control over how you invest your moments. Embrace the power of intentionality and make deliberate choices aligned with your priorities. Regularly assess your progress and make adjustments to your schedule and goals. Remember, it's not just about being busy, but being purposeful. Be mindful of the present, appreciating the richness of each passing second. Take breaks to rejuvenate and recharge, fueling your productivity and creativity. Find harmony between work and leisure, allowing yourself to indulge in activities that bring joy and fulfillment. With focused effort and a mindful approach, you can unlock the true potential of time and live a more balanced, fulfilling life.";

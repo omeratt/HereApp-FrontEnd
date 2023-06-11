@@ -29,7 +29,7 @@ const sliderWidth = pizzaAndCubeViewWidth * 0.6;
 const PlayGround = () => {
   const nav = useNavigation();
   const openDrawer = React.useCallback(() => {
-    nav.dispatch(DrawerActions.openDrawer());
+    // nav.dispatch(DrawerActions.openDrawer());
   }, []);
   const goHome = React.useCallback(() => {
     nav.navigate('HomePage' as never);

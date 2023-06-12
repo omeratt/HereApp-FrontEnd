@@ -1,5 +1,4 @@
 import {
-  FlatList,
   NativeScrollEvent,
   NativeSyntheticEvent,
   StyleSheet,
@@ -12,7 +11,6 @@ import React, {useCallback, useState} from 'react';
 import constants from '../assets/constants';
 import SVG from '../assets/svg';
 import {useNavigation} from '@react-navigation/core';
-import AntDesign from 'react-native-vector-icons/AntDesign';
 import Animated, {
   FadeInRight,
   SlideInLeft,
@@ -24,11 +22,7 @@ import Animated, {
   FadeOut,
   FadeIn,
 } from 'react-native-reanimated';
-import {
-  ExpandingDot,
-  LiquidLike,
-  SlidingDot,
-} from 'react-native-animated-pagination-dots';
+import {ExpandingDot} from 'react-native-animated-pagination-dots';
 import {FlashList, ListRenderItemInfo} from '@shopify/flash-list';
 import AnimatedTyping from '../components/TypeWriter';
 const {colors, rf, Fonts} = constants;

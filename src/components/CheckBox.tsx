@@ -8,9 +8,11 @@ interface props {
   size: number;
   index?: number;
   isFilled?: boolean;
+  borderColor?: string;
   onPress?: () => void;
   type?: CheckBoxListType;
   colorFill?: string;
+  disabled?: boolean;
 }
 const CheckBox = ({
   size,
@@ -18,6 +20,8 @@ const CheckBox = ({
   index,
   onPress,
   isFilled,
+  borderColor,
+  disabled,
   colorFill = constants.colors.BGC,
 }: props) => {
   const isNumber = type === 'NUMBERS';
@@ -35,13 +39,18 @@ const CheckBox = ({
   const checkBoxSize = type === 'DOTS' ? size / 1.5 : size;
   return (
     <TouchableOpacity
+      disabled={disabled}
       onPress={onPress}
       style={[
         styles.circle,
         {
           width: checkBoxSize,
           height: checkBoxSize,
-          borderColor: isNumber ? 'transparent' : constants.colors.BLACK,
+          borderColor: isNumber
+            ? 'transparent'
+            : borderColor
+            ? borderColor
+            : constants.colors.BLACK,
           backgroundColor,
           borderRadius: size / 2,
         },

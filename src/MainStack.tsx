@@ -22,6 +22,7 @@ import {
   createNativeStackNavigator,
 } from '@react-navigation/native-stack';
 import TimeTips from './screens/TimeTips';
+import Widgets from './screens/selectWidgets/Widgets';
 const Stack = createNativeStackNavigator();
 
 export default function MainStack() {
@@ -103,6 +104,11 @@ export default function MainStack() {
             <Stack.Screen
               name="Menu"
               component={Menu}
+              options={screenOptions()}
+            />
+            <Stack.Screen
+              name="Widgets"
+              component={Widgets}
               options={screenOptions()}
             />
           </>

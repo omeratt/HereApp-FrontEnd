@@ -1,5 +1,6 @@
 import HereLogo from './Logo.svg';
 import DoneButton from './Done.svg';
+import GreenDoneButton from './DoneGreen.svg';
 import StartButton from './StartButton.svg';
 import Hi from './Hi.svg';
 import Search from './Search.svg';
@@ -31,6 +32,7 @@ import IAmNotStupidTxt from './IAmNotStupidTxt.svg';
 import IAmNotStupid from './IAmNotStupid.svg';
 import StupidSubTitle from './StupidSubTitle.svg';
 import TimeTips from './TimeTips.svg';
+import SelectWidgetTitle from './SelectWidgetTitle.svg';
 
 const SVG = {
   IAmNotStupid,
@@ -53,6 +55,7 @@ const SVG = {
   PlayHere,
   HereLogo,
   DoneButton,
+  GreenDoneButton,
   StartButton,
   Hi,
   Search,
@@ -66,5 +69,6 @@ const SVG = {
   MenuIconGreen,
   BoxIconGreen,
   TimeTips,
+  SelectWidgetTitle,
 };
 export default SVG;

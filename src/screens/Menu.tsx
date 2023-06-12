@@ -64,7 +64,10 @@ const Menu = () => {
           onPress={navigateTo('IamNotStupid')}>
           <Text style={styles.listTxt}>I'm not stupid</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.listItem}>
+        {/* TODO: NAVIGATE TO SETTINGS, NOT TO SELECT WIDGET */}
+        <TouchableOpacity
+          style={styles.listItem}
+          onPress={navigateTo('Widgets')}>
           <Text style={styles.listTxt}>Settings</Text>
         </TouchableOpacity>
       </View>

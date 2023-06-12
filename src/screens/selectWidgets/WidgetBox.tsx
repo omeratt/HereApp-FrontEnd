@@ -1,5 +1,15 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React from 'react';
+import {
+  FlatList,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Animated as rnAnimated,
+} from 'react-native';
+import React, {useCallback, useState} from 'react';
 import Animated, {
   SequencedTransition,
   ZoomIn,
@@ -12,13 +22,22 @@ import Animated, {
 import constants from '../../assets/constants';
 import CheckBox from '../../components/CheckBox';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import {
+  ExpandingDot,
+  LiquidLike,
+  SlidingDot,
+} from 'react-native-animated-pagination-dots';
+import {FlashList} from '@shopify/flash-list';
+import SVG from '../../assets/svg';
 const {Fonts, HEIGHT, WIDTH, rf, colors} = constants;
 const containerHeight = HEIGHT * (182.88 / 896);
 const containerWidth = WIDTH * (159.91 / 414);
 
 const topHeight = containerHeight * (109.88 / 182.88);
-const BottomHeight = containerHeight - topHeight;
+// const topWidth = containerWidth * (160 / 414);
 
+const BottomHeight = containerHeight - topHeight;
+const PAGINATION_SIZE = 8;
 interface WidgetBoxProps {
   //Top container
   topTitle?: string;
@@ -38,8 +57,7 @@ interface WidgetBoxProps {
   selectedItems: string[];
 }
 
-const AnimatedTouchableOpacity =
-  Animated.createAnimatedComponent(TouchableOpacity);
+const AnimatedTouchableOpacity = Animated.createAnimatedComponent(View);
 const WidgetBox: React.FC<WidgetBoxProps> = ({
   txt,
   index,
@@ -52,8 +70,23 @@ const WidgetBox: React.FC<WidgetBoxProps> = ({
   isCheckbox,
   isArrow,
 }) => {
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
   const progress = useSharedValue(0);
+  const scrollX = React.useRef(new rnAnimated.Value(0)).current;
   const isIndexEven = index !== undefined && index % 2 === 0;
+  const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const {nativeEvent} = e;
+    const {x} = nativeEvent.contentOffset;
+    const width = WIDTH * 0.34444443384806317;
+    const index = x / (WIDTH * 0.34444443384806317);
+    scrollX.setValue(x * 2.78);
+
+    setCurrentIndex(Math.round(index));
+  };
+  const keyExtractor = useCallback(
+    (item: any, index: number) => index.toString(),
+    [],
+  );
   const animatedStyle = useAnimatedStyle(() => {
     return {
       borderColor: interpolateColor(
@@ -74,14 +107,15 @@ const WidgetBox: React.FC<WidgetBoxProps> = ({
         styles.container,
         {...(isIndexEven && {marginRight: '3%'})},
       ]}
-      onPress={() => {
-        SetSelectedItems(txt);
-        progress.value = withTiming(1 - progress.value, {duration: 450});
-      }}>
+      // onPress={() => {
+      //   SetSelectedItems(txt);
+      //   progress.value = withTiming(1 - progress.value, {duration: 450});
+      // }}
+    >
       {/* Top container */}
       <View style={styles.topContainer}>
         {/* title */}
-        {true && (
+        {/* {topTitle && (
           <View style={styles.topTitleContainer}>
             <Text
               numberOfLines={1}
@@ -99,10 +133,102 @@ const WidgetBox: React.FC<WidgetBoxProps> = ({
               />
             )}
           </View>
-        )}
+        )} */}
+        {/* <View style={{backgroundColor: 'red', flex: 1}}> */}
+        <FlatList
+          data={[1, 2]}
+          renderItem={props => {
+            return (
+              <View
+                style={{
+                  // backgroundColor: 'red',
+                  height: HEIGHT * 0.09238579067481956,
+                  width: WIDTH * 0.34444443384806317,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <SVG.PizzaWidget
+                  height={HEIGHT * 0.09238579067481956}
+                  width={WIDTH * 0.34444443384806317}
+                />
+              </View>
+            );
+          }}
+          onLayout={e => {
+            console.log(e.nativeEvent.layout.height / HEIGHT);
+          }}
+          keyExtractor={keyExtractor}
+          onScroll={handleScroll}
+          horizontal
+          initialScrollIndex={0}
+          pagingEnabled
+          extraData={{currentIndex}}
+          getItemLayout={(item, index) => ({
+            index,
+            length: WIDTH * 0.34444443384806317,
+            offset: WIDTH * 0.34444443384806317 * index,
+          })}
+          // get
+        />
+        <SlidingDot
+          scrollX={scrollX}
+          data={[1, 2]}
+          containerStyle={{
+            bottom: PAGINATION_SIZE,
+            position: 'absolute',
+            // justifyContent: 'space-between',
+            // alignItems: 'center',
+          }}
+          slidingIndicatorStyle={{
+            // flex: 1,
+            // justifyContent: 'center',
+            // alignItems: 'center',
+            backgroundColor: colors.GREEN,
+          }}
+          dotStyle={{
+            borderWidth: 1,
+            backgroundColor: 'transparent',
+            borderColor: colors.OFF_WHITE,
+            // justifyContent: 'space-between',
+            // alignItems: 'center',
+            marginRight: PAGINATION_SIZE * 0.5,
+            marginLeft: PAGINATION_SIZE * 0.5,
+          }}
+          // marginHorizontal={12}
+          marginHorizontal={PAGINATION_SIZE * 0.5}
+          // inActiveDotOpacity={1}
+          // expandingDotWidth={PAGINATION_SIZE * 1.5}
+        />
+        {/* <ExpandingDot
+          data={[1, 2]}
+          activeDotColor={colors.GREEN}
+          scrollX={scrollX}
+          containerStyle={{
+            bottom: PAGINATION_SIZE,
+            position: 'absolute',
+            // backgroundColor: 'grey',
+            marginRight: 0,
+            marginLeft: 0,
+            marginHorizontal: 0,
+          }}
+          // inActiveDotColor={'transparent'}
+          dotStyle={{
+            width: PAGINATION_SIZE,
+            height: PAGINATION_SIZE,
+            borderRadius: PAGINATION_SIZE / 2,
+            borderColor: constants.colors.OFF_WHITE,
+            borderWidth: 1,
+            marginRight: 0,
+            marginLeft: 0,
+            marginHorizontal: 0,
+          }}
+          inActiveDotOpacity={1}
+          expandingDotWidth={PAGINATION_SIZE}
+        /> */}
+        {/* </View> */}
         {/* topFooter */}
         <View style={styles.topFooterContainer}>
-          <Text style={styles.topFooterText}>{topDate || 'Mar 24, 2021'}</Text>
+          <Text style={styles.topFooterText}>{topDate || ''}</Text>
           {isArrow && (
             <AntDesign name="right" color={colors.OFF_WHITE} size={12} />
           )}

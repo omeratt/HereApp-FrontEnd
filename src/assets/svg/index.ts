@@ -34,6 +34,8 @@ import StupidSubTitle from './StupidSubTitle.svg';
 import TimeTips from './TimeTips.svg';
 import SelectWidgetTitle from './SelectWidgetTitle.svg';
 import PizzaWidget from './PizzaWidget.svg';
+import ToggleWidget from './ToggleWidget.svg';
+import ImNotStupidGreen from './I_AM_NOT_Stupid_Green.svg';
 
 const SVG = {
   IAmNotStupid,
@@ -72,5 +74,7 @@ const SVG = {
   TimeTips,
   SelectWidgetTitle,
   PizzaWidget,
+  ToggleWidget,
+  ImNotStupidGreen,
 };
 export default SVG;

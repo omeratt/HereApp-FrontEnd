@@ -29,6 +29,8 @@ import {
 } from 'react-native-animated-pagination-dots';
 import {FlashList} from '@shopify/flash-list';
 import SVG from '../../assets/svg';
+import {SvgProps} from 'react-native-svg';
+import {ISvgElement} from './types';
 const {Fonts, HEIGHT, WIDTH, rf, colors} = constants;
 const containerHeight = HEIGHT * (182.88 / 896);
 const containerWidth = WIDTH * (159.91 / 414);
@@ -38,15 +40,17 @@ const topHeight = containerHeight * (109.88 / 182.88);
 
 const BottomHeight = containerHeight - topHeight;
 const PAGINATION_SIZE = 8;
-interface WidgetBoxProps {
+const flatListWidth = WIDTH * 0.34444443384806317;
+const flatListHeight = HEIGHT * 0.09238579067481956;
+
+export interface WidgetBoxProps {
   //Top container
   topTitle?: string;
   topDate?: string;
-  topSvg?: SVGElement;
   isArrow?: boolean;
   isCheckbox?: boolean;
-  isOnBoarding?: boolean;
-  onBoardingSvg?: SVGElement[];
+  isFlatList?: boolean;
+  onBoardingSvg?: React.FC<SvgProps>[];
   //bottom container
   bottomTitle?: string;
   bottomContent?: string;
@@ -55,9 +59,11 @@ interface WidgetBoxProps {
   index: number;
   SetSelectedItems: (item: string) => void;
   selectedItems: string[];
+  svgElements?: ISvgElement[];
 }
 
-const AnimatedTouchableOpacity = Animated.createAnimatedComponent(View);
+const AnimatedTouchableOpacity =
+  Animated.createAnimatedComponent(TouchableOpacity);
 const WidgetBox: React.FC<WidgetBoxProps> = ({
   txt,
   index,
@@ -69,20 +75,15 @@ const WidgetBox: React.FC<WidgetBoxProps> = ({
   topDate,
   isCheckbox,
   isArrow,
+  isFlatList,
+  onBoardingSvg,
+  svgElements,
 }) => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const progress = useSharedValue(0);
+  const borderWidthValue = useSharedValue(0);
   const scrollX = React.useRef(new rnAnimated.Value(0)).current;
   const isIndexEven = index !== undefined && index % 2 === 0;
-  const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const {nativeEvent} = e;
-    const {x} = nativeEvent.contentOffset;
-    const width = WIDTH * 0.34444443384806317;
-    const index = x / (WIDTH * 0.34444443384806317);
-    scrollX.setValue(x * 2.78);
-
-    setCurrentIndex(Math.round(index));
-  };
   const keyExtractor = useCallback(
     (item: any, index: number) => index.toString(),
     [],
@@ -93,11 +94,34 @@ const WidgetBox: React.FC<WidgetBoxProps> = ({
         progress.value,
         [0, 1],
         [colors.UNDER_LINE, colors.GREEN],
-        undefined,
+        // undefined,
       ),
-      borderWidth: interpolate(progress.value, [0, 1], [1, 3], undefined),
+      borderWidth: interpolate(
+        borderWidthValue.value,
+        [0, 1],
+        [1, 3],
+        // undefined,
+      ),
     };
   });
+  const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const {nativeEvent} = e;
+    const {x} = nativeEvent.contentOffset;
+    const index = x / flatListWidth;
+    scrollX.setValue(x * 2.78);
+
+    setCurrentIndex(Math.round(index));
+  };
+  const handlePress = useCallback(() => {
+    SetSelectedItems(txt);
+    progress.value = withTiming(progress.value ? 0 : 1, {
+      duration: 450,
+    });
+    borderWidthValue.value = withTiming(borderWidthValue.value ? 0 : 1, {
+      duration: 450,
+    });
+  }, [progress.value, borderWidthValue.value, SetSelectedItems]);
+
   return (
     <AnimatedTouchableOpacity
       layout={SequencedTransition}
@@ -107,15 +131,10 @@ const WidgetBox: React.FC<WidgetBoxProps> = ({
         styles.container,
         {...(isIndexEven && {marginRight: '3%'})},
       ]}
-      // onPress={() => {
-      //   SetSelectedItems(txt);
-      //   progress.value = withTiming(1 - progress.value, {duration: 450});
-      // }}
-    >
+      onPress={handlePress}>
       {/* Top container */}
       <View style={styles.topContainer}>
-        {/* title */}
-        {/* {topTitle && (
+        {topTitle && (
           <View style={styles.topTitleContainer}>
             <Text
               numberOfLines={1}
@@ -123,7 +142,7 @@ const WidgetBox: React.FC<WidgetBoxProps> = ({
               style={styles.txt}>
               {topTitle || 'Next task'}
             </Text>
-            {true && (
+            {isCheckbox && (
               <CheckBox
                 size={16}
                 isFilled={true}
@@ -133,101 +152,62 @@ const WidgetBox: React.FC<WidgetBoxProps> = ({
               />
             )}
           </View>
-        )} */}
-        {/* <View style={{backgroundColor: 'red', flex: 1}}> */}
-        <FlatList
-          data={[1, 2]}
-          renderItem={props => {
-            return (
-              <View
-                style={{
-                  // backgroundColor: 'red',
-                  height: HEIGHT * 0.09238579067481956,
-                  width: WIDTH * 0.34444443384806317,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <SVG.PizzaWidget
-                  height={HEIGHT * 0.09238579067481956}
-                  width={WIDTH * 0.34444443384806317}
-                />
-              </View>
-            );
-          }}
-          onLayout={e => {
-            console.log(e.nativeEvent.layout.height / HEIGHT);
-          }}
-          keyExtractor={keyExtractor}
-          onScroll={handleScroll}
-          horizontal
-          initialScrollIndex={0}
-          pagingEnabled
-          extraData={{currentIndex}}
-          getItemLayout={(item, index) => ({
-            index,
-            length: WIDTH * 0.34444443384806317,
-            offset: WIDTH * 0.34444443384806317 * index,
-          })}
-          // get
-        />
-        <SlidingDot
-          scrollX={scrollX}
-          data={[1, 2]}
-          containerStyle={{
-            bottom: PAGINATION_SIZE,
-            position: 'absolute',
-            // justifyContent: 'space-between',
-            // alignItems: 'center',
-          }}
-          slidingIndicatorStyle={{
-            // flex: 1,
-            // justifyContent: 'center',
-            // alignItems: 'center',
-            backgroundColor: colors.GREEN,
-          }}
-          dotStyle={{
-            borderWidth: 1,
-            backgroundColor: 'transparent',
-            borderColor: colors.OFF_WHITE,
-            // justifyContent: 'space-between',
-            // alignItems: 'center',
-            marginRight: PAGINATION_SIZE * 0.5,
-            marginLeft: PAGINATION_SIZE * 0.5,
-          }}
-          // marginHorizontal={12}
-          marginHorizontal={PAGINATION_SIZE * 0.5}
-          // inActiveDotOpacity={1}
-          // expandingDotWidth={PAGINATION_SIZE * 1.5}
-        />
-        {/* <ExpandingDot
-          data={[1, 2]}
-          activeDotColor={colors.GREEN}
-          scrollX={scrollX}
-          containerStyle={{
-            bottom: PAGINATION_SIZE,
-            position: 'absolute',
-            // backgroundColor: 'grey',
-            marginRight: 0,
-            marginLeft: 0,
-            marginHorizontal: 0,
-          }}
-          // inActiveDotColor={'transparent'}
-          dotStyle={{
-            width: PAGINATION_SIZE,
-            height: PAGINATION_SIZE,
-            borderRadius: PAGINATION_SIZE / 2,
-            borderColor: constants.colors.OFF_WHITE,
-            borderWidth: 1,
-            marginRight: 0,
-            marginLeft: 0,
-            marginHorizontal: 0,
-          }}
-          inActiveDotOpacity={1}
-          expandingDotWidth={PAGINATION_SIZE}
-        /> */}
-        {/* </View> */}
+        )}
+        {svgElements && (
+          <>
+            <FlatList
+              data={svgElements}
+              renderItem={props => {
+                const aspectRatio = 65 / 68;
+                return (
+                  <Pressable
+                    style={[styles.renderItemContainer, props.item.style]}
+                    onPress={handlePress}
+                    onStartShouldSetResponder={e => true}>
+                    <props.item.Svg
+                      height={props.item.height}
+                      width={props.item.height * aspectRatio}
+                    />
+                  </Pressable>
+                );
+              }}
+              // onLayout={e => {
+              //   console.log(e.nativeEvent.layout.height / HEIGHT);
+              // }}
+              keyExtractor={keyExtractor}
+              onScroll={handleScroll}
+              horizontal
+              initialScrollIndex={0}
+              pagingEnabled
+              extraData={{currentIndex}}
+              getItemLayout={(item, index) => ({
+                index,
+                length: flatListWidth,
+                offset: flatListWidth * index,
+              })}
+            />
+            {svgElements.length > 1 && (
+              <SlidingDot
+                scrollX={scrollX}
+                data={[1, 2]}
+                containerStyle={styles.dotContainer}
+                slidingIndicatorStyle={{
+                  backgroundColor: colors.GREEN,
+                }}
+                dotStyle={styles.dotStyle}
+                dotSize={PAGINATION_SIZE}
+                marginHorizontal={PAGINATION_SIZE * 0.3}
+              />
+            )}
+          </>
+        )}
+
         {/* topFooter */}
-        <View style={styles.topFooterContainer}>
+        <View
+          style={[
+            styles.topFooterContainer,
+            isArrow && svgElements && {flex: undefined, height: 12},
+          ]}>
           <Text style={styles.topFooterText}>{topDate || ''}</Text>
           {isArrow && (
             <AntDesign name="right" color={colors.OFF_WHITE} size={12} />
@@ -235,15 +215,14 @@ const WidgetBox: React.FC<WidgetBoxProps> = ({
         </View>
       </View>
       {/* Bottom container */}
-      <Animated.View
-        style={[
-          styles.bottomContainer,
-          //   animatedStyle,
-          //   {borderColor: colors.GREEN, borderWidth: 1},
-        ]}>
-        <Text style={styles.bottomTitle}>{bottomTitle || 'Tasks'}</Text>
+      <Animated.View style={styles.bottomContainer}>
+        <Text style={styles.bottomTitle}>
+          {svgElements ? svgElements?.[currentIndex].title : bottomTitle || ''}
+        </Text>
         <Text style={styles.bottomContent}>
-          {bottomContent || 'Follow your next task'}
+          {svgElements
+            ? svgElements?.[currentIndex].content
+            : bottomContent || ''}
         </Text>
       </Animated.View>
     </AnimatedTouchableOpacity>
@@ -290,6 +269,13 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.text,
     fontSize: rf(8),
   },
+  renderItemContainer: {
+    height: HEIGHT * 0.09238579067481956,
+    width: flatListWidth,
+    justifyContent: 'center',
+    alignItems: 'center',
+    // backgroundColor: 'grey',
+  },
   txt: {
     flex: 1,
     fontFamily: constants.Fonts.text,
@@ -329,5 +315,16 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     lineHeight: rf(12.5),
     // textAlignVertical: 'center',
+  },
+  dotContainer: {
+    bottom: PAGINATION_SIZE / 2,
+    position: 'absolute',
+  },
+  dotStyle: {
+    borderWidth: 1,
+    backgroundColor: 'transparent',
+    borderColor: colors.OFF_WHITE,
+    marginRight: PAGINATION_SIZE * 0.3,
+    marginLeft: PAGINATION_SIZE * 0.3,
   },
 });

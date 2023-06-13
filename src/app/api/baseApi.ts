@@ -102,6 +102,7 @@ export const apiSlice = createApi({
     'PrioritizedLists',
     'Messages',
     'Search',
+    'Widgets',
   ],
   endpoints: builder => ({}),
 });

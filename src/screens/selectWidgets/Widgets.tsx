@@ -1,4 +1,11 @@
-import {FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ActivityIndicator,
+} from 'react-native';
 import React, {useCallback, useEffect, useState} from 'react';
 import constants from '../../assets/constants';
 import Animated, {
@@ -19,6 +26,7 @@ import WidgetBox from './WidgetBox';
 import SelectWidgetsTitle from './SelectWidgetsTitle';
 import {SvgProps} from 'react-native-svg';
 import {ISvgElement} from './types';
+import {useUpdateWidgetsMutation} from '../../app/api/userApi';
 const {Fonts, HEIGHT, WIDTH, rf, colors} = constants;
 const paddingBottom = HEIGHT * (44 / 896);
 const paddingTop = HEIGHT * (73 / 896);
@@ -68,7 +76,7 @@ const flatListData: IFlatListProps[] = [
     svgElements,
   },
   {
-    id: 'Not stupid',
+    id: 'Im not stupid',
     svgElements: [
       {
         // 65 83
@@ -109,6 +117,7 @@ export default function Widgets() {
   const list = constants.OnBoardingList;
   const nav = useNavigation();
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [updateWidgets, {isLoading}] = useUpdateWidgetsMutation();
   const SetSelectedItems = useCallback((item: string) => {
     setSelectedItems(prev => {
       if (prev.includes(item)) return prev.filter(e => e !== item);
@@ -123,7 +132,11 @@ export default function Widgets() {
   const goHome = useCallback(() => {
     nav.navigate('HomePage' as never);
   }, [nav]);
-
+  const handleSubmit = async () => {
+    //TODO: server fetching
+    await updateWidgets(selectedItems);
+    goHome();
+  };
   return (
     <View style={styles.container}>
       <SelectWidgetsTitle />
@@ -162,8 +175,12 @@ export default function Widgets() {
           showsVerticalScrollIndicator={false}
         />
       </View>
-      <TouchableOpacity onPress={goHome} style={styles.doneContainer}>
-        <SVG.GreenDoneButton fill={colors.OFF_WHITE} />
+      <TouchableOpacity onPress={handleSubmit} style={styles.doneContainer}>
+        {isLoading ? (
+          <ActivityIndicator color={colors.GREEN} size={'small'} />
+        ) : (
+          <SVG.GreenDoneButton fill={colors.OFF_WHITE} />
+        )}
       </TouchableOpacity>
     </View>
   );

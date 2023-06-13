@@ -9,13 +9,14 @@ import {
   View,
   Animated as rnAnimated,
 } from 'react-native';
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import Animated, {
   SequencedTransition,
   ZoomIn,
   interpolate,
   interpolateColor,
   useAnimatedStyle,
+  useDerivedValue,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
@@ -88,6 +89,28 @@ const WidgetBox: React.FC<WidgetBoxProps> = ({
     (item: any, index: number) => index.toString(),
     [],
   );
+
+  // const derivedBorderColor = useDerivedValue(() => {
+  //   const selectedId = svgElements ? svgElements[currentIndex].title : txt;
+  //   progress.value = withTiming(selectedItems.includes(selectedId) ? 0 : 1, {
+  //     duration: 450,
+  //   });
+  //   return progress;
+  // }, [selectedItems, currentIndex]);
+
+  useEffect(() => {
+    console.log({selectedItems});
+    const selectedId = svgElements ? svgElements[currentIndex].title : txt;
+    const isIncludeItem = selectedItems.includes(selectedId);
+
+    progress.value = withTiming(isIncludeItem ? 1 : 0, {
+      duration: 200,
+    });
+    borderWidthValue.value = withTiming(isIncludeItem ? 1 : 0, {
+      duration: 200,
+    });
+  }, [selectedItems, currentIndex]);
+
   const animatedStyle = useAnimatedStyle(() => {
     return {
       borderColor: interpolateColor(
@@ -96,31 +119,30 @@ const WidgetBox: React.FC<WidgetBoxProps> = ({
         [colors.UNDER_LINE, colors.GREEN],
         // undefined,
       ),
-      borderWidth: interpolate(
-        borderWidthValue.value,
-        [0, 1],
-        [1, 3],
-        // undefined,
-      ),
+      borderWidth: interpolate(borderWidthValue.value, [0, 1], [1, 3]),
     };
   });
+
   const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const {nativeEvent} = e;
     const {x} = nativeEvent.contentOffset;
     const index = x / flatListWidth;
     scrollX.setValue(x * 2.78);
-
     setCurrentIndex(Math.round(index));
   };
   const handlePress = useCallback(() => {
-    SetSelectedItems(txt);
-    progress.value = withTiming(progress.value ? 0 : 1, {
-      duration: 450,
-    });
-    borderWidthValue.value = withTiming(borderWidthValue.value ? 0 : 1, {
-      duration: 450,
-    });
-  }, [progress.value, borderWidthValue.value, SetSelectedItems]);
+    const selectedId = svgElements ? svgElements[currentIndex].title : txt;
+    console.log(selectedItems.includes(selectedId), selectedItems);
+    SetSelectedItems(selectedId);
+  }, [
+    progress.value,
+    borderWidthValue.value,
+    SetSelectedItems,
+    txt,
+    svgElements,
+    currentIndex,
+    selectedItems,
+  ]);
 
   return (
     <AnimatedTouchableOpacity

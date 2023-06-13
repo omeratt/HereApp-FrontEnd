@@ -6,6 +6,7 @@ import {apiSlice} from './baseApi';
 import {listsApi} from './listApi';
 import auth from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import {WidgetsType} from '../../screens/selectWidgets/types';
 export const userApi = apiSlice.injectEndpoints({
   endpoints: builder => ({
     home: builder.query({
@@ -82,6 +83,29 @@ export const userApi = apiSlice.injectEndpoints({
         return response.data;
       },
     }),
+    getWidgets: builder.query({
+      query: () => ({
+        url: 'user/widgets',
+        credentials: 'include',
+        method: 'GET',
+      }),
+      transformResponse: async (response: any, meta, arg) => {
+        return response.data as WidgetsType[];
+      },
+      providesTags: ['Widgets'],
+    }),
+    updateWidgets: builder.mutation({
+      query: widgets => ({
+        url: 'user/widgets',
+        body: {widgets},
+        credentials: 'include',
+        method: 'put',
+      }),
+      transformResponse: async (response: any, meta, arg) => {
+        return response.data;
+      },
+      invalidatesTags: ['Widgets'],
+    }),
     myProfile: builder.query({
       query: () => ({
         url: 'user/myProfile',
@@ -128,7 +152,9 @@ export const {
   useLoginMutation,
   useLoginWithGoogleMutation,
   useMyProfileQuery,
+  useGetWidgetsQuery,
   useLogoutMutation,
   useSetFcmTokenMutation,
+  useUpdateWidgetsMutation,
   useRefreshFcmTokenMutation,
 } = userApi;

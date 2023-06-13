@@ -49,6 +49,7 @@ const BoardingBoxWrapper: React.FC<BoardingBoxWrapperProps> = ({
             height={height}
             {...nextTaskProps}
             {...LastMessageProps}
+            size={width}
           />
         </View>
       )}

@@ -9,3 +9,10 @@ export interface ISvgElement {
   title: string;
   style?: ViewStyle;
 }
+
+export type WidgetsType =
+  | 'PlayGround | pizza'
+  | 'PlayGround | toggle'
+  | 'Im not stupid'
+  | 'Next task'
+  | 'Last message';

@@ -49,6 +49,7 @@ import LastMessage from '../components/boardingBox/LastMessage';
 import ToggleButton from '../components/playGround/ToggleButton';
 import ToggleBtn from '../components/boardingBox/ToggleBtn';
 import TimeManage from '../components/boardingBox/TimeManage';
+import {useGetWidgetsQuery} from '../app/api/userApi';
 
 const CURRENT_DATE = new Date();
 // const CURRENT_DATE = getRealDate(new Date(), true);
@@ -114,6 +115,12 @@ const Home = () => {
     error: prioritizedListsFetchError,
     isLoading: prioritizedListsLoading,
   } = useGetPrioritizedListsQuery(null);
+  const {
+    data: widgetsData,
+    error: WidgetsFetchError,
+    isLoading: isWidgetsLoading,
+    isFetching: isWidgetFetching,
+  } = useGetWidgetsQuery(null);
   useEffect(() => {
     if (lists) dispatch(setCategoriesList(lists));
   }, [lists]);
@@ -175,10 +182,10 @@ const Home = () => {
   }, []);
   const handleListPlusIcon = useCallback(() => {
     navigation.navigate(
-      'ListAndNotesStack' as never,
+      ('ListAndNotesStack' as never,
       {
         screen: 'ListAndNotes' as never,
-      } as never,
+      } as never) as never,
     );
   }, [navigation]);
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -224,7 +231,6 @@ const Home = () => {
     },
     [openTaskModal, setEditTaskDetails],
   );
-
   //  -------------------------------------------------------- flat list callbacks --------------------------------------------------------
   const snapToOffsets = useMemo(() => {
     return Array.from({length: initialNumToRender}, (_, index) => {
@@ -389,23 +395,35 @@ const Home = () => {
         </View>
       </View>
       <View style={styles.middleView}>
-        {/* <BoardingBoxWrapper Component={PizzaBox} basicStyle={false} /> */}
-        <BoardingBoxWrapper Component={NotStupid} basicStyle={false} />
-        {/* <BoardingBoxWrapper Component={TimeManage} basicStyle={false} /> */}
-        {/* <BoardingBoxWrapper Component={ToggleBtn} basicStyle={false} /> */}
-        {/* <BoardingBoxWrapper
-          Component={LastMessage}
-          basicStyle={false}
-          LastMessageProps={{
-            message: messages?.[0] as any,
-            isLoading: isMsgFetching || isMessageLoading,
-          }}
-        /> */}
-        {/* <BoardingBoxWrapper
-          Component={NextTask}
-          nextTaskProps={{navToTask: navToTaskFromNextTask, updateTask}}
-          basicStyle={false}
-        /> */}
+        {(isWidgetsLoading || isWidgetFetching) && (
+          <BoardingBoxWrapper Component={ActivityIndicator} />
+        )}
+        {widgetsData?.includes('PlayGround | pizza') && (
+          <BoardingBoxWrapper Component={PizzaBox} basicStyle={false} />
+        )}
+        {widgetsData?.includes('Im not stupid') && (
+          <BoardingBoxWrapper Component={NotStupid} basicStyle={false} />
+        )}
+        {widgetsData?.includes('PlayGround | toggle') && (
+          <BoardingBoxWrapper Component={ToggleBtn} basicStyle={false} />
+        )}
+        {widgetsData?.includes('Last message') && (
+          <BoardingBoxWrapper
+            Component={LastMessage}
+            basicStyle={false}
+            LastMessageProps={{
+              message: messages?.[0] as any,
+              isLoading: isMsgFetching || isMessageLoading,
+            }}
+          />
+        )}
+        {widgetsData?.includes('Next task') && (
+          <BoardingBoxWrapper
+            Component={NextTask}
+            nextTaskProps={{navToTask: navToTaskFromNextTask, updateTask}}
+            basicStyle={false}
+          />
+        )}
       </View>
       <View style={styles.bottomView}>
         <Pressable

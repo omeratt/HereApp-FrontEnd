@@ -1,9 +1,9 @@
 <svg width="47" stroke="none" color="none" height="47" viewBox="0 0 47 47" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M32 14L15 14" stroke="none" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M32 21L15 21" stroke="none" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M32 28L15 28" stroke="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M32 14L15 14" stroke="#F2F1ED" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M32 21L15 21" stroke="#F2F1ED" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M32 28L15 28" stroke="#F2F1ED" stroke-linecap="round" stroke-linejoin="round"/>
 <g filter="url(#filter0_d_254_4)">
-<path d="M3.5 20C3.5 9.23045 12.2304 0.5 23 0.5H24C34.7696 0.5 43.5 9.23045 43.5 20V21C43.5 31.7696 34.7696 40.5 24 40.5H23C12.2304 40.5 3.5 31.7696 3.5 21V20Z" stroke="none" shape-rendering="crispEdges"/>
+<path d="M3.5 20C3.5 9.23045 12.2304 0.5 23 0.5H24C34.7696 0.5 43.5 9.23045 43.5 20V21C43.5 31.7696 34.7696 40.5 24 40.5H23C12.2304 40.5 3.5 31.7696 3.5 21V20Z" stroke="#E5FF00" shape-rendering="crispEdges"/>
 </g>
 <defs>
 <filter id="filter0_d_254_4" x="0" y="0" width="47" height="47" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">

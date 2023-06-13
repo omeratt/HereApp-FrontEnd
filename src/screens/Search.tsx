@@ -135,7 +135,8 @@ const Search = () => {
           </Animated.ScrollView>
         </View>
         <SVG.XBtn
-          onPress={() => navigate.navigate('HomePage' as never)}
+          onPress={navigate.goBack}
+          // onPress={() => navigate.navigate('HomePage' as never)}
           height={xBtnSize}
           style={{
             alignSelf: 'center',

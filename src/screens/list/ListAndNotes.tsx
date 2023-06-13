@@ -50,6 +50,8 @@ import {
   ListRenderItem,
   ListRenderItemInfo,
 } from '@shopify/flash-list';
+import {useAppDispatch} from '../../app/hooks';
+import {setFocus} from '../../app/Reducers/User/screensSlice';
 
 type RootStackParamList = {
   ListAndNotes: {
@@ -74,7 +76,7 @@ const NewCategory = () => {
   const bottomSheetRef = useRef<BottomSheetDeleteModalHandles>(null);
   const flashListRef = useRef<FlashList<CategoryListType> | null>(null);
   const [deleteCategories, {isLoading}] = useDeleteCategoriesMutation();
-
+  const dispatch = useAppDispatch();
   const DeleteCategories = React.useCallback(async () => {
     bottomSheetRef.current?.closeModal();
     toggleSelect();
@@ -86,6 +88,13 @@ const NewCategory = () => {
       duration: 500,
     });
   }, [selected]);
+
+  useEffect(() => {
+    const subscribe = navigation.addListener('focus', e => {
+      dispatch(setFocus({lists: true}));
+    });
+    return subscribe;
+  }, []);
 
   const handleSelected = React.useCallback((id: string) => {
     setSelected(prev => {
@@ -108,7 +117,7 @@ const NewCategory = () => {
   }, []);
 
   const navigateToList = useCallback((index: number) => {
-    navigation.navigate('MyLists' as never, {index} as never);
+    navigation.navigate(('MyLists' as never, {index} as never) as never);
   }, []);
 
   const listSize = useMemo(() => {
@@ -119,7 +128,8 @@ const NewCategory = () => {
     React.useCallback(() => {
       const onBackPress = () => {
         if (isSelect) setIsSelect(false);
-        else navigation.navigate('HomePage' as never);
+        // else navigation.navigate('HomePage' as never);
+        else navigation.goBack();
         return true;
       };
       const subscription = BackHandler.addEventListener(

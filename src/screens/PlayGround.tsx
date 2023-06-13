@@ -1,5 +1,5 @@
 import {SafeAreaView, StyleSheet, View} from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import constants from '../assets/constants';
 import SVG from '../assets/svg';
 import Pizza from '../components/playGround/Pizza';
@@ -14,6 +14,8 @@ import {
   useNavigation,
 } from '@react-navigation/native';
 import {BackHandler} from 'react-native';
+import {setFocus} from '../app/Reducers/User/screensSlice';
+import {useAppDispatch} from '../app/hooks';
 
 const topViewHeight = constants.HEIGHT * 0.15625;
 const middleViewHeight = constants.HEIGHT * 0.63996651785714285714285714285714;
@@ -27,13 +29,13 @@ const realHeight = constants.HEIGHT * 0.9485;
 const sliderHeight = (middleViewHeight - 2 * pizzaAndCubeViewHeight) * 0.4;
 const sliderWidth = pizzaAndCubeViewWidth * 0.6;
 const PlayGround = () => {
-  const nav = useNavigation();
+  const navigation = useNavigation();
   const openDrawer = React.useCallback(() => {
-    nav.navigate('Menu' as never);
+    navigation.navigate('Menu' as never);
   }, []);
-  const goHome = React.useCallback(() => {
-    nav.navigate('HomePage' as never);
-  }, []);
+  const goBack = React.useCallback(() => {
+    navigation.goBack();
+  }, [navigation]);
   const [threeRender, setThreeRender] = React.useState(false);
   // const [isActive, setIsActive] = React.useState(false);
   // React.useEffect(() => {
@@ -41,10 +43,17 @@ const PlayGround = () => {
   //     setIsActive(true);
   //   }, 400);
   // });
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    const subscribe = navigation.addListener('focus', e => {
+      dispatch(setFocus({playGround: true}));
+    });
+    return subscribe;
+  }, []);
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
-        goHome();
+        goBack();
         return true;
       };
       const subscription = BackHandler.addEventListener(
@@ -64,7 +73,7 @@ const PlayGround = () => {
           <View style={styles.topContainer}>
             <View style={styles.topTopContainer}>
               <SVG.XBtn
-                onPress={goHome}
+                onPress={goBack}
                 width={constants.WIDTH * 0.115}
                 height={constants.WIDTH * 0.115}
               />
@@ -84,9 +93,7 @@ const PlayGround = () => {
                 {!threeRender && <Pizza size={pizzaAndCubeSize} />}
               </View>
               <View style={styles.pizzaAndCubeContainer}>
-                {/* {isActive &&  */}
                 <Cube setThreeRender={setThreeRender} />
-                {/* } */}
               </View>
               <View style={styles.middleLeftBottomContainer}>
                 {!threeRender && (

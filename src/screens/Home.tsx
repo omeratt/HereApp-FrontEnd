@@ -50,6 +50,7 @@ import ToggleButton from '../components/playGround/ToggleButton';
 import ToggleBtn from '../components/boardingBox/ToggleBtn';
 import TimeManage from '../components/boardingBox/TimeManage';
 import {useGetWidgetsQuery} from '../app/api/userApi';
+import {setFocus} from '../app/Reducers/User/screensSlice';
 
 const CURRENT_DATE = new Date();
 // const CURRENT_DATE = getRealDate(new Date(), true);
@@ -98,6 +99,16 @@ const Home = () => {
   const [editTaskDetails, setEditTaskDetails] = useState<TaskType | undefined>(
     undefined,
   );
+
+  useEffect(() => {
+    const subscribe = navigation.addListener('focus', e => {
+      dispatch(setFocus({home: true}));
+    });
+    return () => {
+      subscribe();
+    };
+  }, []);
+
   const SetDateHeader = useCallback((header: any) => {
     setDateHeader(header);
   }, []);
@@ -121,6 +132,7 @@ const Home = () => {
     isLoading: isWidgetsLoading,
     isFetching: isWidgetFetching,
   } = useGetWidgetsQuery(null);
+
   useEffect(() => {
     if (lists) dispatch(setCategoriesList(lists));
   }, [lists]);
@@ -396,7 +408,7 @@ const Home = () => {
       </View>
       <View style={styles.middleView}>
         {(isWidgetsLoading || isWidgetFetching) && (
-          <BoardingBoxWrapper Component={ActivityIndicator} />
+          <ActivityIndicator color={constants.colors.UNDER_LINE} />
         )}
         {widgetsData?.includes('PlayGround | pizza') && (
           <BoardingBoxWrapper Component={PizzaBox} basicStyle={false} />

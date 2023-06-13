@@ -8,10 +8,12 @@ import {
   View,
   SafeAreaView,
 } from 'react-native';
-import React, {useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import constants from '../../assets/constants';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useFocusEffect, useNavigation} from '@react-navigation/core';
+import {CommonActions} from '@react-navigation/native';
+
 import {
   useAddOrEditMessageMutation,
   useDeleteMessagesMutation,
@@ -34,6 +36,8 @@ import BottomSheetDeleteModal, {
   BottomSheetDeleteModalHandles,
 } from '../../components/BottomSheetDeleteModal';
 import {RFValue, RFPercentage} from 'react-native-responsive-fontsize';
+import {setFocus} from '../../app/Reducers/User/screensSlice';
+import {useAppDispatch} from '../../app/hooks';
 const {WIDTH, HEIGHT} = constants;
 const paddingHorizontal = WIDTH * (30.37 / 414);
 const width = WIDTH - 2 * paddingHorizontal;
@@ -76,6 +80,15 @@ const Messages = () => {
       }
     });
   }, []);
+
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    const subscribe = navigation.addListener('focus', e => {
+      dispatch(setFocus({chat: true}));
+    });
+    return subscribe;
+  }, []);
+
   const handleDelete = React.useCallback(async () => {
     setIsSelectOn(false);
     bottomSheetRef.current?.closeModal();
@@ -100,19 +113,27 @@ const Messages = () => {
     setSelected([]);
   }, [isSelectOn]);
 
-  const navToEditMessage = React.useCallback((msg: IMessageValues) => {
-    navigation.navigate(
-      'Message' as never,
-      {messageRouteProp: msg, flashListRef} as never,
-    );
-  }, []);
+  const navToEditMessage = React.useCallback(
+    (msg: IMessageValues) => {
+      navigation.dispatch(
+        CommonActions.navigate({
+          name: 'Message',
+          params: {
+            messageRouteProp: msg,
+            flashListRef,
+          },
+        }),
+      );
+    },
+    [flashListRef],
+  );
 
   const isLastSelected = React.useMemo(() => {
     return lastMsg?._id && selected?.includes(lastMsg._id) ? true : false;
   }, [selected, lastMsg]);
 
   const goBack = React.useCallback(() => {
-    navigation.navigate('HomePage' as never);
+    navigation.goBack();
   }, []);
 
   const navToMessage = React.useCallback(() => {

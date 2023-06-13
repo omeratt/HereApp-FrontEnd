@@ -26,6 +26,7 @@ export interface TaskType {
   isSetTime?: boolean;
   note?: string;
 }
+
 // Define the initial state using that type
 const initialState: UserState = {
   _id: '',

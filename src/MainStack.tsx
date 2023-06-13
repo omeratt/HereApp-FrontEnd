@@ -104,7 +104,7 @@ export default function MainStack() {
             <Stack.Screen
               name="Menu"
               component={Menu}
-              options={screenOptions()}
+              options={screenOptions(false)}
             />
             <Stack.Screen
               name="Widgets"

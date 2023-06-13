@@ -11,6 +11,7 @@ import {
   REGISTER,
 } from 'redux-persist';
 import userSlice from './Reducers/User/userSlice';
+import screensSlice from './Reducers/User/screensSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {userApi} from './api/userApi';
 import {setupListeners} from '@reduxjs/toolkit/dist/query';
@@ -27,7 +28,7 @@ const persistConfig = {
 };
 
 const userReducer = persistReducer(persistConfig, userSlice);
-const rootReducer = combineReducers({user: userReducer});
+const rootReducer = combineReducers({user: userReducer, screens: screensSlice});
 export const store = configureStore({
   reducer: {
     [apiSlice.reducerPath]: apiSlice.reducer,

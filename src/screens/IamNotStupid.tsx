@@ -7,7 +7,7 @@ import {
   View,
   Animated as rnAnimated,
 } from 'react-native';
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import constants from '../assets/constants';
 import SVG from '../assets/svg';
 import {useNavigation} from '@react-navigation/core';
@@ -25,6 +25,8 @@ import Animated, {
 import {ExpandingDot} from 'react-native-animated-pagination-dots';
 import {FlashList, ListRenderItemInfo} from '@shopify/flash-list';
 import AnimatedTyping from '../components/TypeWriter';
+import {useAppDispatch} from '../app/hooks';
+import {setFocus} from '../app/Reducers/User/screensSlice';
 const {colors, rf, Fonts} = constants;
 const ICON_SIZE = constants.HEIGHT * (29.25 / 896);
 const paddingHorizontal = constants.WIDTH * (20.37 / 414);
@@ -46,11 +48,21 @@ const IamNotStupid = () => {
   const scrollX = React.useRef(new rnAnimated.Value(0)).current;
 
   const goBack = React.useCallback(() => {
-    return navigation.navigate('HomePage' as never);
+    // return navigation.navigate('HomePage' as never);
+    return navigation.goBack();
   }, []);
   const navToMenu = React.useCallback(() => {
     return navigation.navigate('Menu' as never);
   }, []);
+
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    const subscribe = navigation.addListener('focus', e => {
+      dispatch(setFocus({stupid: true}));
+    });
+    return subscribe;
+  }, []);
+
   const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const {nativeEvent} = e;
     const {x} = nativeEvent.contentOffset;

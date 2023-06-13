@@ -37,6 +37,7 @@ import json from '../../../AllDates.json';
 import BottomSheetDeleteModal, {
   BottomSheetDeleteModalHandles,
 } from '../../components/BottomSheetDeleteModal';
+import {setFocus} from '../../app/Reducers/User/screensSlice';
 const CURRENT_DATE = new Date();
 const allDates = json;
 const flatListData = Object.values(allDates);
@@ -190,6 +191,12 @@ const Home = () => {
     [snapToOffsets],
   );
   //  -------------------------------------------------------- flat list callbacks --------------------------------------------------------
+  useEffect(() => {
+    const subscribe = navigation.addListener('focus', e => {
+      dispatch(setFocus({tasks: true}));
+    });
+    return subscribe;
+  }, []);
 
   const toggleCalendar = useCallback(() => {
     setCalendarVisible(!calendarVisible);

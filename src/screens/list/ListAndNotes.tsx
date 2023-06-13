@@ -23,6 +23,7 @@ import constants, {CategoryListType} from '../../assets/constants';
 import MyListsWrapper, {PADDING_HORIZONTAL} from './MyListsWrapper';
 import BallonTxt, {gap} from '../../components/BallonTxt';
 import {
+  CommonActions,
   RouteProp,
   useFocusEffect,
   useNavigation,
@@ -116,9 +117,19 @@ const NewCategory = () => {
     navigation.navigate('NewListCategory' as never);
   }, []);
 
-  const navigateToList = useCallback((index: number) => {
-    navigation.navigate(('MyLists' as never, {index} as never) as never);
-  }, []);
+  const navigateToList = useCallback(
+    (index: number) => {
+      navigation.dispatch(
+        CommonActions.navigate({
+          name: 'MyLists',
+          params: {
+            index,
+          },
+        }),
+      );
+    },
+    [navigation],
+  );
 
   const listSize = useMemo(() => {
     return lists?.length;

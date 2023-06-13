@@ -17,6 +17,7 @@ import {
   useGetListsQuery,
 } from '../../app/api/listApi';
 import {
+  CommonActions,
   RouteProp,
   useFocusEffect,
   useNavigation,
@@ -60,8 +61,15 @@ const MyLists = () => {
   const bottomSheetRef = useRef<BottomSheetDeleteModalHandles>(null);
   const navigateToList = useCallback(() => {
     const id = lists![index]._id;
-    navigation.navigate('NewListTitle' as never, {id} as never);
-  }, [index]);
+    navigation.dispatch(
+      CommonActions.navigate({
+        name: 'NewListTitle',
+        params: {
+          id,
+        },
+      }),
+    );
+  }, [index, navigation]);
 
   const openDeleteModal = React.useCallback(() => {
     bottomSheetRef.current?.openModal();
@@ -98,12 +106,17 @@ const MyLists = () => {
   );
   const navigateToEditList = useCallback(
     (listIndex: number) => {
-      navigation.navigate(
-        'CreateOrEditList' as never,
-        {categoryIndex: index, listIndex} as never,
+      navigation.dispatch(
+        CommonActions.navigate({
+          name: 'CreateOrEditList',
+          params: {
+            categoryIndex: index,
+            listIndex,
+          },
+        }),
       );
     },
-    [index],
+    [index, navigation],
   );
   const checkBoxSize = constants.HEIGHT * (24.95 / 896);
   const {

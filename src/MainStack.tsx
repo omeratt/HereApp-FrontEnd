@@ -45,11 +45,11 @@ export default function MainStack() {
         screenOptions={screenOptions()}>
         {isSignIn ? (
           <>
-            {/* <Stack.Screen
+            <Stack.Screen
               name="Welcome"
               component={Welcome}
               options={screenOptions()}
-            /> */}
+            />
             <Stack.Screen
               name="OnBoarding"
               component={OnBoarding}

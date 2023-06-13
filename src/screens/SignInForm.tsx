@@ -1,5 +1,6 @@
 import {
   ActivityIndicator,
+  Keyboard,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -129,6 +130,7 @@ export default function SignInForm({
             placeholder="Password"
             onBlur={() => setFieldTouched('password')}
             onSubmitEditing={() => {
+              Keyboard.dismiss();
               handleSubmit();
             }}
           />
@@ -149,7 +151,7 @@ export default function SignInForm({
               disabled={!isValid}
               onPress={() => handleSubmit()}>
               {isLoading ? (
-                <ActivityIndicator color={constants.colors.GREEN} />
+                <ActivityIndicator color={constants.colors.UNDER_LINE} />
               ) : (
                 <Text style={[styles.text]}>Sign In</Text>
               )}

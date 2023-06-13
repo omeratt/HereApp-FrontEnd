@@ -99,7 +99,6 @@ const WidgetBox: React.FC<WidgetBoxProps> = ({
   // }, [selectedItems, currentIndex]);
 
   useEffect(() => {
-    console.log({selectedItems});
     const selectedId = svgElements ? svgElements[currentIndex].title : txt;
     const isIncludeItem = selectedItems.includes(selectedId);
 
@@ -132,7 +131,8 @@ const WidgetBox: React.FC<WidgetBoxProps> = ({
   };
   const handlePress = useCallback(() => {
     const selectedId = svgElements ? svgElements[currentIndex].title : txt;
-    console.log(selectedItems.includes(selectedId), selectedItems);
+    const isIncludeItem = selectedItems.includes(selectedId);
+    if (selectedItems.length === 2 && !isIncludeItem) return;
     SetSelectedItems(selectedId);
   }, [
     progress.value,

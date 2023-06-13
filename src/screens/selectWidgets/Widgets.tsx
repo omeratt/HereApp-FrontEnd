@@ -26,7 +26,12 @@ import WidgetBox from './WidgetBox';
 import SelectWidgetsTitle from './SelectWidgetsTitle';
 import {SvgProps} from 'react-native-svg';
 import {ISvgElement} from './types';
-import {useUpdateWidgetsMutation} from '../../app/api/userApi';
+import {
+  useGetWidgetsQuery,
+  useUpdateWidgetsMutation,
+} from '../../app/api/userApi';
+import {setFocus} from '../../app/Reducers/User/screensSlice';
+import {useAppDispatch} from '../../app/hooks';
 const {Fonts, HEIGHT, WIDTH, rf, colors} = constants;
 const paddingBottom = HEIGHT * (44 / 896);
 const paddingTop = HEIGHT * (73 / 896);
@@ -115,9 +120,17 @@ const flatListData: IFlatListProps[] = [
 
 export default function Widgets() {
   const list = constants.OnBoardingList;
-  const nav = useNavigation();
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const navigation = useNavigation();
   const [updateWidgets, {isLoading}] = useUpdateWidgetsMutation();
+  const {
+    data: widgetsData,
+    error: WidgetsFetchError,
+    isLoading: isWidgetsLoading,
+    isFetching: isWidgetFetching,
+  } = useGetWidgetsQuery(null);
+  const [selectedItems, setSelectedItems] = useState<string[]>(
+    widgetsData || [],
+  );
   const SetSelectedItems = useCallback((item: string) => {
     setSelectedItems(prev => {
       if (prev.includes(item)) return prev.filter(e => e !== item);
@@ -125,16 +138,26 @@ export default function Widgets() {
     });
   }, []);
 
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    const subscribe = navigation.addListener('focus', e => {
+      dispatch(setFocus({widgets: true}));
+    });
+    return () => {
+      subscribe();
+    };
+  }, []);
+
   const keyExtractor = useCallback(
     (item: any, index: number) => index.toString(),
     [],
   );
   const goHome = useCallback(() => {
-    nav.navigate('HomePage' as never);
-  }, [nav]);
+    navigation.navigate('HomePage' as never);
+  }, [navigation]);
   const handleSubmit = async () => {
     //TODO: server fetching
-    await updateWidgets(selectedItems);
+    if (selectedItems.length !== 0) await updateWidgets(selectedItems);
     goHome();
   };
   return (
@@ -167,7 +190,7 @@ export default function Widgets() {
           style={styles.flatList}
           // contentContainerStyle={{
           //   // width: '100%',
-          //   flex: 1,
+          //   // flex: 1,
           //   backgroundColor: 'red',
           // }}
           numColumns={2}
@@ -175,11 +198,22 @@ export default function Widgets() {
           showsVerticalScrollIndicator={false}
         />
       </View>
-      <TouchableOpacity onPress={handleSubmit} style={styles.doneContainer}>
+      <TouchableOpacity onPress={handleSubmit} style={[styles.doneContainer]}>
         {isLoading ? (
           <ActivityIndicator color={colors.GREEN} size={'small'} />
         ) : (
-          <SVG.GreenDoneButton fill={colors.OFF_WHITE} />
+          <>
+            <Text
+              style={{
+                color: constants.colors.OFF_WHITE,
+                fontFamily: constants.Fonts.text,
+                fontSize: constants.rf(18),
+              }}>
+              <Text style={{color: colors.GREEN}}>{selectedItems.length}</Text>{' '}
+              / 2
+            </Text>
+            <SVG.GreenDoneButton fill={colors.OFF_WHITE} />
+          </>
         )}
       </TouchableOpacity>
     </View>

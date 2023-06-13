@@ -26,21 +26,23 @@ const styles1 = StyleSheet.create({
   container: {
     // maxWidth: '61%',
     // minWidth: '25%',
-    minWidth: '30%',
-    maxWidth: '60%',
+    // minWidth: '20%',
+    maxWidth: '59%',
     flexGrow: 1,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: constants.colors.OFF_WHITE,
-    backgroundColor: constants.colors.BGC,
     justifyContent: 'center',
     alignItems: 'center',
+    // alignSelf: 'flex-start',
     height: constants.HEIGHT * 0.078125,
     marginVertical: '2%',
     // marginRight: '3.0%',
-    paddingHorizontal: '5.8%',
+    // paddingHorizontal: '5.8%',
     shadowColor: constants.colors.GREEN,
     elevation: 2.5,
+    backgroundColor: constants.colors.BGC,
+    // borderColor: constants.colors.OFF_WHITE,
+    // backgroundColor: 'red',
   },
   txt: {
     flex: 1,
@@ -104,7 +106,9 @@ export default function OnBoarding() {
             // style={{width: '90%', height: '100%'}}
             onPress={() => {
               SetSelectedItems(txt);
-              progress.value = withTiming(1 - progress.value, {duration: 450});
+              progress.value = withTiming(progress.value > 0 ? 0 : 1, {
+                duration: 250,
+              });
             }}>
             <Text
               numberOfLines={2}

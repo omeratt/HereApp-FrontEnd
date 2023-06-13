@@ -12,6 +12,7 @@ export interface ScreensState {
   timeTips?: boolean;
   stupid?: boolean;
   settings?: boolean;
+  widgets?: boolean;
 }
 // Define the initial state using that type
 const initialState: ScreensState = {
@@ -23,6 +24,7 @@ const initialState: ScreensState = {
   timeTips: false,
   stupid: false,
   settings: false,
+  widgets: false,
 };
 
 export const screensSlice = createSlice({

@@ -1,27 +1,49 @@
-import {FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React, {useEffect, useRef} from 'react';
+import {
+  BackHandler,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import React, {useCallback, useEffect, useRef} from 'react';
 import constants from '../assets/constants';
 import Line from '../components/Line';
 import SVG from '../assets/svg';
-import {useNavigation} from '@react-navigation/native';
-import {useAppSelector} from '../app/hooks';
-import {screenSelector} from '../app/Reducers/User/screensSlice';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {useAppDispatch, useAppSelector} from '../app/hooks';
+import {screenSelector, setFocus} from '../app/Reducers/User/screensSlice';
 import {FlashList} from '@shopify/flash-list';
 import {useLogoutMutation} from '../app/api/userApi';
 import auth from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 const Menu = () => {
   // const [overlayColor,setOverlayColor] = useState()
+  const screens = useAppSelector(screenSelector);
   const navigation = useNavigation();
   const closeDrawer = () => {
-    navigation.goBack();
+    screens.settings || screens.widgets ? goToFirstPage() : navigation.goBack();
   };
   const navigateTo = (screen: string) => () => {
     navigation.navigate(screen as never);
   };
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        closeDrawer();
+        return true;
+      };
+      const subscription = BackHandler.addEventListener(
+        'hardwareBackPress',
+        onBackPress,
+      );
+      return () => subscription.remove();
+    }, [navigation, screens.settings]),
+  );
+  const flashListRef = useRef<FlashList<any> | null>(null);
 
-  const flatListRef = useRef<FlatList>(null);
-  const screens = useAppSelector(screenSelector);
+  const dispatch = useAppDispatch();
+
   const [Logout, {isLoading, data, isSuccess, isError, error}] =
     useLogoutMutation();
   const handleLogout = async () => {
@@ -34,16 +56,22 @@ const Menu = () => {
       console.log('an error at logout', err);
     }
   };
+  const goToSetting = useCallback(() => {
+    flashListRef.current?.scrollToIndex({index: 1, animated: true});
+    dispatch(setFocus({settings: true}));
+  }, [flashListRef]);
+
+  const goToFirstPage = useCallback(() => {
+    flashListRef.current?.scrollToIndex({index: 0, animated: true});
+    dispatch(setFocus({settings: false}));
+  }, [flashListRef]);
   const page1 = () => {
     return (
       <View
         style={{
           width: constants.WIDTH * 0.6037036895751953,
           alignItems: 'center',
-          // height: '100%',
-          height: constants.HEIGHT * (581 / 896),
-          // height: constants.HEIGHT * (650 / 896),
-          backgroundColor: 'tomato',
+          height: '100%',
         }}>
         <TouchableOpacity
           style={[
@@ -209,7 +237,7 @@ const Menu = () => {
                 : 'transparent',
             },
           ]}
-          onPress={navigateTo('Widgets')}>
+          onPress={goToSetting}>
           <Text
             style={[
               styles.listTxt,
@@ -231,16 +259,13 @@ const Menu = () => {
         style={{
           width: constants.WIDTH * 0.6037036895751953,
           alignItems: 'center',
-          // height: '100%',
-          backgroundColor: 'tomato',
-          height: constants.HEIGHT * (581 / 896),
-          // flex: 1,
+          height: '100%',
         }}>
         <TouchableOpacity
           style={[
             styles.listItem,
             {
-              backgroundColor: screens.home
+              backgroundColor: screens.widgets
                 ? constants.colors.GREEN
                 : 'transparent',
             },
@@ -250,7 +275,7 @@ const Menu = () => {
             style={[
               styles.listTxt,
               {
-                color: screens.home
+                color: screens.widgets
                   ? constants.colors.BGC
                   : constants.colors.OFF_WHITE,
               },
@@ -259,47 +284,33 @@ const Menu = () => {
           </Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.listItem]} onPress={handleLogout}>
-          <Text
-            style={[
-              styles.listTxt,
-              {
-                color: screens.home
-                  ? constants.colors.BGC
-                  : constants.colors.OFF_WHITE,
-              },
-            ]}>
-            Logout
-          </Text>
+          <Text style={[styles.listTxt]}>Logout</Text>
         </TouchableOpacity>
       </View>
     );
   };
   const pages = [page1, settingPage];
-  useEffect(() => {
-    console.log(flatListRef);
-    flatListRef.current?.scrollToEnd();
-  }, []);
+
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.topView} onPress={navigateTo('Search')}>
         <Text style={styles.searchTxt}>Search</Text>
       </TouchableOpacity>
       <View style={styles.headerView}>
-        <Text style={styles.menuTxt}>Menu</Text>
+        <Text style={styles.menuTxt}>
+          {screens.settings ? 'Settings' : 'Menu'}
+        </Text>
       </View>
       <Line
         lengthPercentage={widthNumberPercent}
         strength={1}
         lineColor={constants.colors.OFF_WHITE}
       />
-      <View style={[styles.menuList, {backgroundColor: 'red'}]}>
+      <View style={[styles.menuList]}>
         <FlashList
+          ref={flashListRef}
           data={pages}
-          renderItem={props => (
-            <View style={{height: constants.HEIGHT * (581 / 896)}}>
-              <props.item />
-            </View>
-          )}
+          renderItem={props => <props.item />}
           horizontal
           pagingEnabled
           estimatedItemSize={constants.WIDTH * 0.6037036895751953}
@@ -340,7 +351,7 @@ const styles = StyleSheet.create({
     height: constants.HEIGHT * (581 / 896),
     alignItems: 'center',
     paddingTop: constants.HEIGHT * (70 / 896),
-    paddingBottom: constants.HEIGHT * (173 / 896),
+    // paddingBottom: constants.HEIGHT * (173 / 896),
     // justifyContent: 'space-evenly',
     // backgroundColor: 'red',
   },

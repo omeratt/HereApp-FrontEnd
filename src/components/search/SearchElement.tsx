@@ -18,6 +18,7 @@ import {useAppSelector} from '../../app/hooks';
 import {selectCategoriesList} from '../../app/Reducers/User/userSlice';
 import {FlashList} from '@shopify/flash-list';
 import RenderSearchElement from './RenderSearchElement';
+import {CommonActions} from '@react-navigation/native';
 const {HEIGHT, WIDTH} = constants;
 const paddingVertical = HEIGHT * (45 / 896);
 const RENDER_ITEM_SIZE = HEIGHT * 0.03690529039246393;
@@ -52,23 +53,35 @@ const SearchElement: React.FC<ISearchElementProps> = ({
       const listId = (items as IListSearchResult[])[indexOfSearch]._id;
       const categoryIndex = findCategoryIndex(categoryId);
       const listIndex = findListIndexInCategory(categoryIndex, listId);
-      navigation.navigate(
-        'ListAndNotesStack' as never,
-        {
-          screen: 'CreateOrEditList' as never,
-          params: {categoryIndex, listIndex, navFromHome: false} as never,
-        } as never,
+      navigation.dispatch(
+        CommonActions.navigate('ListAndNotesStack', {
+          name: 'CreateOrEditList',
+
+          params: {
+            categoryIndex,
+            listIndex,
+            navFromHome: false,
+          },
+        }),
       );
     },
-    [categoriesList],
+    [categoriesList, navigation],
   );
-  const navToEditMessage = React.useCallback((index: number) => {
-    const msg = (items as IMessageSearchResult[])[index];
-    navigation.navigate(
-      'Message' as never,
-      {messageRouteProp: msg, navFromSearch: true} as never,
-    );
-  }, []);
+  const navToEditMessage = React.useCallback(
+    (index: number) => {
+      const msg = (items as IMessageSearchResult[])[index];
+      navigation.dispatch(
+        CommonActions.navigate({
+          name: 'Message',
+          params: {
+            messageRouteProp: msg,
+            navFromSearch: true,
+          },
+        }),
+      );
+    },
+    [navigation],
+  );
   const navToTask = React.useCallback(
     (index: number) => {
       const task = (items as ITaskSearchResult[])[index];

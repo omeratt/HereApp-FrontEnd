@@ -186,7 +186,7 @@ const ListItem: React.FC<ListItemProps> = ({
               {
                 width,
                 fontSize: iconSize / 1.1,
-                height: iconSize / 1.05,
+                height: iconSize + 3,
                 color: constants.colors.GREY,
               },
             ]}

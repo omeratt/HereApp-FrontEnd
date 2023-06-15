@@ -269,7 +269,7 @@ const Home = () => {
   }, [calendarVisible]);
   const emptyList = () => {
     return prioritizedListsLoading ? (
-      <ActivityIndicator size={32} color={constants.colors.GREEN} />
+      <ActivityIndicator size={32} color={constants.colors.UNDER_LINE} />
     ) : (
       <Text style={[styles.noLists]}>No lists</Text>
     );
@@ -306,7 +306,7 @@ const Home = () => {
               prioritizedListsLoading ||
               isMutateTaskLoading ||
               tasksLoading ? (
-                <ActivityIndicator size={32} color={constants.colors.GREEN} />
+                <ActivityIndicator size={32} color={constants.colors.UNDER_LINE} />
               ) : (
                 <React.Fragment />
                 // !isToday && <FloatHERE />

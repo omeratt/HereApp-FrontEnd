@@ -257,7 +257,7 @@ const CreateOrEditList = () => {
             style={styles.listContainerContent}
           />
         ) : (
-          <ActivityIndicator color={'black'} size={'large'} />
+          <ActivityIndicator color={constants.colors.UNDER_LINE} size={'large'} />
         )}
       </View>
       <View

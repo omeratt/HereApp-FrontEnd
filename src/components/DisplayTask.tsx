@@ -191,7 +191,7 @@ const DisplayTask = ({
           },
         ]}>
         {isTaskLoading ? (
-          <ActivityIndicator size={32} color={constants.colors.GREEN} />
+          <ActivityIndicator size={32} color={constants.colors.UNDER_LINE} />
         ) : (
           <Text style={[styles.noTasks]}>No tasks</Text>
         )}

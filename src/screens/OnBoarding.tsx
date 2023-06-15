@@ -205,7 +205,7 @@ export default function OnBoarding() {
 
       <TouchableOpacity onPress={handleSubmit} style={[styles.doneContainer]}>
         {isLoading ? (
-          <ActivityIndicator color={constants.colors.GREEN} size={'small'} />
+          <ActivityIndicator color={constants.colors.UNDER_LINE} size={'small'} />
         ) : (
           <>
             <Text

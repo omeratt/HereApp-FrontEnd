@@ -200,7 +200,7 @@ export default function Widgets() {
       </View>
       <TouchableOpacity onPress={handleSubmit} style={[styles.doneContainer]}>
         {isLoading ? (
-          <ActivityIndicator color={colors.GREEN} size={'small'} />
+          <ActivityIndicator color={colors.GREEN} size={'large'} />
         ) : (
           <>
             <Text

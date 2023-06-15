@@ -73,8 +73,7 @@ const TimeTips = () => {
     const {x} = nativeEvent.contentOffset;
     const index = x / (constants.WIDTH - paddingHorizontal * 2);
     scrollX.setValue(x);
-
-    borderWidthSharedValue.value = index;
+    if (index <= 1) borderWidthSharedValue.value = index;
     bgcSharedValue.value = index;
     opacityValue.value = 1 - index;
     setCurrentIndex(Math.round(index));
@@ -209,6 +208,7 @@ const Content = ({item, index, extraData}: ListRenderItemInfo<any>) => {
               },
             ]}
             adjustsFontSizeToFit
+            allowFontScaling={false}
             textBreakStrategy="balanced">
             About time and how can we use it better
           </Text>
@@ -228,7 +228,7 @@ export default TimeTips;
 const styles = StyleSheet.create({
   typeWriterText: {
     fontFamily: Fonts.text,
-    fontSize: 15,
+    fontSize: rf(18),
     color: colors.BLACK,
     lineHeight: rf(23),
   },
@@ -261,7 +261,9 @@ const styles = StyleSheet.create({
 });
 
 const textPart1 =
-  'Time is a valuable resource that often slips away unnoticed. Just like attention deficit disorder (ADD) can hinder focus, poor time management leads to inefficiency. Prioritize tasks, set clear goals, and create a schedule. Minimize distractions to optimize productivity and make the most of your time. Time can feel subjective, either rushing by or dragging on. Practice mindfulness to ground yourself in the present moment. Incorporate breaks and leisure activities for balance. Reflect on past time usage, set goals, and take actionable steps to improve time management. Make each moment count';
+  'Time is a valuable resource that often slips away unnoticed. Just like attention deficit disorder (ADD) can hinder focus, poor time management leads to inefficiency. Prioritize tasks, set clear goals, and create a schedule. Minimize distractions to optimize productivity and make the most of your time. Time can feel subjective, either rushing by or dragging on. Practice mindfulness to ground yourself in the present moment. Incorporate breaks and leisure activities for balance. Reflect on past time usage, set goals, and take actionable steps to improve time management. Make each moment count' +
+  '\n';
 
 const textPart2 =
-  "By consciously managing your time, you gain control over how you invest your moments. Embrace the power of intentionality and make deliberate choices aligned with your priorities. Regularly assess your progress and make adjustments to your schedule and goals. Remember, it's not just about being busy, but being purposeful. Be mindful of the present, appreciating the richness of each passing second. Take breaks to rejuvenate and recharge, fueling your productivity and creativity. Find harmony between work and leisure, allowing yourself to indulge in activities that bring joy and fulfillment. With focused effort and a mindful approach, you can unlock the true potential of time and live a more balanced, fulfilling life.";
+  "By consciously managing your time, you gain control over how you invest your moments. Embrace the power of intentionality and make deliberate choices aligned with your priorities. Regularly assess your progress and make adjustments to your schedule and goals. Remember, it's not just about being busy, but being purposeful. Be mindful of the present, appreciating the richness of each passing second. Take breaks to rejuvenate and recharge, fueling your productivity and creativity. Find harmony between work and leisure, allowing yourself to indulge in activities that bring joy and fulfillment. With focused effort and a mindful approach, you can unlock the true potential of time and live a more balanced, fulfilling life." +
+  '\n';

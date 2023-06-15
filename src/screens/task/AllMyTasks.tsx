@@ -266,7 +266,10 @@ const Home = () => {
               {(isMutateTaskLoading ||
                 tasksLoading ||
                 isDeleteTasksLoading) && (
-                <ActivityIndicator size={32} color={constants.colors.GREEN} />
+                <ActivityIndicator
+                  size={32}
+                  color={constants.colors.UNDER_LINE}
+                />
               )}
             </View>
           </View>

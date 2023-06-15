@@ -196,6 +196,8 @@ const Content = ({item, index, extraData}: ListRenderItemInfo<any>) => {
         <Animated.View entering={FadeIn} exiting={FadeOut}>
           {/* <View style={{flexDirection: 'row'}}> */}
           <Text
+            adjustsFontSizeToFit
+            allowFontScaling={false}
             style={[
               styles.typeWriterText,
               {
@@ -218,13 +220,12 @@ const Content = ({item, index, extraData}: ListRenderItemInfo<any>) => {
   );
 };
 export default IamNotStupid;
-console.log(rf(18));
 const styles = StyleSheet.create({
   typeWriterText: {
     fontFamily: Fonts.text,
     // fontSize: rf(13.00000156),
-    // fontSize: rf(18),
-    fontSize: 15,
+    fontSize: rf(18),
+    // fontSize: 15,
     color: colors.BLACK,
     lineHeight: rf(23),
   },

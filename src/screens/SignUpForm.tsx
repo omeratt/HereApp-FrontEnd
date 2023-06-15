@@ -139,7 +139,7 @@ export default function SignUpForm({
               disabled={!isValid}
               onPress={() => handleSubmit()}>
               {isLoading ? (
-                <ActivityIndicator color={constants.colors.GREY} />
+                <ActivityIndicator color={constants.colors.UNDER_LINE} />
               ) : (
                 <Text style={[styles.text]}>Sign Up</Text>
               )}

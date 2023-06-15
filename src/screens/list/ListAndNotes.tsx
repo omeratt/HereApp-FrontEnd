@@ -223,7 +223,7 @@ const NewCategory = () => {
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={() => {
             return listsLoading ? (
-              <ActivityIndicator size={32} color={constants.colors.GREEN} />
+              <ActivityIndicator size={32} color={constants.colors.UNDER_LINE} />
             ) : (
               <Text style={styles.newTaskTitleInput}>No categories</Text>
             );

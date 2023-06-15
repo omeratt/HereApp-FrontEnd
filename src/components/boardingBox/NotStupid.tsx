@@ -121,11 +121,11 @@ const NotStupid: React.FC<INotStupid> = ({width, height}) => {
               </Text>
               <TouchableOpacity
                 onPress={navigateToStupidScreen}
-                style={{alignSelf: 'flex-end', marginTop: ICON_SIZE / 2}}>
+                style={{alignSelf: 'flex-end', marginTop: ICON_SIZE / 1}}>
                 <AntDesign
                   name="rightcircleo"
                   color={constants.colors.BLACK}
-                  size={ICON_SIZE / 1.2}
+                  size={20}
                 />
               </TouchableOpacity>
             </View>

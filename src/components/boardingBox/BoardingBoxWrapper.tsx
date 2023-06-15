@@ -3,6 +3,7 @@ import React, {ReactElement, ReactNode, cloneElement, useState} from 'react';
 import SVG from '../../assets/svg';
 import constants from '../../assets/constants';
 import {TaskType} from '../../app/Reducers/User/userSlice';
+import Animated, {ZoomIn, ZoomOut} from 'react-native-reanimated';
 type Children<P> = P & {children?: ReactNode};
 
 interface INextTaskProps {
@@ -41,7 +42,11 @@ const BoardingBoxWrapper: React.FC<BoardingBoxWrapperProps> = ({
   };
   // const formattedText;
   return (
-    <View style={styles.box} onLayout={handleLayout}>
+    <Animated.View
+      entering={ZoomIn.duration(450)}
+      exiting={ZoomOut.duration(450)}
+      style={styles.box}
+      onLayout={handleLayout}>
       {Component && width && height && (
         <View style={[styles.topBox, topBoxStyle]}>
           <Component
@@ -62,7 +67,7 @@ const BoardingBoxWrapper: React.FC<BoardingBoxWrapperProps> = ({
           />
         </View>
       )}
-    </View>
+    </Animated.View>
   );
 };
 

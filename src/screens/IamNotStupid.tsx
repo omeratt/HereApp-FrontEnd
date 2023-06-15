@@ -68,8 +68,7 @@ const IamNotStupid = () => {
     const {x} = nativeEvent.contentOffset;
     const index = x / (constants.WIDTH - paddingHorizontal * 2);
     scrollX.setValue(x);
-
-    borderWidthSharedValue.value = index;
+    if (index <= 1) borderWidthSharedValue.value = index;
     bgcSharedValue.value = index;
     opacityValue.value = 1 - index;
     setCurrentIndex(Math.round(index));
@@ -110,6 +109,7 @@ const IamNotStupid = () => {
           borderColor: colors.UNDER_LINE,
           width: '100%',
           height: constants.HEIGHT * (680 / 896),
+          // backgroundColor: 'red',
           marginTop: '3%',
         }}>
         <FlashList
@@ -218,9 +218,12 @@ const Content = ({item, index, extraData}: ListRenderItemInfo<any>) => {
   );
 };
 export default IamNotStupid;
+console.log(rf(18));
 const styles = StyleSheet.create({
   typeWriterText: {
     fontFamily: Fonts.text,
+    // fontSize: rf(13.00000156),
+    // fontSize: rf(18),
     fontSize: 15,
     color: colors.BLACK,
     lineHeight: rf(23),
@@ -275,7 +278,8 @@ that is sometimes used for one of the \
 presentations of attention-deficit \
 hyperactivity disorder (ADHD). \
 Attention deficit disorder(ADD) \
-.';
+.' + '\n';
 
 const ADHDDescription =
-  "Living with ADHD can be an overwhelming experience. The constant struggle to maintain focus, stay organized, and manage impulses can be frustrating. However, it's crucial to understand that individuals with ADHD are not stupid. In fact, their minds are often brimming with creativity, intuition, and unique perspectives. ADHD presents challenges, but it doesn't define intelligence. Our app aims to empower and support individuals with ADHD, providing tools to enhance productivity, improve time management, and celebrate the incredible strengths and abilities that come with neurodiversity.";
+  "Living with ADHD can be an overwhelming experience. The constant struggle to maintain focus, stay organized, and manage impulses can be frustrating. However, it's crucial to understand that individuals with ADHD are not stupid. In fact, their minds are often brimming with creativity, intuition, and unique perspectives. ADHD presents challenges, but it doesn't define intelligence. Our app aims to empower and support individuals with ADHD, providing tools to enhance productivity, improve time management, and celebrate the incredible strengths and abilities that come with neurodiversity." +
+  '\n';

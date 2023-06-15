@@ -57,11 +57,11 @@ const CalendarModal: FC<Props> = ({
         calendarStyle={{
           backgroundColor: constants.colors.OFF_WHITE,
         }}
-        getItemLayout={(data, index) => ({
-          index,
-          length: height,
-          offset: height * index,
-        })}
+        // getItemLayout={(data, index) => ({
+        //   index,
+        //   length: height,
+        //   offset: height * index,
+        // })}
         theme={{
           textDayFontFamily: constants.Fonts.text,
           backgroundColor: constants.colors.BGC,
@@ -69,7 +69,8 @@ const CalendarModal: FC<Props> = ({
           selectedDayBackgroundColor: constants.colors.GREEN,
           textMonthFontFamily: constants.Fonts.paragraph,
           textDayHeaderFontFamily: constants.Fonts.paragraph,
-          todayTextColor: constants.colors.UNDER_LINE,
+          // todayTextColor: constants.colors.GREY,
+          todayTextColor: '#B9AB85',
           dayTextColor: constants.colors.BGC,
           selectedDayTextColor: constants.colors.BGC,
           arrowColor: constants.colors.UNDER_LINE,

@@ -115,8 +115,8 @@ const IamNotStupid = () => {
         <FlashList
           data={[
             {component: Intro},
-            {component: Content},
-            {component: Content},
+            {component: Content, text: string},
+            {component: Content, text: ADHDDescription},
           ]}
           renderItem={props => {
             return <props.item.component {...props} />;
@@ -207,7 +207,7 @@ const Content = ({item, index, extraData}: ListRenderItemInfo<any>) => {
           </Text>
 
           <AnimatedTyping
-            text={[string]}
+            text={[item.text]}
             style={styles.typeWriterText}
             cursorStyle={styles.typeWriterCursorText}
             cursorColor={colors.GREEN}
@@ -276,3 +276,6 @@ presentations of attention-deficit \
 hyperactivity disorder (ADHD). \
 Attention deficit disorder(ADD) \
 .';
+
+const ADHDDescription =
+  "Living with ADHD can be an overwhelming experience. The constant struggle to maintain focus, stay organized, and manage impulses can be frustrating. However, it's crucial to understand that individuals with ADHD are not stupid. In fact, their minds are often brimming with creativity, intuition, and unique perspectives. ADHD presents challenges, but it doesn't define intelligence. Our app aims to empower and support individuals with ADHD, providing tools to enhance productivity, improve time management, and celebrate the incredible strengths and abilities that come with neurodiversity.";

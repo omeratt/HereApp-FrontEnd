@@ -178,13 +178,17 @@ const DisplayTask = ({
     );
   };
   const EmptyList = useCallback(() => {
+    useEffect(() => {
+      sharedX.value = sharedX.value < 0 ? TASK_WIDTH * 2 : -TASK_WIDTH * 2;
+      sharedX.value = withSpring(0, springConfig);
+    }, []);
     return (
       <View
         style={[
           // styles.taskListContainer,
           {
             height: TASK_CONTAINER_HEIGHT * 0.63,
-            backgroundColor: 'red',
+            // backgroundColor: 'red',
             justifyContent: 'center',
             alignItems: 'center',
           },

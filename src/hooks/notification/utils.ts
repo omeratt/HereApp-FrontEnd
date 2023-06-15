@@ -47,15 +47,15 @@ export const onDisplayNotification = async (remoteMessage: any) => {
 
       actions: [
         {
-          title: '✅ Done',
+          title: 'did it!',
           pressAction: {id: 'done'},
         },
         {
-          title: '❌ Dismiss',
+          title: 'not today',
           pressAction: {id: 'dismiss'},
         },
         {
-          title: '⏰ Remind me later',
+          title: 'remind me later',
           pressAction: {id: 'remind me later'},
         },
       ],

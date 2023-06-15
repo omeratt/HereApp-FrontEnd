@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   btnTxt: {
-    color: '#0500FF',
+    color: constants.colors.UNDER_LINE,
     textAlign: 'center',
     fontSize: 12,
     fontFamily: constants.Fonts.text,

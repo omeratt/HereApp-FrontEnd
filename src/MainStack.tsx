@@ -23,6 +23,8 @@ import {
 } from '@react-navigation/native-stack';
 import TimeTips from './screens/TimeTips';
 import Widgets from './screens/selectWidgets/Widgets';
+import Privacy from './components/Privacy';
+import TermOfUse from './components/TermOfUse';
 const Stack = createNativeStackNavigator();
 
 export default function MainStack() {
@@ -115,12 +117,32 @@ export default function MainStack() {
               component={Widgets}
               options={screenOptions()}
             />
+            <Stack.Screen
+              name="Privacy"
+              component={Privacy}
+              options={screenOptions()}
+            />
+            <Stack.Screen
+              name="TermOfUse"
+              component={TermOfUse}
+              options={screenOptions()}
+            />
           </>
         ) : (
           <>
             <Stack.Screen
               name="Auth"
               component={Auth}
+              options={screenOptions()}
+            />
+            <Stack.Screen
+              name="Privacy"
+              component={Privacy}
+              options={screenOptions()}
+            />
+            <Stack.Screen
+              name="TermOfUse"
+              component={TermOfUse}
               options={screenOptions()}
             />
           </>

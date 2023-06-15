@@ -182,11 +182,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 15,
     fontWeight: '400',
+    fontFamily: constants.Fonts.text,
   },
   forgotPassword: {
     color: constants.colors.BGC,
     paddingLeft: '1%',
     fontSize: 13,
+
+    fontFamily: constants.Fonts.text,
   },
   google: {
     justifyContent: 'flex-end',

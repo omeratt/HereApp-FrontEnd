@@ -283,6 +283,50 @@ const Menu = () => {
             Edit Widgets
           </Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.listItem,
+            {
+              backgroundColor: screens.privacy
+                ? constants.colors.GREEN
+                : 'transparent',
+            },
+          ]}
+          onPress={navigateTo('Privacy')}>
+          <Text
+            style={[
+              styles.listTxt,
+              {
+                color: screens.privacy
+                  ? constants.colors.BGC
+                  : constants.colors.OFF_WHITE,
+              },
+            ]}>
+            Privacy
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.listItem,
+            {
+              backgroundColor: screens.termOfUse
+                ? constants.colors.GREEN
+                : 'transparent',
+            },
+          ]}
+          onPress={navigateTo('TermOfUse')}>
+          <Text
+            style={[
+              styles.listTxt,
+              {
+                color: screens.termOfUse
+                  ? constants.colors.BGC
+                  : constants.colors.OFF_WHITE,
+              },
+            ]}>
+            Term of use
+          </Text>
+        </TouchableOpacity>
         <TouchableOpacity style={[styles.listItem]} onPress={handleLogout}>
           <Text style={[styles.listTxt]}>Logout</Text>
         </TouchableOpacity>

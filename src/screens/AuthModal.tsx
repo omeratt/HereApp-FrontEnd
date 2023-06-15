@@ -11,6 +11,8 @@ import Animated, {
 import {FlatList} from 'react-native-gesture-handler';
 import SignInForm from './SignInForm';
 import SignUpForm from './SignUpForm';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {useNavigation} from '@react-navigation/native';
 
 export const ZERO = 0.00000000000000001;
 export const SPRING_CONFIG: WithSpringConfig = {
@@ -30,6 +32,7 @@ interface RenderItemProps {
 
 const AuthModal: React.FC = () => {
   const [emailFromSignUp, setEmailFromSignUp] = useState('');
+  const navigation = useNavigation();
   const ref = React.useRef<FlatList>(null);
   const flex = useSharedValue(ZERO);
   const style = useAnimatedStyle(() => {
@@ -51,6 +54,9 @@ const AuthModal: React.FC = () => {
   const goToSignIn = () => {
     ref.current?.scrollToIndex({index: 0});
     transformValue(1.7, 1.5);
+  };
+  const navigateTo = (screen: string) => () => {
+    navigation.navigate(screen as never);
   };
 
   const hideScreen = () => {
@@ -99,7 +105,7 @@ const AuthModal: React.FC = () => {
     },
   ];
 
-  const renderItem: ListRenderItem<RenderItemProps> = ({item}) => (
+  const renderItem: ListRenderItem<RenderItemProps> = ({item, index}) => (
     <Animated.View style={[styles.container, style]}>
       <ScrollView
         style={{width: '100%'}}
@@ -113,6 +119,25 @@ const AuthModal: React.FC = () => {
           </TouchableOpacity>
           <Text style={styles.text}>{item.bottomTxt} </Text>
         </View>
+        {index === 0 && (
+          <Text
+            style={[
+              styles.text,
+              {fontSize: 12, color: constants.colors.UNDER_LINE},
+            ]}
+            allowFontScaling={false}
+            adjustsFontSizeToFit
+            textBreakStrategy="balanced">
+            By signing in, you agree to the{' '}
+            <Text onPress={navigateTo('TermOfUse')} style={styles.boldText}>
+              Terms of Use
+            </Text>{' '}
+            and confirm that you have read the{' '}
+            <Text onPress={navigateTo('Privacy')} style={styles.boldText}>
+              Privacy Policy
+            </Text>
+          </Text>
+        )}
       </ScrollView>
     </Animated.View>
   );
@@ -136,6 +161,7 @@ export default React.memo(AuthModal);
 const styles = StyleSheet.create({
   container: {
     width: constants.WIDTH,
+    paddingBottom: '2%',
   },
   flatList: {
     width: constants.WIDTH,
@@ -161,11 +187,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  boldText: {
+    fontFamily: constants.Fonts.text,
+    // fontWeight: 'bold',
+    textDecorationLine: 'underline',
+    color: 'black',
+    textAlign: 'justify',
+  },
   text: {
     color: constants.colors.BGC,
     textAlign: 'center',
     fontSize: 15,
     fontWeight: '400',
+    fontFamily: constants.Fonts.text,
+    lineHeight: 20,
   },
   forgotPassword: {
     color: constants.colors.BGC,

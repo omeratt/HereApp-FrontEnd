@@ -160,6 +160,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 15,
     fontWeight: '400',
+
+    fontFamily: constants.Fonts.text,
   },
 
   button: {

@@ -185,12 +185,11 @@ const DisplayTask = ({
     return (
       <View
         style={[
-          // styles.taskListContainer,
           {
-            height: TASK_CONTAINER_HEIGHT * 0.63,
-            backgroundColor: 'red',
+            height: TASK_CONTAINER_HEIGHT,
             justifyContent: 'center',
             alignItems: 'center',
+            backgroundColor: 'red',
           },
         ]}>
         {isTaskLoading ? (

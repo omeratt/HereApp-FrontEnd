@@ -63,14 +63,14 @@ const flatListData = Object.values(allDates);
 const initialNumToRender = flatListData.length;
 
 export const DATE_WIDTH = constants.WIDTH * 0.89444444444444444444444444444444;
-// export const TASK_CONTAINER_HEIGHT =
-//   constants.HEIGHT * 0.64 * 0.84 - //topView till lists
-//   constants.HEIGHT * 0.64 * 0.84 * 0.17 - //date header
-//   constants.HEIGHT * 0.64 * 0.84 * 0.17 - //dates list
-//   8.7 - //triangle
-//   constants.WIDTH * 0.025 -
-//   3; //container padding
-export const TASK_CONTAINER_HEIGHT = constants.HEIGHT * 0.2716763073627341;
+export const TASK_CONTAINER_HEIGHT =
+  constants.HEIGHT * 0.64 * 0.84 - //topView till lists
+  constants.HEIGHT * 0.64 * 0.84 * 0.17 - //date header
+  constants.HEIGHT * 0.64 * 0.84 * 0.17 - //dates list
+  8.7 - //triangle
+  constants.WIDTH * 0.025 -
+  3; //container padding
+// export const TASK_CONTAINER_HEIGHT = constants.HEIGHT * 0.2716763073627341;
 
 export const ListCategoryWidth = constants.WIDTH * 0.2925925996568468;
 const Home = () => {
@@ -372,7 +372,10 @@ const Home = () => {
               onLayout={e => {
                 console.log(e.nativeEvent.layout.height / constants.HEIGHT);
               }}
-              style={{flex: 1, backgroundColor: 'blue'}}>
+              style={{
+                height: TASK_CONTAINER_HEIGHT - TASK_CONTAINER_HEIGHT * 0.17,
+                backgroundColor: 'blue',
+              }}>
               <DisplayTask
                 data={tasks}
                 isTaskLoading={tasksLoading}
@@ -387,7 +390,9 @@ const Home = () => {
                 task={editTaskDetails}
                 setTask={setEditTaskDetails}
                 updateTask={updateTask}
-                TASK_CONTAINER_HEIGHT={TASK_CONTAINER_HEIGHT}
+                TASK_CONTAINER_HEIGHT={
+                  TASK_CONTAINER_HEIGHT - TASK_CONTAINER_HEIGHT * 0.17
+                }
               />
             </View>
 

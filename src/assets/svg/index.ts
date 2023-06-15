@@ -36,6 +36,7 @@ import SelectWidgetTitle from './SelectWidgetTitle.svg';
 import PizzaWidget from './PizzaWidget.svg';
 import ToggleWidget from './ToggleWidget.svg';
 import ImNotStupidGreen from './I_AM_NOT_Stupid_Green.svg';
+import Google from './Google.svg';
 
 const SVG = {
   IAmNotStupid,
@@ -76,5 +77,6 @@ const SVG = {
   PizzaWidget,
   ToggleWidget,
   ImNotStupidGreen,
+  Google,
 };
 export default SVG;

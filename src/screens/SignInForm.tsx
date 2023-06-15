@@ -18,6 +18,7 @@ import {
 } from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
 import {GOOGLE_WEB_CLIENT_ID} from '@env';
+import SVG from '../assets/svg';
 interface props {
   hideScreen: () => void;
   ErrTxt: ({txt}: any, {touched}: any) => JSX.Element | any;
@@ -56,19 +57,21 @@ export default function SignInForm({
 
   const googleSignIn = useCallback(async () => {
     try {
-      await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
-      const {idToken} = await GoogleSignin.signIn();
-      // dispatch(loadingModal(true));
-      // console.log(idToken);
-      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-      const user = await auth().signInWithCredential(googleCredential);
-      // console.log(user);
-      await GoogleLogIn(undefined);
+      try {
+        await GoogleSignin.hasPlayServices({
+          showPlayServicesUpdateDialog: true,
+        });
+        // Get the users ID token
+        const {idToken} = await GoogleSignin.signIn();
 
-      // if (user) loginSaga();
-    } catch (error: any) {
-      // const obj = getFailedMessage(error?.message);
-      // showError(obj);
+        // Create a Google credential with the token
+        const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+
+        await auth().signInWithCredential(googleCredential);
+        await GoogleLogIn(undefined);
+      } catch (e: any) {
+        console.log('an error in google sign in ', e.message);
+      }
     } finally {
       // dispatch(loadingModal(false));
     }
@@ -157,21 +160,16 @@ export default function SignInForm({
               )}
             </TouchableOpacity>
           </View>
-          <View
-            style={{
-              width: '100%',
-              height: '20%',
-              justifyContent: 'flex-end',
-              alignItems: 'center',
-            }}>
-            <GoogleSigninButton
-              // style={styles.button}
-              size={GoogleSigninButton.Size.Standard}
-              color={GoogleSigninButton.Color.Dark}
-              // disabled={!isValid}
-              onPress={googleSignIn}
-            />
-          </View>
+          <TouchableOpacity
+            style={styles.google}
+            disabled={GLoading}
+            onPress={googleSignIn}>
+            {GLoading ? (
+              <ActivityIndicator color={constants.colors.BGC} />
+            ) : (
+              <SVG.Google />
+            )}
+          </TouchableOpacity>
         </>
       )}
     </Formik>
@@ -189,6 +187,11 @@ const styles = StyleSheet.create({
     color: constants.colors.BGC,
     paddingLeft: '1%',
     fontSize: 13,
+  },
+  google: {
+    justifyContent: 'flex-end',
+    flex: 1,
+    alignItems: 'center',
   },
   button: {
     borderRadius: 20,

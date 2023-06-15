@@ -4,6 +4,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Keyboard,
 } from 'react-native';
 import React, {Dispatch, SetStateAction, useRef} from 'react';
 import TextInput, {InputHandle} from '../components/TextInput';
@@ -58,6 +59,7 @@ export default function SignUpForm({
 
   const submit = async (values: typeof userInfo) => {
     try {
+      Keyboard.dismiss();
       const data = await signup(values).unwrap();
       setEmailFromSignUp(values.email);
       goToSignIn();
@@ -127,6 +129,7 @@ export default function SignUpForm({
             secureTextEntry
             placeholder="Repeat Password"
             onBlur={() => setFieldTouched('confirmPassword')}
+            onSubmitEditing={handleSubmit}
           />
           <ErrTxt
             txt={errors.confirmPassword}

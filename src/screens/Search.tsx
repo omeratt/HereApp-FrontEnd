@@ -1,16 +1,13 @@
 import {
-  Pressable,
   StyleSheet,
   Text,
   TextInput,
-  TouchableWithoutFeedback,
   View,
-  ScrollView,
+  ActivityIndicator,
 } from 'react-native';
-import React, {useCallback, useEffect, useMemo, useRef} from 'react';
+import React, {useCallback, useMemo, useRef} from 'react';
 import constants from '../assets/constants';
 import SVG from '../assets/svg';
-import {Keyboard} from 'react-native';
 import {LayoutChangeEvent} from 'react-native';
 import SearchElement from '../components/search/SearchElement';
 import Line from '../components/Line';
@@ -84,7 +81,18 @@ const Search = () => {
           exiting={FadeOutUp}
           onLayout={onLayout}
           style={styles.searchContainer}>
-          <SVG.SearchBtn height={18} style={{top: 21, alignSelf: 'flex-end'}} />
+          {isLoading || isFetching ? (
+            <ActivityIndicator
+              style={{top: 21, alignSelf: 'flex-end'}}
+              size={18}
+              color={constants.colors.GREEN}
+            />
+          ) : (
+            <SVG.SearchBtn
+              height={18}
+              style={{top: 21, alignSelf: 'flex-end'}}
+            />
+          )}
           <TextInput
             value={inputValue}
             placeholder={

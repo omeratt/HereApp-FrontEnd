@@ -99,6 +99,8 @@ const Home = () => {
   const [touchSearch, setTouchSearch] = useState<boolean>(false);
   const [touchBox, setTouchBox] = useState<boolean>(false);
   const [touchMenu, setTouchMenu] = useState<boolean>(false);
+  const [displayTaskContainerHeight, setDisplayTaskContainerHeight] =
+    useState<number>(0);
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const [editTaskDetails, setEditTaskDetails] = useState<TaskType | undefined>(
@@ -359,8 +361,12 @@ const Home = () => {
               style={{elevation: 2.5}}
             />
           </View>
-          <View style={styles.taskListColumnContainer}>
-            <View style={styles.taskHeader}>
+          <View
+            style={[
+              styles.taskListColumnContainer,
+              // {backgroundColor: 'tomato'},
+            ]}>
+            <View style={[styles.taskHeader]}>
               <TouchableOpacity
                 onPress={openTaskModal}
                 style={[styles.PlusIcon, {zIndex: 1}]}>
@@ -370,30 +376,34 @@ const Home = () => {
             </View>
             <View
               onLayout={e => {
-                console.log(e.nativeEvent.layout.height / constants.HEIGHT);
+                const {height} = e.nativeEvent.layout;
+                setDisplayTaskContainerHeight(height);
               }}
               style={{
-                height: TASK_CONTAINER_HEIGHT - TASK_CONTAINER_HEIGHT * 0.17,
-                backgroundColor: 'blue',
+                // height: TASK_CONTAINER_HEIGHT - TASK_CONTAINER_HEIGHT * 0.17,
+                flex: 1,
               }}>
-              <DisplayTask
-                data={tasks}
-                isTaskLoading={tasksLoading}
-                sharedX={sharedX}
-                flashListRef={flashListRef}
-                sharedDatesIndex={sharedDatesIndex}
-                datePress={datePress}
-                //@ts-ignore
-                flatListData={flatListData}
-                snapToOffsets={snapToOffsets}
-                openTaskModal={openTaskModal}
-                task={editTaskDetails}
-                setTask={setEditTaskDetails}
-                updateTask={updateTask}
-                TASK_CONTAINER_HEIGHT={
-                  TASK_CONTAINER_HEIGHT - TASK_CONTAINER_HEIGHT * 0.17
-                }
-              />
+              {displayTaskContainerHeight > 0 && (
+                <DisplayTask
+                  data={tasks}
+                  isTaskLoading={tasksLoading}
+                  sharedX={sharedX}
+                  flashListRef={flashListRef}
+                  sharedDatesIndex={sharedDatesIndex}
+                  datePress={datePress}
+                  //@ts-ignore
+                  flatListData={flatListData}
+                  snapToOffsets={snapToOffsets}
+                  openTaskModal={openTaskModal}
+                  task={editTaskDetails}
+                  setTask={setEditTaskDetails}
+                  updateTask={updateTask}
+                  TASK_CONTAINER_HEIGHT={
+                    // TASK_CONTAINER_HEIGHT - TASK_CONTAINER_HEIGHT * 0.17
+                    displayTaskContainerHeight
+                  }
+                />
+              )}
             </View>
 
             {/* {tasks?.length > 0 ? (
@@ -676,7 +686,7 @@ const styles = StyleSheet.create({
     // fontWeight: '600',
   },
   myListContainer: {
-    // height: '16%',
+    height: '16%',
     paddingVertical: '1.5%',
     // justifyContent: 'flex-end',
     // backgroundColor: 'blue',

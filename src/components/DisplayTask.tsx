@@ -186,10 +186,11 @@ const DisplayTask = ({
       <View
         style={[
           {
-            height: TASK_CONTAINER_HEIGHT,
+            height: TASK_CONTAINER_HEIGHT - TASK_CONTAINER_HEIGHT * 0.17,
+            // flex: 1,
             justifyContent: 'center',
             alignItems: 'center',
-            backgroundColor: 'red',
+            // backgroundColor: 'red',
           },
         ]}>
         {isTaskLoading ? (
@@ -221,7 +222,7 @@ const DisplayTask = ({
           // {...(sharedX.value === 0 && {exiting: SlideOutRight})}
           style={[
             styles.taskListContainer,
-            {height: TASK_CONTAINER_HEIGHT * 0.32},
+            {height: TASK_CONTAINER_HEIGHT * (93 / 215)},
             {...(!index && {marginTop: 0})},
           ]}>
           <View style={styles.taskListContent}>
@@ -364,14 +365,14 @@ const DisplayTask = ({
       style={{
         justifyContent: 'flex-start',
         alignItems: 'center',
-        height: contentH - 38,
-        // backgroundColor: 'red',
+        height: TASK_CONTAINER_HEIGHT,
+        // backgroundColor: 'blue',
       }}>
       <GestureDetector gesture={gestureX}>
         <View
           style={{
             width: '100%',
-            height: contentH - 38,
+            height: TASK_CONTAINER_HEIGHT,
             // backgroundColor: 'red',
           }}>
           <Animated.FlatList
@@ -383,7 +384,7 @@ const DisplayTask = ({
             keyExtractor={keyExtractor}
             contentContainerStyle={{
               paddingBottom: !isRenderTaskFromAllTasks
-                ? TASK_CONTAINER_HEIGHT * 0.005
+                ? TASK_CONTAINER_HEIGHT * 0.07
                 : TASK_CONTAINER_HEIGHT * 0.07,
             }}
           />
@@ -394,10 +395,10 @@ const DisplayTask = ({
                 // justifyContent: 'flex-end',
                 alignSelf: 'center',
                 // position: 'absolute',
-                bottom: 0,
+                bottom: 3,
                 // flex: 1,
                 // height: TASK_CONTAINER_HEIGHT - contentH,
-                backgroundColor: 'red',
+                // backgroundColor: 'red',
               }}>
               {data?.length > 2 && <SVG.ArrowDown />}
             </View>

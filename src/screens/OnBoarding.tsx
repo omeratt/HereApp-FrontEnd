@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   FlatList,
   FlatListProps,
   StyleSheet,
@@ -7,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import React, {useCallback, useEffect, useState} from 'react';
-import constants from '../assets/constants';
+import constants, {OnBoardingList} from '../assets/constants';
 import Animated, {
   Easing,
   FadeInLeft,
@@ -22,6 +23,7 @@ import Line from '../components/Line';
 import SVG from '../assets/svg';
 import {useNavigation} from '@react-navigation/native';
 import {gap} from '../components/BallonTxt';
+import {useSetNewUserMutation} from '../app/api/userApi';
 const styles1 = StyleSheet.create({
   container: {
     // maxWidth: '61%',
@@ -57,25 +59,31 @@ const styles1 = StyleSheet.create({
   },
 });
 interface BallonProps {
-  txt: string;
+  txt: OnBoardingList;
   index: number;
-  SetSelectedItems: (item: string) => void;
-  selectedItems: string[];
+  SetSelectedItems: (item: OnBoardingList) => void;
+  selectedItems: OnBoardingList[];
 }
 export default function OnBoarding() {
   const list = constants.OnBoardingList;
   const nav = useNavigation();
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
-  const SetSelectedItems = useCallback((item: string) => {
+  const [selectedItems, setSelectedItems] = useState<OnBoardingList[]>([]);
+  const SetSelectedItems = useCallback((item: OnBoardingList) => {
     setSelectedItems(prev => {
       if (prev.includes(item)) return prev.filter(e => e !== item);
       return [...prev, item];
     });
   }, []);
+  const [setNewUser, {isLoading, data}] = useSetNewUserMutation();
 
   const goHome = useCallback(() => {
     nav.navigate('HomePage' as never);
   }, [nav]);
+  const handleSubmit = useCallback(() => {
+    console.log(selectedItems);
+    setNewUser(selectedItems);
+    nav.navigate('HomePage' as never);
+  }, [nav, selectedItems]);
   const BallonTxt = useCallback(
     ({txt, index, selectedItems, SetSelectedItems}: BallonProps) => {
       const isTimeManagement = txt === 'Time management';
@@ -105,8 +113,10 @@ export default function OnBoarding() {
           <TouchableOpacity
             // style={{width: '90%', height: '100%'}}
             onPress={() => {
+              const isIncludeItem = selectedItems.includes(txt);
+              if (selectedItems.length === 2 && !isIncludeItem) return;
               SetSelectedItems(txt);
-              progress.value = withTiming(progress.value > 0 ? 0 : 1, {
+              progress.value = withTiming(isIncludeItem ? 0 : 1, {
                 duration: 250,
               });
             }}>
@@ -192,17 +202,26 @@ export default function OnBoarding() {
           showsVerticalScrollIndicator={false}
         />
       </View>
-      <TouchableOpacity
-        onPress={goHome}
-        style={{
-          flex: 1, //wtf
-          alignItems: 'center',
-          justifyContent: 'center',
-          // backgroundColor: 'red',
-          // height: constants.HEIGHT * 0.12,
-          // marginTop: 12,
-        }}>
-        <SVG.Continue />
+
+      <TouchableOpacity onPress={handleSubmit} style={[styles.doneContainer]}>
+        {isLoading ? (
+          <ActivityIndicator color={constants.colors.GREEN} size={'small'} />
+        ) : (
+          <>
+            <Text
+              style={{
+                color: constants.colors.OFF_WHITE,
+                fontFamily: constants.Fonts.text,
+                fontSize: constants.rf(18),
+              }}>
+              <Text style={{color: constants.colors.GREEN}}>
+                {selectedItems.length}
+              </Text>{' '}
+              / 2
+            </Text>
+            <SVG.Continue />
+          </>
+        )}
       </TouchableOpacity>
     </View>
   );
@@ -234,6 +253,11 @@ const styles = StyleSheet.create({
   bottomContainer: {
     height: '76.2277%',
     // backgroundColor: 'red',
+  },
+  doneContainer: {
+    flex: 1, //wtf
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
   },
   // wordsContainer: {
   //   flex: 1,

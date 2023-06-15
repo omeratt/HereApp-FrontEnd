@@ -43,7 +43,11 @@ const Search = () => {
   const [flashListHeight, setFlashListHeight] = React.useState<
     number | undefined
   >(undefined);
-  const {data: searchResult} = useSearchQuery({input: inputValue});
+  const {
+    data: searchResult,
+    isLoading,
+    isFetching,
+  } = useSearchQuery({input: inputValue});
   const shouldDisplayList = useMemo(
     () => searchResult?.lists && searchResult?.lists?.length > 0,
     [searchResult],
@@ -97,6 +101,24 @@ const Search = () => {
         </Animated.View>
 
         <View style={[styles.searchContent, {height: flashListHeight}]}>
+          {!shouldDisplayTask &&
+            !shouldDisplayList &&
+            !shouldDisplayMsg &&
+            !isLoading &&
+            !isFetching &&
+            inputValue.length !== 0 && (
+              <Text
+                style={[
+                  {
+                    fontSize: 11,
+                    height: '10%',
+                    textAlignVertical: 'center',
+                    color: constants.colors.UNDER_LINE,
+                  },
+                ]}>
+                Sorry, no results has been found...
+              </Text>
+            )}
           <Animated.ScrollView
             contentContainerStyle={{flexGrow: 1}}
             style={{flex: 1}}

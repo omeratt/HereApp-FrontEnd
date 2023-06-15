@@ -192,6 +192,7 @@ const NewCategory = () => {
       onSelectPress={isLoading ? undefined : toggleSelect}
       isSelected={isLoading ? undefined : isSelect}
       onRightBtnPress={isLoading ? undefined : navigateToAddCategory}
+      onDonePress={navigation.goBack}
       isLoading={isLoading}>
       <View
         style={{
@@ -224,9 +225,7 @@ const NewCategory = () => {
             return listsLoading ? (
               <ActivityIndicator size={32} color={constants.colors.GREEN} />
             ) : (
-              <Text style={styles.newTaskTitleInput}>
-                No Lists yet, Create One By Clicking On Plus Icon
-              </Text>
+              <Text style={styles.newTaskTitleInput}>No categories</Text>
             );
           }}
           //   getItemLayout={(_, index) => {

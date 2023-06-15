@@ -38,6 +38,7 @@ import BottomSheetDeleteModal, {
 import {RFValue, RFPercentage} from 'react-native-responsive-fontsize';
 import {setFocus} from '../../app/Reducers/User/screensSlice';
 import {useAppDispatch} from '../../app/hooks';
+import {getRealDate} from '../../components/WeeklyCalender';
 const {WIDTH, HEIGHT} = constants;
 const paddingHorizontal = WIDTH * (30.37 / 414);
 const width = WIDTH - 2 * paddingHorizontal;
@@ -108,10 +109,11 @@ const Messages = () => {
   }, [data]);
 
   const toggleSelect = React.useCallback(() => {
+    if (!lastMsg) return;
     setIsSelectOn(!isSelectOn);
     Vibration.vibrate(1);
     setSelected([]);
-  }, [isSelectOn]);
+  }, [isSelectOn, lastMsg]);
 
   const navToEditMessage = React.useCallback(
     (msg: IMessageValues) => {
@@ -174,7 +176,6 @@ const Messages = () => {
     [],
   );
   return (
-    // <SafeAreaView style={{flex: 1}}>
     <View style={styles.container}>
       <View
         style={{
@@ -208,26 +209,6 @@ const Messages = () => {
               }}
             />
           </TouchableOpacity>
-          {isSelectOn && (
-            <Animated.View
-              entering={ZoomIn.duration(250)}
-              exiting={ZoomOut.duration(250)}
-              style={{}}>
-              <TouchableOpacity
-              // style={}
-              // onPress={onVCheckboxPress}
-              >
-                {selected.length > 0 ? (
-                  <SVG.TrashGreen
-                    height={ICON_BACK_SIZE}
-                    onPress={openDeleteModal}
-                  />
-                ) : (
-                  <SVG.TrashWhite height={ICON_BACK_SIZE} />
-                )}
-              </TouchableOpacity>
-            </Animated.View>
-          )}
         </View>
       </View>
       <View style={styles.msgContainer}>
@@ -269,12 +250,14 @@ const Messages = () => {
               exiting={FadeOutUp}
               style={styles.flashListFooter}>
               <TouchableOpacity
-                onLongPress={toggleSelect}
-                onPress={() =>
-                  isSelectOn
+                onLongPress={() => {
+                  lastMsg && toggleSelect();
+                }}
+                onPress={() => {
+                  isSelectOn && lastMsg
                     ? handleSelected(lastMsg._id!)
-                    : navToEditMessage(lastMsg)
-                }>
+                    : navToEditMessage(lastMsg);
+                }}>
                 <Animated.View
                   style={{
                     height: lastMsgH,
@@ -297,67 +280,78 @@ const Messages = () => {
                           size={25 / 1.05}
                           isFilled={isLastSelected}
                           colorFill={constants.colors.GREEN}
-                          onPress={() => handleSelected(lastMsg._id!)}
+                          onPress={() =>
+                            lastMsg && handleSelected(lastMsg._id!)
+                          }
                         />
                       </Animated.View>
                     )}
                     <Animated.View
                       layout={SequencedTransition}
                       onLayout={onLayout}
-                      style={{alignSelf: 'flex-start'}}>
-                      <Text
-                        numberOfLines={4}
-                        // textBreakStrategy="highQuality"
-                        style={[
-                          styles.lastMsgTxt,
-                          // , {maxHeight: '30%'}
-                        ]}>
-                        {lastMsg?.message}
-                        {/* An idea I had for an interactive course - to search in
-                      science books */}
+                      style={{
+                        alignSelf: 'flex-start',
+                        justifyContent: 'center',
+                      }}>
+                      <Text numberOfLines={4} style={[styles.lastMsgTxt]}>
+                        {lastMsg?.message || 'No messages'}
                       </Text>
-                      {lastMsg?.createdAt && (
+                      {
                         <Text style={styles.dateTxt}>
-                          {new Date(lastMsg.createdAt).toLocaleString('eng', {
+                          {new Date(
+                            lastMsg?.createdAt || getRealDate(new Date()),
+                          ).toLocaleString('eng', {
                             month: 'short',
                             day: '2-digit',
                             year: 'numeric',
                           })}
                         </Text>
-                      )}
+                      }
                     </Animated.View>
                   </View>
                 </Animated.View>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.plusIcon} onPress={navToMessage}>
-                <AntDesign
-                  name="pluscircleo"
-                  color={constants.colors.OFF_WHITE}
-                  size={ICON_PLUS_SIZE - 1}
-                />
-              </TouchableOpacity>
+              {isSelectOn ? (
+                <Animated.View
+                  entering={ZoomIn.duration(250)}
+                  exiting={ZoomOut.duration(250)}
+                  style={styles.plusIcon}>
+                  <TouchableOpacity>
+                    {selected.length > 0 ? (
+                      <SVG.TrashGreen
+                        height={ICON_BACK_SIZE}
+                        onPress={openDeleteModal}
+                      />
+                    ) : (
+                      <SVG.TrashWhite height={ICON_BACK_SIZE} />
+                    )}
+                  </TouchableOpacity>
+                </Animated.View>
+              ) : (
+                <TouchableOpacity
+                  style={styles.plusIcon}
+                  onPress={navToMessage}>
+                  <AntDesign
+                    name="pluscircleo"
+                    color={constants.colors.OFF_WHITE}
+                    size={ICON_PLUS_SIZE - 1}
+                  />
+                </TouchableOpacity>
+              )}
             </Animated.View>
           </>
         )}
       </View>
-      {/* <TouchableOpacity style={styles.plusIcon} onPress={navToMessage}>
-        <AntDesign
-          name="pluscircleo"
-          color={constants.colors.OFF_WHITE}
-          size={ICON_PLUS_SIZE - 1}
-        />
-      </TouchableOpacity> */}
       <BottomSheetDeleteModal
         onDelete={handleDelete}
         ids={selected}
         ref={bottomSheetRef}
       />
     </View>
-    // </SafeAreaView>
   );
 };
 export default Messages;
-const lineHeight = constants.rf(31);
+const lineHeight = constants.rf(35);
 const lastMsgFontSize = constants.rf(35);
 const dateFontSize = constants.rf(11);
 // const lineHeight = RF(32);
@@ -405,10 +399,12 @@ const styles = StyleSheet.create({
   lastMsgTxt: {
     fontFamily: constants.Fonts.paragraph,
     fontSize: lastMsgFontSize,
-    lineHeight: lineHeight,
+    // lineHeight: lineHeight,
     color: constants.colors.GREEN,
     width: width * 0.9,
+    textAlign: 'left',
     // backgroundColor: 'red',
+    // textAlignVertical: 'center',
   },
   dateTxt: {
     fontFamily: constants.Fonts.text,

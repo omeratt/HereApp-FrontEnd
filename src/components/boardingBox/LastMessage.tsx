@@ -11,7 +11,7 @@ import moment from 'moment';
 import {getShortName, getTimeFromDateString} from '../WeeklyCalender';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import SVG from '../../assets/svg';
-import {useNavigation} from '@react-navigation/native';
+import {CommonActions, useNavigation} from '@react-navigation/native';
 const {rf} = constants;
 interface LastMessageProps {
   width: number;
@@ -26,7 +26,7 @@ const LastMessage: React.FC<LastMessageProps> = ({
   message,
   isLoading,
 }) => {
-  if (!message || isLoading) {
+  if (isLoading) {
     return isLoading ? (
       <View
         style={{
@@ -46,21 +46,27 @@ const LastMessage: React.FC<LastMessageProps> = ({
   const formattedDate = getShortName(date.day()) + ' ' + date.date();
 
   const navToNewMessage = React.useCallback(() => {
-    navigation.navigate('Message' as never, {navFromHome: true} as never);
+    navigation.dispatch(
+      CommonActions.navigate('Message', {
+        params: {navFromHome: true},
+      }),
+    );
   }, [message]);
   const navToEditMessage = React.useCallback(() => {
-    navigation.navigate(
-      'Message' as never,
-      {messageRouteProp: message, navFromHome: true} as never,
+    navigation.dispatch(
+      CommonActions.navigate('Message', {
+        messageRouteProp: message,
+        navFromHome: true,
+      }),
     );
   }, [message]);
   const messageSubString = React.useMemo(() => {
-    const inputString = message.message;
-    const searchString = message.title;
+    const inputString = message?.message;
+    const searchString = message?.title;
     const regex = new RegExp(searchString, 'g');
-    const result = inputString.replace(regex, '');
-    return result.trim();
-  }, [message.message, message.title]);
+    const result = inputString?.replace(regex, '');
+    return result?.trim();
+  }, [message?.message, message?.title]);
 
   return (
     <View style={styles.container}>
@@ -69,18 +75,36 @@ const LastMessage: React.FC<LastMessageProps> = ({
           <Text style={[styles.font, styles.title]}>Message</Text>
           {message && <Text style={[styles.font]}>{hours}</Text>}
         </View>
-        {message._id && (
-          <TouchableOpacity onPress={navToNewMessage}>
-            <SVG.NotePlus height={23.75} width={23.75} />
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity onPress={navToNewMessage}>
+          <SVG.NotePlus height={23.75} width={23.75} />
+        </TouchableOpacity>
       </View>
       <View style={{marginTop: height * 0.1}}>
-        <Text style={[styles.font, styles.title]}>{message.title?.trim()}</Text>
-        <Text numberOfLines={3} style={styles.font}>
-          {messageSubString?.trim()}
-        </Text>
+        {message ? (
+          <>
+            <Text style={[styles.font, styles.title]}>
+              {message?.title?.trim()}
+            </Text>
+            <Text numberOfLines={3} style={styles.font}>
+              {messageSubString?.trim()}
+            </Text>
+          </>
+        ) : (
+          <Text
+            style={[
+              styles.font,
+              {
+                height: '60%',
+                textAlignVertical: 'bottom',
+                fontSize: constants.rf(15),
+                color: constants.colors.UNDER_LINE,
+              },
+            ]}>
+            No messages
+          </Text>
+        )}
       </View>
+
       <View style={styles.footerContainer}>
         <View style={styles.footer}>
           <View style={[styles.textFooter, {width: `${(49 / width) * 100}%`}]}>

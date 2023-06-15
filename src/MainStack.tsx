@@ -4,7 +4,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import Auth from './screens/Auth';
 import Welcome from './screens/Welcome';
 import {useAppSelector} from './app/hooks';
-import {selectIsSignIn} from './app/Reducers/User/userSlice';
+import {selectIsNewUser, selectIsSignIn} from './app/Reducers/User/userSlice';
 import Home from './screens/Home';
 import constants from './assets/constants';
 import OnBoarding from './screens/OnBoarding';
@@ -29,7 +29,7 @@ export default function MainStack() {
   useNotification();
 
   const isSignIn = useAppSelector(selectIsSignIn);
-
+  const isNewUser = useAppSelector(selectIsNewUser);
   const screenOptions =
     (freezeOnBlur = true) =>
     (): NativeStackNavigationOptions => ({
@@ -45,16 +45,20 @@ export default function MainStack() {
         screenOptions={screenOptions()}>
         {isSignIn ? (
           <>
-            <Stack.Screen
-              name="Welcome"
-              component={Welcome}
-              options={screenOptions()}
-            />
-            <Stack.Screen
-              name="OnBoarding"
-              component={OnBoarding}
-              options={screenOptions()}
-            />
+            {isNewUser && (
+              <>
+                <Stack.Screen
+                  name="Welcome"
+                  component={Welcome}
+                  options={screenOptions()}
+                />
+                <Stack.Screen
+                  name="OnBoarding"
+                  component={OnBoarding}
+                  options={screenOptions()}
+                />
+              </>
+            )}
             <Stack.Screen
               name="HomePage"
               component={Home}

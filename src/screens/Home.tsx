@@ -20,7 +20,11 @@ import {
 import DisplayTask from '../components/DisplayTask';
 import {useAppDispatch} from '../app/hooks';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
-import {DrawerActions, useNavigation} from '@react-navigation/native';
+import {
+  CommonActions,
+  DrawerActions,
+  useNavigation,
+} from '@react-navigation/native';
 import {
   DateObject,
   getDatesForYear,
@@ -193,11 +197,16 @@ const Home = () => {
     navigation.navigate('Search' as never);
   }, []);
   const handleListPlusIcon = useCallback(() => {
-    navigation.navigate(
-      ('ListAndNotesStack' as never,
-      {
-        screen: 'ListAndNotes' as never,
-      } as never) as never,
+    // navigation.navigate(
+    //   'ListAndNotesStack' as never,
+    //   {
+    //     name: 'ListAndNotes',
+    //   } as never,
+    // );
+    navigation.dispatch(
+      CommonActions.navigate('ListAndNotesStack', {
+        name: 'ListAndNotes',
+      }),
     );
   }, [navigation]);
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -269,6 +278,13 @@ const Home = () => {
   const toggleCalendar = useCallback(() => {
     setCalendarVisible(!calendarVisible);
   }, [calendarVisible]);
+  const emptyList = () => {
+    return prioritizedListsLoading ? (
+      <ActivityIndicator size={32} color={constants.colors.GREEN} />
+    ) : (
+      <Text style={[styles.noLists]}>No lists</Text>
+    );
+  };
   return (
     <Animated.View
       entering={FlipInEasyY}
@@ -401,6 +417,7 @@ const Home = () => {
                 renderItem={props => <RenderListCategoryHome {...props} />}
                 estimatedItemSize={ListCategoryWidth}
                 extraData={{lists}}
+                ListEmptyComponent={emptyList}
               />
             )}
           </View>
@@ -538,6 +555,21 @@ const styles = StyleSheet.create({
     borderColor: constants.colors.UNDER_LINE,
     backgroundColor: constants.colors.OFF_WHITE,
     elevation: 2,
+  },
+  noLists: {
+    fontSize: constants.rf(14),
+    // width: '100%',
+    height: '100%',
+    // flex: 1,
+    color: constants.colors.UNDER_LINE,
+    // alignItems: 'center',
+    // justifyContent: 'center',
+    fontFamily: constants.Fonts.text,
+    // backgroundColor: 'red',
+    // textAlign: 'center',
+    // textAlignVertical: 'center',
+    // top: '22%',
+    // padding: '6%',
   },
   topBox: {
     height: '85%',

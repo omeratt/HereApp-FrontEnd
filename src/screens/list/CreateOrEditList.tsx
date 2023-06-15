@@ -48,7 +48,7 @@ export interface ListItemType {
 }
 
 export interface Action {
-  type: 'INPUT' | 'FLAG' | 'CHECK' | 'POP' | 'PUSH' | 'SET';
+  type: 'INPUT' | 'FLAG' | 'CHECK' | 'POP' | 'PUSH' | 'SET' | 'SET_INITIAL';
   index?: number;
   payload: any;
 }
@@ -95,6 +95,9 @@ const reducer = (state: ListItemType[], action: Action) => {
       action.index !== undefined &&
         (state[action.index].flag = !state[action.index].flag);
       return [...state];
+    case 'SET_INITIAL':
+      state = action.payload;
+      return [...state];
     default:
       return state;
   }
@@ -127,6 +130,19 @@ const CreateOrEditList = () => {
       ? [...lists[categoryIndex].lists[listIndex].listItems, {...newItem}]
       : [],
   );
+
+  useEffect(() => {
+    if (lists) {
+      dispatch?.({
+        type: 'SET_INITIAL',
+        payload: [
+          ...lists[categoryIndex].lists[listIndex].listItems,
+          {...newItem},
+        ],
+      });
+    }
+  }, [lists]);
+
   const title = lists?.[categoryIndex].name;
   // ? '' +
   //   lists![categoryIndex].name +
@@ -135,7 +151,9 @@ const CreateOrEditList = () => {
   // : 'loading...';
 
   const subtitle = lists?.[categoryIndex].lists[listIndex].title;
-  const [checkboxType, setCheckboxType] = useState<CheckBoxListType>('V');
+  const [checkboxType, setCheckboxType] = useState<CheckBoxListType>(
+    lists?.[categoryIndex].lists[listIndex].checkBoxListType || 'V',
+  );
   const [currentFocusIndex, setCurrentFocusIndex] = useState(-1);
   const nav = useNavigation();
   const handleSubmit = useCallback(async () => {
@@ -143,6 +161,7 @@ const CreateOrEditList = () => {
       listId: lists![categoryIndex].lists[listIndex]._id,
       items: state,
       deleted,
+      checkBoxListType: checkboxType,
     };
     addItemSubmit(items)
       .then(data => {
@@ -151,18 +170,18 @@ const CreateOrEditList = () => {
       .catch(error => {
         console.log('error on handleSubmit add items, error', state);
       });
-  }, [addItemSubmit, state, deleted]);
+  }, [addItemSubmit, state, deleted, checkboxType]);
   const onListItemTypePress = useCallback((type: CheckBoxListType) => {
     setCheckboxType(type);
   }, []);
 
-  useEffect(() => {
-    if (state.length > 0) return;
-    const items = lists
-      ? lists[categoryIndex]?.lists[listIndex]?.listItems
-      : [];
-    dispatch({type: 'SET', index: listIndex, payload: items});
-  }, [lists]);
+  // useEffect(() => {
+  //   if (state.length > 0) return;
+  //   const items = lists
+  //     ? lists[categoryIndex]?.lists[listIndex]?.listItems
+  //     : [];
+  //   dispatch({type: 'SET', index: listIndex, payload: items});
+  // }, [lists]);
 
   const onVCheckboxPress = useCallback(
     () => onListItemTypePress('V'),

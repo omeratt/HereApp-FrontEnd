@@ -6,6 +6,7 @@ import {
   // ListRenderItemInfo,
   Vibration,
   TouchableOpacity,
+  Text,
 } from 'react-native';
 import React, {memo, useCallback, useEffect, useRef} from 'react';
 import constants, {ListType} from '../../assets/constants';
@@ -202,7 +203,6 @@ const MyLists = () => {
       onDonePress={() => {
         navigation.goBack();
       }}>
-      {listsLoading && <ActivityIndicator />}
       {lists && (
         <FlashList
           data={lists![index].lists}
@@ -210,14 +210,13 @@ const MyLists = () => {
           renderItem={props => <RenderItem {...props} />}
           estimatedItemSize={40}
           extraData={{selected, showLine, isSelect}}
-          // style={styles.listContainerContent}
-          // getItemLayout={(_, index) => {
-          //   return {
-          //     index,
-          //     length: 40,
-          //     offset: 40 * index,
-          //   };
-          // }}
+          ListEmptyComponent={() => {
+            return listsLoading ? (
+              <ActivityIndicator size={32} color={constants.colors.GREEN} />
+            ) : (
+              <Text style={styles.newTaskTitleInput}>No Lists</Text>
+            );
+          }}
         />
       )}
       {isSelect && (
@@ -259,6 +258,15 @@ export default memo(MyLists);
 const styles = StyleSheet.create({
   listContainerContent: {
     // paddingVertical: '7%',
+  },
+  newTaskTitleInput: {
+    borderWidth: 0,
+    fontSize: 20,
+    color: constants.colors.UNDER_LINE,
+    alignItems: 'center',
+    textAlignVertical: 'center',
+    fontFamily: constants.Fonts.text,
+    marginLeft: '2%',
   },
   listContainerFooter: {
     position: 'absolute',

@@ -1,4 +1,4 @@
-import {login, logout} from '../Reducers/User/userSlice';
+import {login, logout, setNewUser} from '../Reducers/User/userSlice';
 import {store} from '../store';
 import CookieManager from '@react-native-cookies/cookies';
 import {tasksApi} from './taskApi';
@@ -7,6 +7,7 @@ import {listsApi} from './listApi';
 import auth from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {WidgetsType} from '../../screens/selectWidgets/types';
+import {OnBoardingList} from '../../assets/constants';
 export const userApi = apiSlice.injectEndpoints({
   endpoints: builder => ({
     home: builder.query({
@@ -106,6 +107,19 @@ export const userApi = apiSlice.injectEndpoints({
       },
       invalidatesTags: ['Widgets'],
     }),
+    setNewUser: builder.mutation({
+      query: (list: OnBoardingList[]) => ({
+        url: 'user/setNewUser',
+        body: {list},
+        credentials: 'include',
+        method: 'POST',
+      }),
+      transformResponse: async (response: any, meta, arg) => {
+        store?.dispatch(setNewUser(false));
+        return response.data;
+      },
+      invalidatesTags: ['Widgets'],
+    }),
     myProfile: builder.query({
       query: () => ({
         url: 'user/myProfile',
@@ -157,4 +171,5 @@ export const {
   useSetFcmTokenMutation,
   useUpdateWidgetsMutation,
   useRefreshFcmTokenMutation,
+  useSetNewUserMutation,
 } = userApi;

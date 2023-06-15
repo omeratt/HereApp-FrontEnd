@@ -177,11 +177,26 @@ const DisplayTask = ({
       </BottomSheetModal>
     );
   };
-  const emptyList = () => {
-    if (isTaskLoading)
-      return <ActivityIndicator size={30} color={constants.colors.GREEN} />;
-    else return null;
-  };
+  const EmptyList = useCallback(() => {
+    return (
+      <View
+        style={[
+          // styles.taskListContainer,
+          {
+            height: TASK_CONTAINER_HEIGHT * 0.63,
+            backgroundColor: 'red',
+            justifyContent: 'center',
+            alignItems: 'center',
+          },
+        ]}>
+        {isTaskLoading ? (
+          <ActivityIndicator size={32} color={constants.colors.GREEN} />
+        ) : (
+          <Text style={[styles.noTasks]}>No tasks</Text>
+        )}
+      </View>
+    );
+  }, [data, isTaskLoading, TASK_CONTAINER_HEIGHT]);
   const springConfig = useMemo(() => {
     return {stiffness: 100, mass: 0.5};
   }, []);
@@ -267,22 +282,25 @@ const DisplayTask = ({
   const startX = useSharedValue(sharedDatesIndex.value);
   const DATE_WIDTH = (constants.WIDTH * 0.89444444444444444444444444444444) / 7;
 
-  const scroll = useCallback((x: number) => {
-    const offset = snapToOffsets[startX.value] - (x / DATE_WIDTH) * 15;
-    flashListRef?.current?.scrollToOffset({
-      offset: offset,
-    });
-  }, []);
+  const scroll = useCallback(
+    (x: number) => {
+      const offset = snapToOffsets[startX.value] - (x / DATE_WIDTH) * 15;
+      flashListRef?.current?.scrollToOffset({
+        offset: offset,
+      });
+    },
+    [snapToOffsets, flashListRef, startX, DATE_WIDTH],
+  );
 
   const press: () => void = useCallback(() => {
     datePress(flatListData[sharedDatesIndex.value]);
-  }, []);
+  }, [flatListData, sharedDatesIndex]);
   const endScroll: () => void = useCallback(() => {
     flashListRef?.current?.scrollToOffset({
       offset: snapToOffsets[sharedDatesIndex.value],
       animated: true,
     });
-  }, []);
+  }, [flashListRef, snapToOffsets, sharedDatesIndex]);
 
   const gestureX = useMemo(
     () =>
@@ -329,7 +347,7 @@ const DisplayTask = ({
       const item = {...props.item, updateTask};
       return <RenderItem {...props} item={item} />;
     },
-    [selected, isSelectOn],
+    [selected, isSelectOn, data],
   );
   const keyExtractor: (item: RenderItemProps, index: number) => string =
     useCallback((item: RenderItemProps) => item._id!, []);
@@ -356,7 +374,7 @@ const DisplayTask = ({
             fadingEdgeLength={isRenderTaskFromAllTasks ? 350 : 50}
             style={{transform: [{translateX: sharedX}]}}
             data={data}
-            ListEmptyComponent={emptyList}
+            ListEmptyComponent={<EmptyList />}
             renderItem={renderItem}
             keyExtractor={keyExtractor}
             contentContainerStyle={{
@@ -401,6 +419,17 @@ const styles = StyleSheet.create({
     backgroundColor: constants.colors.OFF_WHITE,
     // height
     // backgroundColor: 'red',
+  },
+  noTasks: {
+    fontSize: constants.rf(14),
+    // width: '100%',
+    color: constants.colors.UNDER_LINE,
+    fontFamily: constants.Fonts.text,
+    // backgroundColor: 'red',
+    // textAlign: 'center',
+    // textAlignVertical: 'center',
+    // top: '22%',
+    // padding: '6%',
   },
   PlusIcon: {
     position: 'absolute',

@@ -56,6 +56,7 @@ const initialValues: IMessageValues = {
 const Message: React.FC<IMessagesProps> = () => {
   const messageRouteProp =
     useRoute<MessageRouteProp>().params?.messageRouteProp;
+  console.log(messageRouteProp);
   const navFromSearch = useRoute<MessageRouteProp>().params?.navFromSearch;
   const navFromHome = useRoute<MessageRouteProp>().params?.navFromHome;
   const flashListRef = useRoute<MessageRouteProp>().params?.flashListRef;
@@ -71,22 +72,22 @@ const Message: React.FC<IMessagesProps> = () => {
   const inputRef = React.useRef<TextInput>(null);
   const changeDarkMode = () => setDarkMode(prev => !prev);
   const goBack = React.useCallback(() => {
-    if (navFromSearch) {
-      return navigation.navigate('Search' as never);
-    }
-    if (navFromHome) {
-      return navigation.navigate('HomePage' as never);
-    }
-    navigation.navigate('Messages' as never);
+    // if (navFromSearch) {
+    //   return navigation.navigate('Search' as never);
+    // }
+    // if (navFromHome) {
+    //   return navigation.navigate('HomePage' as never);
+    // }
+    navigation.goBack();
   }, []);
 
   const handleSubmit = async () => {
     goBack();
     await addMsg(values);
-    if (flashListRef?.current) {
-      flashListRef.current?.prepareForLayoutAnimationRender();
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    }
+    // if (flashListRef?.current) {
+    //   flashListRef.current?.prepareForLayoutAnimationRender();
+    //   LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    // }
   };
   const sliceTitle = (value: string) => {
     if (value.length > textLengthLimit + 1) return;

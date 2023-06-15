@@ -15,6 +15,7 @@ export interface UserState {
   categoriesList: CategoryListType[];
   token?: string;
   fcmToken?: string;
+  isNewUser?: boolean;
 }
 export interface TaskType {
   _id?: string;
@@ -38,6 +39,7 @@ const initialState: UserState = {
   token: '',
   fcmToken: '',
   categoriesList: [],
+  isNewUser: true,
 };
 
 export const userSlice = createSlice({
@@ -64,10 +66,14 @@ export const userSlice = createSlice({
       state = {...state, fcmToken: action.payload};
       return state;
     },
+    setNewUser: (state, action: PayloadAction<boolean>) => {
+      state = {...state, isNewUser: action.payload};
+      return state;
+    },
   },
 });
 
-export const {setUser, login, logout, setCategoriesList, setFcm} =
+export const {setUser, login, logout, setCategoriesList, setFcm, setNewUser} =
   userSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
@@ -76,6 +82,8 @@ export const selectUserToken = (state: RootState) => state.reducer.user.token;
 export const selectUserFcmToken = (state: RootState) =>
   state.reducer.user.fcmToken;
 export const selectIsSignIn = (state: RootState) => state.reducer.user.isSignIn;
+export const selectIsNewUser = (state: RootState) =>
+  state.reducer.user.isNewUser;
 export const selectCategoriesList = (state: RootState) =>
   state.reducer.user.categoriesList;
 

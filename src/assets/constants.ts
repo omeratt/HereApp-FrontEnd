@@ -24,6 +24,19 @@ export interface ListItemType {
   done: boolean;
   flag: boolean;
 }
+
+export type OnBoardingList =
+  | 'Time management'
+  | 'Confusion'
+  | 'Unorganized'
+  | 'Lack of focus'
+  | 'Self-expression'
+  | 'Priorities'
+  | 'Feeling lonely'
+  | 'Distractions'
+  | 'Feeling abnormal'
+  | 'Frustration';
+
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
 const fontScale = PixelRatio.getFontScale();
@@ -86,16 +99,16 @@ const constants = {
     'Every year',
   ],
   OnBoardingList: [
-    {txt: 'Time management'},
-    {txt: 'Confusion'},
-    {txt: 'Unorganized'},
-    {txt: 'Lack of focus'},
-    {txt: 'Self-expression'},
-    {txt: 'Priorities'},
-    {txt: 'Feeling lonely'},
-    {txt: 'Distractions'},
-    {txt: 'Feeling abnormal'},
-    {txt: 'Frustration'},
+    {txt: 'Time management' as OnBoardingList},
+    {txt: 'Confusion' as OnBoardingList},
+    {txt: 'Unorganized' as OnBoardingList},
+    {txt: 'Lack of focus' as OnBoardingList},
+    {txt: 'Self-expression' as OnBoardingList},
+    {txt: 'Priorities' as OnBoardingList},
+    {txt: 'Feeling lonely' as OnBoardingList},
+    {txt: 'Distractions' as OnBoardingList},
+    {txt: 'Feeling abnormal' as OnBoardingList},
+    {txt: 'Frustration' as OnBoardingList},
   ],
   rf,
   // rf: (size: number, multiplier = 2) => {

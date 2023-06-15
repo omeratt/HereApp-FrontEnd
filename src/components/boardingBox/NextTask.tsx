@@ -78,14 +78,18 @@ const NextTask: React.FC<NextTaskProps> = ({
           />
         )}
       </View>
-      <View style={{marginTop: height * 0.1}}>
-        <Text style={[styles.font, styles.title]}>
-          {nextTask[0]?.name?.trim()}
-        </Text>
-        <Text numberOfLines={3} style={styles.font}>
-          {nextTask[0]?.details?.trim()}
-        </Text>
-      </View>
+      {nextTask[0]?._id ? (
+        <View style={{marginTop: height * 0.1}}>
+          <Text style={[styles.font, styles.title]}>
+            {nextTask[0]?.name?.trim()}
+          </Text>
+          <Text numberOfLines={3} style={styles.font}>
+            {nextTask[0]?.details?.trim()}
+          </Text>
+        </View>
+      ) : (
+        <Text style={styles.noTasks}>No tasks</Text>
+      )}
       <View style={styles.footerContainer}>
         <View style={styles.footer}>
           <View style={[styles.textFooter, {width: `${(49 / width) * 100}%`}]}>
@@ -113,6 +117,15 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 7,
     paddingHorizontal: 17,
+  },
+  noTasks: {
+    borderWidth: 0,
+    fontSize: constants.rf(15),
+    color: constants.colors.UNDER_LINE,
+    // alignItems: 'center',
+    flex: 1,
+    textAlignVertical: 'bottom',
+    fontFamily: constants.Fonts.text,
   },
   header: {
     flexDirection: 'row',

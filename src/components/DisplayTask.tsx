@@ -178,6 +178,10 @@ const DisplayTask = ({
     );
   };
   const EmptyList = useCallback(() => {
+    useEffect(() => {
+      sharedX.value = sharedX.value < 0 ? TASK_WIDTH * 2 : -TASK_WIDTH * 2;
+      sharedX.value = withSpring(0, springConfig);
+    }, []);
     return (
       <View
         style={[
@@ -361,15 +365,16 @@ const DisplayTask = ({
       style={{
         justifyContent: 'flex-start',
         alignItems: 'center',
-        height: TASK_CONTAINER_HEIGHT,
+        height: contentH - 38,
+        // backgroundColor: 'red',
       }}>
-      <View
-        style={{
-          width: '100%',
-          height: contentH,
-          // backgroundColor: 'red',
-        }}>
-        <GestureDetector gesture={gestureX}>
+      <GestureDetector gesture={gestureX}>
+        <View
+          style={{
+            width: '100%',
+            height: contentH - 38,
+            // backgroundColor: 'red',
+          }}>
           <Animated.FlatList
             fadingEdgeLength={isRenderTaskFromAllTasks ? 350 : 50}
             style={{transform: [{translateX: sharedX}]}}
@@ -383,27 +388,27 @@ const DisplayTask = ({
                 : TASK_CONTAINER_HEIGHT * 0.07,
             }}
           />
-        </GestureDetector>
-        {!isRenderTaskFromAllTasks && (
-          <View
-            style={{
-              // alignItems: 'center',
-              // justifyContent: 'flex-end',
-              alignSelf: 'center',
-              // position: 'absolute',
-              bottom: 0,
-              // flex: 1,
-              height: TASK_CONTAINER_HEIGHT - contentH,
-              // backgroundColor: 'red',
-            }}>
-            {data?.length > 2 && <SVG.ArrowDown />}
-          </View>
-        )}
-        <DeleteModal
-          _id={deleteProps.id as string}
-          name={deleteProps.name as string}
-        />
-      </View>
+          {!isRenderTaskFromAllTasks && (
+            <View
+              style={{
+                // alignItems: 'center',
+                // justifyContent: 'flex-end',
+                alignSelf: 'center',
+                // position: 'absolute',
+                bottom: 0,
+                // flex: 1,
+                // height: TASK_CONTAINER_HEIGHT - contentH,
+                backgroundColor: 'red',
+              }}>
+              {data?.length > 2 && <SVG.ArrowDown />}
+            </View>
+          )}
+          <DeleteModal
+            _id={deleteProps.id as string}
+            name={deleteProps.name as string}
+          />
+        </View>
+      </GestureDetector>
     </View>
   );
 };

@@ -138,7 +138,7 @@ export const userApi = apiSlice.injectEndpoints({
         url: 'logout',
         credentials: 'include',
         method: 'post',
-        Headers: {'x-fcmtoken': store.getState().reducer.user.fcmToken},
+        headers: {'x-fcmtoken': store.getState().reducer.user.fcmToken},
       }),
       transformResponse: async (response: any, meta, arg) => {
         store?.dispatch(logout());

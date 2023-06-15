@@ -351,28 +351,30 @@ const DisplayTask = ({
       const item = {...props.item, updateTask};
       return <RenderItem {...props} item={item} />;
     },
-    [selected, isSelectOn, data],
+    [selected, isSelectOn, data, TASK_CONTAINER_HEIGHT],
   );
   const keyExtractor: (item: RenderItemProps, index: number) => string =
     useCallback((item: RenderItemProps) => item._id!, []);
   const contentH = useMemo(() => {
     return isRenderTaskFromAllTasks
       ? TASK_CONTAINER_HEIGHT
-      : TASK_CONTAINER_HEIGHT - 0.185 * TASK_CONTAINER_HEIGHT;
+      : TASK_CONTAINER_HEIGHT;
+    // : TASK_CONTAINER_HEIGHT - 0.185 * TASK_CONTAINER_HEIGHT;
   }, [isRenderTaskFromAllTasks, TASK_CONTAINER_HEIGHT]);
   return (
     <View
       style={{
         justifyContent: 'flex-start',
         alignItems: 'center',
-        height: contentH - 38,
-        // backgroundColor: 'red',
+        // height: contentH - 38,
+        flex: 1,
+        backgroundColor: 'cyan',
       }}>
       <GestureDetector gesture={gestureX}>
         <View
           style={{
             width: '100%',
-            height: contentH - 38,
+            // height: contentH - 38,
             // backgroundColor: 'red',
           }}>
           <Animated.FlatList
@@ -384,7 +386,7 @@ const DisplayTask = ({
             keyExtractor={keyExtractor}
             contentContainerStyle={{
               paddingBottom: !isRenderTaskFromAllTasks
-                ? TASK_CONTAINER_HEIGHT * 0.005
+                ? TASK_CONTAINER_HEIGHT * 0.05
                 : TASK_CONTAINER_HEIGHT * 0.07,
             }}
           />
@@ -394,11 +396,11 @@ const DisplayTask = ({
                 // alignItems: 'center',
                 // justifyContent: 'flex-end',
                 alignSelf: 'center',
-                // position: 'absolute',
-                bottom: 0,
+                position: 'absolute',
+                bottom: '0%',
                 // flex: 1,
                 // height: TASK_CONTAINER_HEIGHT - contentH,
-                backgroundColor: 'red',
+                // backgroundColor: 'red',
               }}>
               {data?.length > 2 && <SVG.ArrowDown />}
             </View>

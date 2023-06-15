@@ -99,6 +99,7 @@ const Home = () => {
   const [touchSearch, setTouchSearch] = useState<boolean>(false);
   const [touchBox, setTouchBox] = useState<boolean>(false);
   const [touchMenu, setTouchMenu] = useState<boolean>(false);
+  const [dada, setDada] = useState<number>(210);
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const [editTaskDetails, setEditTaskDetails] = useState<TaskType | undefined>(
@@ -370,9 +371,16 @@ const Home = () => {
             </View>
             <View
               onLayout={e => {
-                console.log(e.nativeEvent.layout.height / constants.HEIGHT);
+                const {height} = e.nativeEvent.layout;
+                // console.log(e.nativeEvent.layout.height / constants.HEIGHT);
+                console.log({height: height});
+                setDada(height);
               }}
-              style={{flex: 1, backgroundColor: 'blue'}}>
+              style={{
+                height: '95%',
+                // backgroundColor: 'blue',
+                overflow: 'visible',
+              }}>
               <DisplayTask
                 data={tasks}
                 isTaskLoading={tasksLoading}
@@ -387,15 +395,10 @@ const Home = () => {
                 task={editTaskDetails}
                 setTask={setEditTaskDetails}
                 updateTask={updateTask}
-                TASK_CONTAINER_HEIGHT={TASK_CONTAINER_HEIGHT}
+                TASK_CONTAINER_HEIGHT={dada}
+                // TASK_CONTAINER_HEIGHT={dada}
               />
             </View>
-
-            {/* {tasks?.length > 0 ? (
-              <DisplayTask data={tasks} isTaskLoading={isTaskLoading} />
-            ) : (
-              <React.Fragment />
-            )} */}
           </View>
         </View>
         <View style={styles.myListContainer}>
@@ -636,7 +639,7 @@ const styles = StyleSheet.create({
   taskListColumnContainer: {
     // height: `${100 - 22.7 - 20}%`,
     height: TASK_CONTAINER_HEIGHT, //container padding
-    overflow: 'hidden',
+    // overflow: 'hidden',
     // backgroundColor: 'cyan',
     // borderColor: 'brown',
     // borderWidth: 1,

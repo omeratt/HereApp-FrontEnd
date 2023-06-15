@@ -59,13 +59,6 @@ interface props {
   isSelectOn?: boolean;
   updateTask?: (taskId: string, done: boolean) => Promise<void>;
 }
-// const TASK_CONTAINER_HEIGHT =
-//   constants.HEIGHT * 0.64 * 0.84 - //topView till lists
-//   constants.HEIGHT * 0.64 * 0.84 * 0.2 - //date header
-//   constants.HEIGHT * 0.64 * 0.84 * 0.2 - //dates list
-//   8.7 - //triangle
-//   constants.WIDTH * 0.025;
-// const height = TASK_CONTAINER_HEIGHT;
 
 const DisplayTask = ({
   data,
@@ -182,15 +175,19 @@ const DisplayTask = ({
       sharedX.value = sharedX.value < 0 ? TASK_WIDTH * 2 : -TASK_WIDTH * 2;
       sharedX.value = withSpring(0, springConfig);
     }, []);
+    useEffect(() => {
+      sharedX.value = sharedX.value < 0 ? TASK_WIDTH * 2 : -TASK_WIDTH * 2;
+      sharedX.value = withSpring(0, springConfig);
+    }, []);
     return (
       <View
         style={[
-          // styles.taskListContainer,
           {
-            height: TASK_CONTAINER_HEIGHT * 0.63,
-            // backgroundColor: 'red',
+            height: TASK_CONTAINER_HEIGHT - TASK_CONTAINER_HEIGHT * 0.17,
+            // flex: 1,
             justifyContent: 'center',
             alignItems: 'center',
+            // backgroundColor: 'red',
           },
         ]}>
         {isTaskLoading ? (
@@ -222,7 +219,7 @@ const DisplayTask = ({
           // {...(sharedX.value === 0 && {exiting: SlideOutRight})}
           style={[
             styles.taskListContainer,
-            {height: TASK_CONTAINER_HEIGHT * 0.32},
+            {height: TASK_CONTAINER_HEIGHT * (93 / 215)},
             {...(!index && {marginTop: 0})},
           ]}>
           <View style={styles.taskListContent}>
@@ -250,33 +247,6 @@ const DisplayTask = ({
                 colorFill={constants.colors.GREEN}
               />
             </View>
-            {/* <CheckBox
-              checked={item.done}
-              iconRight
-              fontFamily={constants.Fonts.text}
-              containerStyle={{
-                position: 'absolute',
-                right: 2,
-                backgroundColor: 'transparent',
-              }}
-              checkedIcon={
-                <CircleCheckBox
-                  size={25}
-                  fill={constants.colors.GREEN}
-                  borderColor={constants.colors.UNDER_LINE}
-                />
-              }
-              uncheckedIcon={
-                <CircleCheckBox
-                  size={25}
-                  fill={constants.colors.GREEN}
-                  borderColor={constants.colors.UNDER_LINE}
-                />
-              }
-              textStyle={styles.taskTxt}
-              titleProps={{}}
-              uncheckedColor="#F00"
-            /> */}
           </View>
         </Animated.View>
       );
@@ -355,11 +325,7 @@ const DisplayTask = ({
   );
   const keyExtractor: (item: RenderItemProps, index: number) => string =
     useCallback((item: RenderItemProps) => item._id!, []);
-  const contentH = useMemo(() => {
-    return isRenderTaskFromAllTasks
-      ? TASK_CONTAINER_HEIGHT
-      : TASK_CONTAINER_HEIGHT - 0.185 * TASK_CONTAINER_HEIGHT;
-  }, [isRenderTaskFromAllTasks, TASK_CONTAINER_HEIGHT]);
+
   return (
     <View
       style={{
@@ -367,13 +333,12 @@ const DisplayTask = ({
         alignItems: 'center',
         height: TASK_CONTAINER_HEIGHT,
       }}>
-      <View
-        style={{
-          width: '100%',
-          height: contentH,
-          // backgroundColor: 'red',
-        }}>
-        <GestureDetector gesture={gestureX}>
+      <GestureDetector gesture={gestureX}>
+        <View
+          style={{
+            width: '100%',
+            height: TASK_CONTAINER_HEIGHT,
+          }}>
           <Animated.FlatList
             fadingEdgeLength={isRenderTaskFromAllTasks ? 350 : 50}
             style={{transform: [{translateX: sharedX}]}}
@@ -382,32 +347,24 @@ const DisplayTask = ({
             renderItem={renderItem}
             keyExtractor={keyExtractor}
             contentContainerStyle={{
-              paddingBottom: !isRenderTaskFromAllTasks
-                ? TASK_CONTAINER_HEIGHT * 0.005
-                : TASK_CONTAINER_HEIGHT * 0.07,
+              paddingBottom: TASK_CONTAINER_HEIGHT * 0.07,
             }}
           />
-        </GestureDetector>
-        {!isRenderTaskFromAllTasks && (
-          <View
-            style={{
-              // alignItems: 'center',
-              // justifyContent: 'flex-end',
-              alignSelf: 'center',
-              // position: 'absolute',
-              bottom: 0,
-              // flex: 1,
-              height: TASK_CONTAINER_HEIGHT - contentH,
-              // backgroundColor: 'red',
-            }}>
-            {data?.length > 2 && <SVG.ArrowDown />}
-          </View>
-        )}
-        <DeleteModal
-          _id={deleteProps.id as string}
-          name={deleteProps.name as string}
-        />
-      </View>
+          {!isRenderTaskFromAllTasks && (
+            <View
+              style={{
+                alignSelf: 'center',
+                bottom: 3,
+              }}>
+              {data?.length > 2 && <SVG.ArrowDown />}
+            </View>
+          )}
+          <DeleteModal
+            _id={deleteProps.id as string}
+            name={deleteProps.name as string}
+          />
+        </View>
+      </GestureDetector>
     </View>
   );
 };

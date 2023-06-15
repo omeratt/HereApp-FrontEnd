@@ -3,7 +3,6 @@ import {
   Pressable,
   StyleSheet,
   Text,
-  TouchableHighlight,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -20,20 +19,11 @@ import {
 import DisplayTask from '../components/DisplayTask';
 import {useAppDispatch} from '../app/hooks';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
-import {
-  CommonActions,
-  DrawerActions,
-  useNavigation,
-} from '@react-navigation/native';
-import {
-  DateObject,
-  getDatesForYear,
-  getRealDate,
-} from '../components/WeeklyCalender';
+import {CommonActions, useNavigation} from '@react-navigation/native';
+import {DateObject} from '../components/WeeklyCalender';
 import Line from '../components/Line';
 import {FlashList} from '@shopify/flash-list';
 import DatesFlatList from '../components/DatesFlatList';
-import moment from 'moment';
 import {
   useGetListsQuery,
   useGetPrioritizedListsQuery,
@@ -45,14 +35,10 @@ import NextTask from '../components/boardingBox/NextTask';
 import {TaskType, setCategoriesList} from '../app/Reducers/User/userSlice';
 import json from '../../AllDates.json';
 import PizzaBox from '../components/boardingBox/PizzaBox';
-import FloatHERE from '../components/FloatHERE';
-import IamNotStupid from './IamNotStupid';
 import NotStupid from '../components/boardingBox/NotStupid';
 import {useGetMessagesQuery} from '../app/api/messageApi';
 import LastMessage from '../components/boardingBox/LastMessage';
-import ToggleButton from '../components/playGround/ToggleButton';
 import ToggleBtn from '../components/boardingBox/ToggleBtn';
-import TimeManage from '../components/boardingBox/TimeManage';
 import {useGetWidgetsQuery} from '../app/api/userApi';
 import {setFocus} from '../app/Reducers/User/screensSlice';
 
@@ -70,6 +56,7 @@ export const TASK_CONTAINER_HEIGHT =
   8.7 - //triangle
   constants.WIDTH * 0.025 -
   3; //container padding
+// export const TASK_CONTAINER_HEIGHT = constants.HEIGHT * 0.2716763073627341;
 
 export const ListCategoryWidth = constants.WIDTH * 0.2925925996568468;
 const Home = () => {
@@ -98,6 +85,8 @@ const Home = () => {
   const [touchSearch, setTouchSearch] = useState<boolean>(false);
   const [touchBox, setTouchBox] = useState<boolean>(false);
   const [touchMenu, setTouchMenu] = useState<boolean>(false);
+  const [displayTaskContainerHeight, setDisplayTaskContainerHeight] =
+    useState<number>(0);
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const [editTaskDetails, setEditTaskDetails] = useState<TaskType | undefined>(
@@ -358,8 +347,8 @@ const Home = () => {
               style={{elevation: 2.5}}
             />
           </View>
-          <View style={styles.taskListColumnContainer}>
-            <View style={styles.taskHeader}>
+          <View style={[styles.taskListColumnContainer]}>
+            <View style={[styles.taskHeader]}>
               <TouchableOpacity
                 onPress={openTaskModal}
                 style={[styles.PlusIcon, {zIndex: 1}]}>
@@ -367,28 +356,33 @@ const Home = () => {
               </TouchableOpacity>
               <Text style={styles.taskHeaderTitle}>Tasks</Text>
             </View>
-            <DisplayTask
-              data={tasks}
-              isTaskLoading={tasksLoading}
-              sharedX={sharedX}
-              flashListRef={flashListRef}
-              sharedDatesIndex={sharedDatesIndex}
-              datePress={datePress}
-              //@ts-ignore
-              flatListData={flatListData}
-              snapToOffsets={snapToOffsets}
-              openTaskModal={openTaskModal}
-              task={editTaskDetails}
-              setTask={setEditTaskDetails}
-              updateTask={updateTask}
-              TASK_CONTAINER_HEIGHT={TASK_CONTAINER_HEIGHT * 1.18}
-            />
-
-            {/* {tasks?.length > 0 ? (
-              <DisplayTask data={tasks} isTaskLoading={isTaskLoading} />
-            ) : (
-              <React.Fragment />
-            )} */}
+            <View
+              onLayout={e => {
+                const {height} = e.nativeEvent.layout;
+                setDisplayTaskContainerHeight(height);
+              }}
+              style={{
+                flex: 1,
+              }}>
+              {displayTaskContainerHeight > 0 && (
+                <DisplayTask
+                  data={tasks}
+                  isTaskLoading={tasksLoading}
+                  sharedX={sharedX}
+                  flashListRef={flashListRef}
+                  sharedDatesIndex={sharedDatesIndex}
+                  datePress={datePress}
+                  //@ts-ignore
+                  flatListData={flatListData}
+                  snapToOffsets={snapToOffsets}
+                  openTaskModal={openTaskModal}
+                  task={editTaskDetails}
+                  setTask={setEditTaskDetails}
+                  updateTask={updateTask}
+                  TASK_CONTAINER_HEIGHT={displayTaskContainerHeight}
+                />
+              )}
+            </View>
           </View>
         </View>
         <View style={styles.myListContainer}>
@@ -628,7 +622,8 @@ const styles = StyleSheet.create({
   },
   taskListColumnContainer: {
     // height: `${100 - 22.7 - 20}%`,
-    height: TASK_CONTAINER_HEIGHT, //container padding
+    // height: TASK_CONTAINER_HEIGHT, //container padding
+    flex: 1,
     overflow: 'hidden',
     // backgroundColor: 'cyan',
     // borderColor: 'brown',
@@ -664,7 +659,7 @@ const styles = StyleSheet.create({
     // fontWeight: '600',
   },
   myListContainer: {
-    // height: '16%',
+    height: '16%',
     paddingVertical: '1.5%',
     // justifyContent: 'flex-end',
     // backgroundColor: 'blue',

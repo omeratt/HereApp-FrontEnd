@@ -88,6 +88,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     width: '70%',
     color: constants.colors.BGC,
+    fontFamily: constants.Fonts.text,
   },
   eyeIcon: {
     position: 'absolute',

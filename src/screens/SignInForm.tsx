@@ -165,9 +165,15 @@ export default function SignInForm({
             disabled={GLoading}
             onPress={googleSignIn}>
             {GLoading ? (
-              <ActivityIndicator color={constants.colors.BGC} />
+              <ActivityIndicator
+                color={constants.colors.BGC}
+                size={constants.WIDTH * 0.09}
+              />
             ) : (
-              <SVG.Google />
+              <SVG.Google
+                width={constants.WIDTH * 0.09}
+                height={constants.WIDTH * 0.09}
+              />
             )}
           </TouchableOpacity>
         </>

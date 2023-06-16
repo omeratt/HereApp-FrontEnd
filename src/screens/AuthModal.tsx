@@ -123,7 +123,11 @@ const AuthModal: React.FC = () => {
           <Text
             style={[
               styles.text,
-              {fontSize: 12, color: constants.colors.UNDER_LINE},
+              {
+                fontSize: 12,
+                color: constants.colors.UNDER_LINE,
+                paddingBottom: '3%',
+              },
             ]}
             allowFontScaling={false}
             adjustsFontSizeToFit
@@ -161,7 +165,7 @@ export default React.memo(AuthModal);
 const styles = StyleSheet.create({
   container: {
     width: constants.WIDTH,
-    paddingBottom: '2%',
+    // paddingBottom: '3%',
   },
   flatList: {
     width: constants.WIDTH,
@@ -174,7 +178,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingBottom: '10%',
     alignItems: 'flex-end',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     width: '70%',
     flexDirection: 'row-reverse',
   },

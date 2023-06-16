@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import TextInput, {InputHandle} from '../components/TextInput';
 import constants from '../assets/constants';
 import * as Yup from 'yup';
@@ -55,25 +55,25 @@ export default function SignInForm({
   const [GoogleLogIn, {isLoading: GLoading, isError: GIsError}] =
     useLoginWithGoogleMutation();
 
+  const [googlePressLoading, setGooglePressLoading] = useState(false);
   const googleSignIn = useCallback(async () => {
     try {
-      try {
-        await GoogleSignin.hasPlayServices({
-          showPlayServicesUpdateDialog: true,
-        });
-        // Get the users ID token
-        const {idToken} = await GoogleSignin.signIn();
+      setGooglePressLoading(true);
+      await GoogleSignin.hasPlayServices({
+        showPlayServicesUpdateDialog: true,
+      });
+      // Get the users ID token
+      const {idToken} = await GoogleSignin.signIn();
 
-        // Create a Google credential with the token
-        const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+      // Create a Google credential with the token
+      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
 
-        await auth().signInWithCredential(googleCredential);
-        await GoogleLogIn(undefined);
-      } catch (e: any) {
-        console.log('an error in google sign in ', e.message);
-      }
+      await auth().signInWithCredential(googleCredential);
+      await GoogleLogIn(undefined);
+    } catch (e: any) {
+      console.log('an error in google sign in ', e.message);
     } finally {
-      // dispatch(loadingModal(false));
+      setGooglePressLoading(false);
     }
   }, []);
   const submit = async (values: typeof userInfo) => {
@@ -164,7 +164,7 @@ export default function SignInForm({
             style={styles.google}
             disabled={GLoading}
             onPress={googleSignIn}>
-            {GLoading ? (
+            {googlePressLoading ? (
               <ActivityIndicator
                 color={constants.colors.BGC}
                 size={constants.WIDTH * 0.09}

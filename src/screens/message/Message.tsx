@@ -141,7 +141,10 @@ const Message: React.FC<IMessagesProps> = () => {
   });
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior="padding">
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior="padding"
+      keyboardVerticalOffset={-30}>
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <Animated.ScrollView
           entering={FadeIn}

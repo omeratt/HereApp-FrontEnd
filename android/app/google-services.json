@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "372513103675-3t7mq4uuqipqtg2akdd3eau7mqpg39p0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.fronend",
+            "certificate_hash": "01bab3c12ba488e754bf08acd8daea7b3a591370"
+          }
+        },
+        {
           "client_id": "372513103675-jkglti6i2t966blckj133d8jmf2j4pts.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

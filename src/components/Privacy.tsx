@@ -37,7 +37,7 @@ const Privacy = () => {
         />
       </TouchableOpacity>
       <Pdf
-        source={pdf}
+        source={{uri: 'bundle-assets://privacy.pdf'}}
         trustAllCerts={false}
         onError={error => {
           console.log(error);

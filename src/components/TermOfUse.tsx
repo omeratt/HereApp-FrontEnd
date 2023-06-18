@@ -37,7 +37,7 @@ const TermOfUse = () => {
         />
       </TouchableOpacity>
       <Pdf
-        source={pdf}
+        source={{uri: 'bundle-assets://term_of_use.pdf'}}
         trustAllCerts={false}
         onError={error => {
           console.log(error);

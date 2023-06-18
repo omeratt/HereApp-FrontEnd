@@ -69,7 +69,7 @@ export default function SignInForm({
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
 
       await auth().signInWithCredential(googleCredential);
-      await GoogleLogIn(undefined);
+      GoogleLogIn(undefined);
     } catch (e: any) {
       console.log('an error in google sign in ', e.message);
     } finally {

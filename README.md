@@ -41,7 +41,7 @@
 ## Features
 
 - **Task Scheduling:** Easily create and schedule tasks, ensuring you stay organized and on track.
-- **Category Management:** Organize your tasks into different categories for better management and prioritization.
+- **Category Management:** Organize your lists into different categories for better management and prioritization.
 - **Playground Feature:** Enjoy interactive elements like vibration, rotating cubes, and a toggle button to help simulate focus and reduce hyperactivity.
 - **List Creation and Organization:** Create and organize lists based on your needs, whether it's work tasks, personal errands, or daily routines.
 - **Push Notifications:** Set reminders and receive push notifications to ensure you never miss an important task.

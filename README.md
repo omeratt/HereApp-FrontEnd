@@ -1,23 +1,23 @@
 <h1 align="center">
-  <img src="https://i.ibb.co/0JrKMrp/HERE.png" alt="HERE Logo"><br>
-  HERE - Task Management App for ADHD
+ Task Management App for ADHD
 </h1>
-
 <p align="center">
+<img src="https://i.ibb.co/fdqGWxk/Group-253.png" alt="HERE Logo"><br>
   <em>Stay organized and on top of your daily tasks</em>
 </p>
 
+## Preview
 <div align="center">
-  <video controls width="400">
-    <source src="https://www.example.com/here-app-intro-video.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-  </video>
+<a href="https://www.youtube.com/watch?v=7yljqBFDWtA" target="_blank" align="center"> 
+  
+  https://github.com/omeratt/HereApp-FrontEnd/assets/73067552/238fa0b1-1607-407f-a142-3a2ceeb1b40e
+  
+</a>
 </div>
 
-## Preview
 
 <div align="center">
-  <img src="https://i.ibb.co/DGy0D2D/2.png" alt="Home Page, Playground, and Customize Widget" width="600" />
+  <img src="https://i.ibb.co/nc3FSLD/6.png" alt="Home Page, Playground, and Customize Widget" width="600" />
   <p><em>Home Page, Playground, and Customize Widget</em></p>
 </div>
 
@@ -35,7 +35,7 @@
 - This screen serves as a "Message to Myself" feature, where you can have a chat-like interface to communicate with yourself. It provides a space for self-reflection, reminders, and notes.
 
 <div align="center">
-  <img src="https://i.ibb.co/7nChqYb/4.png" alt="Screen 3" width="400" />
+  <img src="https://i.ibb.co/7nChqYb/4.png" alt="Screen 3" width="600" />
 </div>
 
 ## Features
@@ -59,4 +59,4 @@ To get started with HERE, follow these steps:
 
 ## Feedback and Support
 
-We value your feedback and are continuously working to improve the app. If you have any suggestions, encounter any issues, or need support, please reach out to us at [support@example.com](mailto:support@example.com).
+We value your feedback and are continuously working to improve the app. If you have any suggestions, encounter any issues, or need support, please reach out to us at [support@example.com](mailto

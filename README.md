@@ -51,8 +51,7 @@
 ## Installation
 
 To get started with HERE, follow these steps:
-
-1. Download the app from the [App Store](https://example.com) or [Google Play Store](https://example.com).
+1. Download the app from the [Google Play Store](https://play.google.com/store/apps/details?id=com.fronend).
 2. Install the app on your mobile device.
 3. Launch the app and create your account.
 4. Explore the features and start organizing your tasks with ease.
